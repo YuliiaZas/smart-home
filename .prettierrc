@@ -4,5 +4,6 @@
   "trailingComma": "es5",
   "printWidth": 120,
   "arrowParens": "always",
-  "useTabs": false
+  "useTabs": false,
+  "overrides": [{ "files": "*.html", "options": { "parser": "angular" } }]
 }

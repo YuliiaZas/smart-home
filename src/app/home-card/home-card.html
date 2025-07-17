@@ -1,0 +1,21 @@
+<app-card [data]="data()">
+  <ng-container cardContent>
+    @for (item of data().items; track $index) {
+      @if (item.type === 'sensor') {
+        <app-sensor [data]="item" [iconPosition]="getIconPosition()"></app-sensor>
+      } @else if (item.type === 'device') {
+        <app-device
+          [data]="item"
+          [iconPosition]="getIconPosition()"
+          [hideStateToggle]="isSingleDevice()"
+          (changeState)="changeDeviceState(item)"
+        ></app-device>
+      }
+    }
+  </ng-container>
+  @if (isSingleDevice()) {
+    <ng-container cardFooter>
+      <span class="home-card-footer">{{ singleDeviceState() | appStateValue }}</span>
+    </ng-container>
+  }
+</app-card>

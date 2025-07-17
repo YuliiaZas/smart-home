@@ -1,0 +1,7 @@
+<div appItemWithIcon [iconPosition]="iconPosition()">
+  <mat-icon aria-hidden="true" [fontIcon]="data().icon"></mat-icon>
+  <span class="label">{{data().label}}</span>
+</div>
+<div class="value">
+  <span>{{data().value | appUnits}}</span>
+</div>

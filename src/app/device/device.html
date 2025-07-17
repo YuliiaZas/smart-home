@@ -1,0 +1,9 @@
+<div appItemWithIcon [iconPosition]="iconPosition()" [activeIcon]="activeIcon()">
+  <mat-icon aria-hidden="true" [fontIcon]="data().icon" (click)="handleIconClick()"></mat-icon>
+  <span class="label">{{ data().label }}</span>
+</div>
+@if (!hideStateToggle()) {
+  <div class="value">
+    <mat-slide-toggle [checked]="data().state" (change)="emitChangeState()"></mat-slide-toggle>
+  </div>
+}
