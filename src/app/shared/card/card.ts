@@ -1,4 +1,4 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import {
   MatCard,
   MatCardContent,
@@ -8,8 +8,6 @@ import {
   MatCardFooter,
   MatCardActions,
 } from '@angular/material/card';
-import { CardInfo } from './card-info';
-import { CardLayout } from '../models/card-layout.enum';
 
 @Component({
   selector: 'app-card',
@@ -18,7 +16,7 @@ import { CardLayout } from '../models/card-layout.enum';
   styleUrl: './card.scss',
 })
 export class Card {
-  data = input.required<CardInfo>();
-
-  isVertical = computed(() => this.data().layout === CardLayout.VERTICAL);
+  title = input<string>('');
+  hideTitle = input(false);
+  isContentVertical = input(false);
 }

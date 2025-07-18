@@ -1,4 +1,9 @@
-<app-card [data]="data()">
+<app-card [title]="data().title" [hideTitle]="isSingleDevice()" [isContentVertical]="isContentVertical()">
+  <ng-container cardAction>
+    @if (showAllDevicesState()) {
+      <mat-slide-toggle [checked]="allDevicesState()" (change)="changeAllDevicesState()"></mat-slide-toggle>
+    }
+  </ng-container>
   <ng-container cardContent>
     @for (item of data().items; track $index) {
       @if (item.type === 'sensor') {
