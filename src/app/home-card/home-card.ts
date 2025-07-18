@@ -1,5 +1,6 @@
 import { Component, computed, model, output } from '@angular/core';
-import { DeviceInfo, HomeCardInfo, HomeItemInfo } from '../shared/models/home-card-info';
+import { DeviceInfo, HomeItemInfo } from '../shared/models/home-item-info';
+import { HomeCardInfo } from '../shared/models/home-card-info';
 import * as mockData from '../shared/constants/mock-data.json';
 import { Card } from '../shared/card/card';
 import { Sensor } from '../sensor/sensor';
@@ -19,8 +20,20 @@ export class HomeCard {
   updateCardData = output<HomeCardInfo>();
 
   private devices = computed(() => this.data().items.filter((item) => item.type === 'device') as DeviceInfo[]);
-  getIconPosition = computed(() => (this.data().layout === CardLayout.HORIZONTAL ? 'left' : 'right'));
   isContentVertical = computed(() => this.data().layout === CardLayout.VERTICAL);
+  getIconPosition = computed(() => {
+    switch (this.data().layout) {
+      case CardLayout.VERTICAL: {
+        return 'bottom';
+      }
+      case CardLayout.SINGLE: {
+        return 'right';
+      }
+      default: {
+        return 'left';
+      }
+    }
+  });
   isSingleDevice = computed(() => this.data().layout === CardLayout.SINGLE && this.devices().length === 1);
   singleDeviceState = computed<boolean | undefined>(() => this.devices()[0].state);
   showAllDevicesState = computed(() => this.devices().length > 1);

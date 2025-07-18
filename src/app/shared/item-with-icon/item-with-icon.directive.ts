@@ -1,24 +1,42 @@
-import { Directive, HostBinding, input } from '@angular/core';
+import { Directive, input, Renderer2, OnInit, ElementRef, inject, effect } from '@angular/core';
+import { IconPositionInfo } from './icon-position-info';
 
 @Directive({
   selector: '[appItemWithIcon]',
+  host: {
+    class: 'item-with-icon',
+  },
 })
-export class ItemWithIconDirective {
-  iconPosition = input<'left' | 'right'>('left');
+export class ItemWithIconDirective implements OnInit {
+  iconPosition = input<IconPositionInfo>('left');
   activeIcon = input(false);
 
-  @HostBinding('class.item-icon-left')
-  get isIconLeft() {
-    return this.iconPosition() === 'left';
+  private host = inject(ElementRef);
+  private renderer = inject(Renderer2);
+  private iconElement?: HTMLElement;
+
+  constructor() {
+    effect(() => this.setIconState());
   }
 
-  @HostBinding('class.item-icon-right')
-  get isIconRight() {
-    return this.iconPosition() === 'right';
+  ngOnInit() {
+    this.iconElement = this.host.nativeElement.querySelector('mat-icon');
+    this.addIconPositionClass();
   }
 
-  @HostBinding('class.item-icon-active')
-  get isIconActive() {
-    return this.activeIcon();
+  addIconPositionClass() {
+    if (this.iconElement) {
+      this.renderer.addClass(this.iconElement, `item-icon-${this.iconPosition()}`);
+    }
+  }
+
+  setIconState() {
+    if (this.iconElement) {
+      if (this.activeIcon()) {
+        this.renderer.addClass(this.iconElement, 'item-icon-active');
+      } else {
+        this.renderer.removeClass(this.iconElement, 'item-icon-active');
+      }
+    }
   }
 }

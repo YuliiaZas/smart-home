@@ -2,7 +2,8 @@ import { Component, computed, input, output } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { ItemWithIconDirective } from '../shared/item-with-icon/item-with-icon.directive';
-import { DeviceInfo } from '../shared/models/home-card-info';
+import { DeviceInfo } from '../shared/models/home-item-info';
+import { IconPositionInfo } from '../shared/item-with-icon/icon-position-info';
 
 @Component({
   selector: 'app-device',
@@ -12,7 +13,7 @@ import { DeviceInfo } from '../shared/models/home-card-info';
 })
 export class Device {
   data = input.required<DeviceInfo>();
-  iconPosition = input<'left' | 'right'>('left');
+  iconPosition = input<IconPositionInfo>('left');
   hideStateToggle = input(false);
 
   changeState = output<string>();
