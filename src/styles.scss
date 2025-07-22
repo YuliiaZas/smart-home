@@ -4,6 +4,7 @@
 // Learn more about theming and how to use it for your application's
 // custom components at https://material.angular.dev/guide/theming
 @use '@angular/material' as mat;
+@use 'styles/material/material.scss';
 
 html {
   @include mat.theme(
@@ -20,7 +21,7 @@ html {
   // Default the application to a light color theme. This can be changed to
   // `dark` to enable the dark color theme, or to `light dark` to defer to the
   // user's system settings.
-  color-scheme: light;
+  color-scheme: dark;
 
   // Set a default background, font and text colors for the application using
   // Angular Material's system-level CSS variables. Learn more about these
@@ -64,3 +65,18 @@ body {
 .item-icon-active {
   color: rebeccapurple;
 }
+
+// :root {
+//   @include mat.slide-toggle-overrides(
+//     (
+//       unselected-handle-size: 24px,
+//       selected-handle-size: 24px,
+//       unselected-handle-horizontal-margin: 0px,
+//       unselected-pressed-handle-horizontal-margin: 0px,
+//       // selected-handle-horizontal-margin: 0px,
+//       // selected-pressed-handle-horizontal-margin: 0px,
+//       track-width: 48px,
+//       track-height: 16px,
+//     )
+//   );
+// }

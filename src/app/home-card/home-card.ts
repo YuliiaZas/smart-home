@@ -1,7 +1,6 @@
-import { Component, computed, model, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, model, output } from '@angular/core';
 import { DeviceInfo, HomeItemInfo } from '../shared/models/home-item-info';
 import { HomeCardInfo } from '../shared/models/home-card-info';
-import * as mockData from '../shared/constants/mock-data.json';
 import { Card } from '../shared/card/card';
 import { Sensor } from '../sensor/sensor';
 import { Device } from '../device/device';
@@ -14,9 +13,10 @@ import { MatSlideToggle } from '@angular/material/slide-toggle';
   imports: [MatSlideToggle, Card, Sensor, Device, StateValuePipe],
   templateUrl: './home-card.html',
   styleUrl: './home-card.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeCard {
-  data = model<HomeCardInfo>(mockData.tabs[0].cards[3] as HomeCardInfo);
+  data = model.required<HomeCardInfo>();
   updateCardData = output<HomeCardInfo>();
 
   private devices = computed(() => this.data().items.filter((item) => item.type === 'device') as DeviceInfo[]);

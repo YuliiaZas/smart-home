@@ -1,4 +1,4 @@
-import { Component, computed, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { ItemWithIconDirective } from '../shared/item-with-icon/item-with-icon.directive';
@@ -10,6 +10,7 @@ import { IconPositionInfo } from '../shared/item-with-icon/icon-position-info';
   imports: [MatIcon, MatSlideToggle, ItemWithIconDirective],
   templateUrl: './device.html',
   styleUrl: './device.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Device {
   data = input.required<DeviceInfo>();
