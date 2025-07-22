@@ -19,5 +19,4 @@ import {
 export class Card {
   title = input<string>('');
   hideTitle = input(false);
-  isContentVertical = input(false);
 }

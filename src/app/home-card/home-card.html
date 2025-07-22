@@ -1,4 +1,4 @@
-<app-card [title]="data().title" [hideTitle]="isSingleDevice()" [isContentVertical]="isContentVertical()">
+<app-card [title]="data().title" [hideTitle]="isSingleDevice()">
   <ng-container cardAction>
     @if (showAllDevicesState()) {
       <mat-slide-toggle
@@ -9,22 +9,25 @@
     }
   </ng-container>
   <ng-container cardContent>
-    @for (item of data().items; track $index) {
-      @if (item.type === 'sensor') {
-        <app-sensor [data]="item" [iconPosition]="getIconPosition()"></app-sensor>
-      } @else if (item.type === 'device') {
-        <app-device
-          [data]="item"
-          [iconPosition]="getIconPosition()"
-          [hideStateToggle]="isSingleDevice()"
-          (changeState)="changeDeviceState(item)"
-        ></app-device>
+    <div [class.card-content-vertical]="isContentVertical()">
+      @for (item of data().items; track $index) {
+        @if (item.type === 'sensor') {
+          <app-sensor class="card-row" [data]="item" [iconPosition]="getIconPosition()"></app-sensor>
+        } @else if (item.type === 'device') {
+          <app-device
+            class="card-row"
+            [data]="item"
+            [iconPosition]="getIconPosition()"
+            [hideStateToggle]="isSingleDevice()"
+            (changeState)="changeDeviceState(item)"
+          ></app-device>
+        }
       }
-    }
+    </div>
   </ng-container>
   @if (isSingleDevice()) {
     <ng-container cardFooter>
-      <span class="home-card-footer">{{ singleDeviceState() | appStateValue }}</span>
+      <span class="card-footer">{{ singleDeviceState() | appStateValue }}</span>
     </ng-container>
   }
 </app-card>

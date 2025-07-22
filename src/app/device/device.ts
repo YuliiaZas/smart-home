@@ -4,10 +4,11 @@ import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { ItemWithIconDirective } from '../shared/item-with-icon/item-with-icon.directive';
 import { DeviceInfo } from '../shared/models/home-item-info';
 import { IconPositionInfo } from '../shared/item-with-icon/icon-position-info';
+import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'app-device',
-  imports: [MatIcon, MatSlideToggle, ItemWithIconDirective],
+  imports: [NgClass, MatIcon, MatSlideToggle, ItemWithIconDirective],
   templateUrl: './device.html',
   styleUrl: './device.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -20,6 +21,8 @@ export class Device {
   changeState = output<string>();
 
   activeIcon = computed(() => !!this.data().state);
+
+  iconClass = computed(() => (this.hideStateToggle() ? 'w-100 cursor-pointer justify-content-between' : ''));
 
   handleIconClick() {
     if (this.hideStateToggle()) {

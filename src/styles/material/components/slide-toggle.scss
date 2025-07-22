@@ -3,14 +3,15 @@
 :root {
   @include mat.slide-toggle-overrides(
     (
-      unselected-handle-size: 24px,
-      selected-handle-size: 24px,
+      unselected-handle-size: 20px,
+      selected-handle-size: 20px,
+      pressed-handle-size: 20px,
       unselected-handle-horizontal-margin: 0px,
       unselected-pressed-handle-horizontal-margin: 0px,
-      // selected-handle-horizontal-margin: 0px,
-      // selected-pressed-handle-horizontal-margin: 0px,
-      track-width: 48px,
-      track-height: 16px,
+      selected-handle-horizontal-margin: 0 18px,
+      selected-pressed-handle-horizontal-margin: 0 18px,
+      track-width: 36px,
+      track-height: 12px,
     )
   );
 }

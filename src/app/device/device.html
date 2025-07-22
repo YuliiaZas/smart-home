@@ -1,4 +1,4 @@
-<div appItemWithIcon [iconPosition]="iconPosition()" [activeIcon]="activeIcon()">
+<div appItemWithIcon [iconPosition]="iconPosition()" [activeIcon]="activeIcon()" [ngClass]="iconClass()">
   <mat-icon aria-hidden="true" [fontIcon]="data().icon" (click)="handleIconClick()"></mat-icon>
   <span class="label">{{ data().label }}</span>
 </div>

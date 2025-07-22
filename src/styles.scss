@@ -5,6 +5,7 @@
 // custom components at https://material.angular.dev/guide/theming
 @use '@angular/material' as mat;
 @use 'styles/material/material.scss';
+@use 'styles/default/default.scss';
 
 html {
   @include mat.theme(
@@ -39,44 +40,3 @@ body {
   margin: 0;
   font-family: Roboto, 'Helvetica Neue', sans-serif;
 }
-
-.item-with-icon {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  &:has(.item-icon-bottom) {
-    flex-direction: column;
-  }
-}
-
-.item-icon-left {
-  order: -1;
-}
-
-.item-icon-right {
-  order: 1;
-}
-
-.item-icon-bottom {
-  order: 1;
-}
-
-.item-icon-active {
-  color: rebeccapurple;
-}
-
-// :root {
-//   @include mat.slide-toggle-overrides(
-//     (
-//       unselected-handle-size: 24px,
-//       selected-handle-size: 24px,
-//       unselected-handle-horizontal-margin: 0px,
-//       unselected-pressed-handle-horizontal-margin: 0px,
-//       // selected-handle-horizontal-margin: 0px,
-//       // selected-pressed-handle-horizontal-margin: 0px,
-//       track-width: 48px,
-//       track-height: 16px,
-//     )
-//   );
-// }

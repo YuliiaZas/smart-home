@@ -1,0 +1,23 @@
+.card {
+  padding: 1.5rem 1rem;
+}
+
+.card-header {
+  padding: 0 0 1.5rem;
+}
+
+.card-content {
+  &,
+  &:first-child {
+    padding: 0;
+  }
+}
+
+.card-footer:not(:empty) {
+  padding-top: 0.5rem;
+}
+
+.card-action {
+  min-height: auto;
+  padding: 0 0 0 1rem;
+}

@@ -1,18 +1,29 @@
-$gap: 16px;
+@use '/styles/breakpoints';
+
+$gap: 0.5rem;
 
 .card-list {
   display: flex;
   flex-wrap: wrap;
   gap: $gap;
+  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+
+  @media (max-width: breakpoints.$grid-breakpoint-md) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: breakpoints.$grid-breakpoint-sm) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .card-list-group {
-  flex: 1 1 30%;
+  min-width: 250px;
   display: flex;
   flex-direction: column;
   gap: $gap;
-  min-width: 200px;
-  max-width: 400px;
 }
 
 .card-box {
