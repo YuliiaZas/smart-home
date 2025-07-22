@@ -9,9 +9,12 @@ export class CardSortingService {
   emptyStorage: string[][] = [];
 
   getCardsSorting(dashboard: string, cards: string[]): string[][] {
-    const cardSorting = localStorage.getItem(dashboard);
-    if (cardSorting) {
-      return JSON.parse(cardSorting) as string[][];
+    const cardSortingFromStorage = localStorage.getItem(dashboard);
+    if (cardSortingFromStorage) {
+      const cardSorting = JSON.parse(cardSortingFromStorage) as string[][];
+      if (cardSorting.flat().sort().join(',') === cards.sort().join(',')) {
+        return cardSorting;
+      }
     }
     return this.getDefaultSorting(dashboard, cards);
   }
