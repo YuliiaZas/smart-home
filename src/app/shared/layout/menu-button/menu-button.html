@@ -1,0 +1,6 @@
+<button matButton (click)="toggleMenu.emit()" class="menu-button">
+  <mat-icon>menu</mat-icon>
+  @if (showLabel()) {
+    <span class="label">Smart Home UI</span>
+  }
+</button>
