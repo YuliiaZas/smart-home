@@ -9,7 +9,6 @@ import { IconPositionInfo } from '../shared/item-with-icon/icon-position-info';
   selector: 'app-sensor',
   imports: [MatIcon, ItemWithIconDirective, UnitsPipe],
   templateUrl: './sensor.html',
-  styleUrl: './sensor.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Sensor {

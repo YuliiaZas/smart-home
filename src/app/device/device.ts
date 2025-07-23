@@ -10,7 +10,6 @@ import { NgClass } from '@angular/common';
   selector: 'app-device',
   imports: [NgClass, MatIcon, MatSlideToggle, ItemWithIconDirective],
   templateUrl: './device.html',
-  styleUrl: './device.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Device {

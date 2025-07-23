@@ -16,9 +16,8 @@ import { ChangeDetectionStrategy, Component, computed, input, output, TemplateRe
   styleUrl: './card-list.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CardList<T> {
+export class CardList {
   sortingByGroups = input.required<string[][]>();
-  cards = input.required<Record<string, T>>();
   cardTemplateRef = input.required<TemplateRef<{ cardId: string }>>();
   sortUpdated = output<string[][]>();
 

@@ -1,11 +1,11 @@
 <div cdkDropListGroup class="card-list">
   @for (group of sortingByGroups(); track group; let groupIndex = $index) {
     <div
+      class="card-list-group"
+      id="{{ groupIndex }}"
       cdkDropList
       [cdkDropListData]="group"
-      id="{{ groupIndex }}"
       [cdkDropListConnectedTo]="dropListsIds()"
-      class="card-list-group"
       (cdkDropListDropped)="drop($event)"
     >
       @for (cardId of group; track cardId) {
