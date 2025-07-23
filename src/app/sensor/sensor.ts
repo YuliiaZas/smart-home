@@ -14,4 +14,5 @@ import { IconPositionInfo } from '../shared/item-with-icon/icon-position-info';
 export class Sensor {
   data = input.required<SensorInfo>();
   iconPosition = input<IconPositionInfo>('left');
+  typesWithHiddenAmount = input<string[]>(['cloud', 'motion_photos_on']);
 }

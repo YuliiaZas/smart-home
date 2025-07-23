@@ -5,7 +5,14 @@ import { UnitsInfo } from './units-info';
   name: 'appUnits',
 })
 export class UnitsPipe implements PipeTransform {
-  transform(value: UnitsInfo): string {
-    return `${value.amount} ${value.unit}`;
+  transform(value: UnitsInfo, type?: string, typesWithHiddenAmmount: string[] = []): string {
+    const valueWithUnit = `${value.amount} ${value.unit}`;
+
+    if (!type || typesWithHiddenAmmount.length === 0) {
+      return valueWithUnit;
+    }
+
+    const isAmountHidden = typesWithHiddenAmmount.includes(type);
+    return isAmountHidden ? value.unit : valueWithUnit;
   }
 }
