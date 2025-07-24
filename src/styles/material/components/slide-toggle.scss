@@ -1,17 +1,48 @@
 @use '@angular/material' as mat;
 
+$handle-size: 20px;
+$track-width: 36px;
+$track-height: 12px;
+$unselected-margin: 0;
+$selected-margin: 0 calc((#{$track-width}) / 2);
+$color-map: (
+  unselected: (
+    handle: #999999,
+  ),
+  selected: (
+    handle: #07a9f4,
+    track: #106891,
+  ),
+);
+
 :root {
   @include mat.slide-toggle-overrides(
     (
-      unselected-handle-size: 20px,
-      selected-handle-size: 20px,
-      pressed-handle-size: 20px,
-      unselected-handle-horizontal-margin: 0px,
-      unselected-pressed-handle-horizontal-margin: 0px,
-      selected-handle-horizontal-margin: 0 18px,
-      selected-pressed-handle-horizontal-margin: 0 18px,
-      track-width: 36px,
-      track-height: 12px,
+      unselected-handle-size: $handle-size,
+      selected-handle-size: $handle-size,
+      pressed-handle-size: $handle-size,
+
+      track-width: $track-width,
+      track-height: $track-height,
+
+      unselected-handle-horizontal-margin: $unselected-margin,
+      unselected-pressed-handle-horizontal-margin: $unselected-margin,
+
+      selected-handle-horizontal-margin: $selected-margin,
+      selected-pressed-handle-horizontal-margin: $selected-margin,
     )
   );
+
+  @each $state, $colors in $color-map {
+    @each $part, $color in $colors {
+      @include mat.slide-toggle-overrides(
+        (
+          #{$state}-#{$part}-color: #{$color},
+          #{$state}-hover-#{$part}-color: #{$color},
+          #{$state}-focus-#{$part}-color: #{$color},
+          #{$state}-pressed-#{$part}-color: #{$color}
+        )
+      );
+    }
+  }
 }

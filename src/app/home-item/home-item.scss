@@ -1,3 +1,7 @@
+@use '@angular/material' as mat;
+
+$item-icon-color: #44739e;
+
 .info:only-child {
   width: 100%;
   justify-content: space-between;
@@ -5,4 +9,12 @@
 
 .icon {
   flex-shrink: 0;
+}
+
+:host {
+  @include mat.icon-overrides(
+    (
+      color: $item-icon-color,
+    )
+  );
 }

@@ -1,5 +1,5 @@
 import { Component, inject, signal, input, OnInit, DestroyRef, computed } from '@angular/core';
-import { MatNavList } from '@angular/material/list';
+import { MatDivider, MatList, MatListItemIcon, MatNavList } from '@angular/material/list';
 import { MatSidenav, MatSidenavContainer, MatSidenavContent } from '@angular/material/sidenav';
 import { MatListItem } from '@angular/material/list';
 import { BreakpointObserver } from '@angular/cdk/layout';
@@ -11,8 +11,20 @@ import { BREAKPOINT_MAX_WIDTH } from '../../constants/breakpoint';
 
 @Component({
   selector: 'app-side-nav',
-  imports: [MatSidenavContainer, MatSidenav, MatSidenavContent, MatNavList, MatListItem, MatIcon, MenuButton],
+  imports: [
+    MatSidenavContainer,
+    MatSidenav,
+    MatSidenavContent,
+    MatNavList,
+    MatList,
+    MatListItem,
+    MatListItemIcon,
+    MatIcon,
+    MatDivider,
+    MenuButton,
+  ],
   templateUrl: './side-nav.html',
+  styleUrls: ['./side-nav.scss'],
 })
 export class SideNav implements OnInit {
   navItems = input.required<NavInfo[]>();

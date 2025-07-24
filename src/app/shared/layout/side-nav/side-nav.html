@@ -1,19 +1,29 @@
 <mat-sidenav-container fullscreen [hasBackdrop]="false">
   <mat-sidenav opened [style.width.px]="sideNavWidth()" [attr.aria-label]="'Side navigation'">
+    <mat-list class="nav-header">
+      <app-menu-button
+        class="w-100"
+        mat-list-item
+        [showLabel]="expanded()"
+        (toggleMenu)="toggleExpanded()"
+      ></app-menu-button>
+    </mat-list>
+
+    <mat-divider></mat-divider>
+
     <mat-nav-list>
-      <app-menu-button [showLabel]="expanded()" (toggleMenu)="toggleExpanded()"></app-menu-button>
-      @for (nav of navItems(); track nav) {
-        <mat-list-item [activated]="!!nav.active">
-          <a [href]="nav.link">
-            <div appItemWithIcon>
-              <mat-icon aria-hidden="true" [fontIcon]="nav.icon"></mat-icon>
+      <ul class="nav-list">
+        @for (nav of navItems(); track nav) {
+          <li>
+            <a mat-list-item [href]="nav.link" [activated]="!!nav.active">
+              <mat-icon matListItemIcon aria-hidden="true" [fontIcon]="nav.icon"></mat-icon>
               @if (expanded()) {
                 <span class="label">{{ nav.label }}</span>
               }
-            </div>
-          </a>
-        </mat-list-item>
-      }
+            </a>
+          </li>
+        }
+      </ul>
     </mat-nav-list>
   </mat-sidenav>
 
