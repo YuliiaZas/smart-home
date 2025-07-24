@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { CardSortingService } from './shared/card-sorting.service';
+import { CardSortingService } from './shared/services/card-sorting.service';
 import { SideNav } from './shared/layout/side-nav/side-nav';
 import { Home } from './home/home';
 

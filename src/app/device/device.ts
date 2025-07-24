@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { DeviceInfo } from '../shared/models/home-item-info';
-import { IconPositionInfo } from '../shared/item-with-icon/icon-position-info';
+import { IconPositionInfo } from '../shared/directives/item-with-icon/icon-position-info';
 import { HomeItem } from '../home-item/home-item';
 
 @Component({
