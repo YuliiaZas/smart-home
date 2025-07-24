@@ -1,9 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject, computed, input } from '@angular/core';
-import { CardList } from '../shared/components/card-list/card-list';
+import { CardList } from '@shared/components';
+import { DashboardInfo, HomeCardInfo } from '@shared/models';
+import { CardSortingService } from '@shared/services';
 import { HomeCard } from '../home-card/home-card';
-import { DashboardInfo } from '../shared/models/dashboard-info';
-import { CardSortingService } from '../shared/services/card-sorting.service';
-import { HomeCardInfo } from '../shared/models/home-card-info';
 
 @Component({
   selector: 'app-home-dashboard',

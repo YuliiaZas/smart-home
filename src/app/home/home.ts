@@ -1,8 +1,8 @@
 import { Component, input } from '@angular/core';
-import * as mockData from '../shared/constants/mock-data.json';
-import { HomeInfo } from './home-info';
 import { MatTab, MatTabGroup } from '@angular/material/tabs';
+import * as mockData from '@shared/constants/mock-data.json';
 import { HomeDashboard } from '../home-dashboard/home-dashboard';
+import { HomeInfo } from './home-info';
 
 @Component({
   selector: 'app-home',

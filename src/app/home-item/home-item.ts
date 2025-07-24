@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
-import { ItemWithIconDirective } from '../shared/directives/item-with-icon/item-with-icon.directive';
-import { IconPositionInfo } from '../shared/directives/item-with-icon/icon-position-info';
+import { ItemWithIconDirective, IconPositionInfo } from '@shared/directives';
 
 @Component({
   selector: 'app-home-item',

@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
-import { DeviceInfo } from '../shared/models/home-item-info';
-import { IconPositionInfo } from '../shared/directives/item-with-icon/icon-position-info';
+import { DeviceInfo } from '@shared/models';
+import { IconPositionInfo } from '@shared/directives';
+import { AddTitleToLabelPipe } from '@shared/pipes';
 import { HomeItem } from '../home-item/home-item';
-import { AddTitleToLabelPipe } from '../shared/pipes/add-title-to-label-pipe/add-title-to-label-pipe';
 
 @Component({
   selector: 'app-device',

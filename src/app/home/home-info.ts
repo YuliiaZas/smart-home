@@ -1,4 +1,4 @@
-import { DashboardInfo } from '../shared/models/dashboard-info';
+import { DashboardInfo } from '@shared/models';
 
 export interface HomeInfo {
   tabs: DashboardInfo[];
