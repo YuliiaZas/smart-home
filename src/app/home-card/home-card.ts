@@ -2,8 +2,8 @@ import { ChangeDetectionStrategy, Component, computed, model, output } from '@an
 import { DeviceInfo, HomeItemInfo, SensorInfo } from '../shared/models/home-item-info';
 import { HomeCardInfo } from '../shared/models/home-card-info';
 import { Card } from '../shared/components/card/card';
-import { Sensor } from '../sensor/sensor';
-import { Device } from '../device/device';
+import { Sensor } from '../home-sensor/home-sensor';
+import { Device } from '../home-device/home-device';
 import { CardLayout } from '../shared/models/card-layout.enum';
 import { StateValuePipe } from '../shared/pipes/state-value-pipe';
 import { MatSlideToggle } from '@angular/material/slide-toggle';

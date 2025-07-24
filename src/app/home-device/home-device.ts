@@ -8,14 +8,13 @@ import { AddTitleToLabelPipe } from '../shared/pipes/add-title-to-label-pipe/add
 @Component({
   selector: 'app-device',
   imports: [MatSlideToggle, HomeItem, AddTitleToLabelPipe],
-  templateUrl: './device.html',
+  templateUrl: './home-device.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Device {
   data = input.required<DeviceInfo>();
   cardTitle = input<string>('');
   iconPosition = input<IconPositionInfo>('left');
-  hideStateToggle = input(false);
   showStateToggle = input(false);
 
   changeState = output<string>();

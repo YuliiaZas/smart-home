@@ -8,13 +8,13 @@ import { AddTitleToLabelPipe } from '../shared/pipes/add-title-to-label-pipe/add
 @Component({
   selector: 'app-sensor',
   imports: [UnitsPipe, HomeItem, AddTitleToLabelPipe],
-  templateUrl: './sensor.html',
+  templateUrl: './home-sensor.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Sensor {
   data = input.required<SensorInfo>();
   cardTitle = input<string>('');
-  showValue = input(true);
   iconPosition = input<IconPositionInfo>('left');
+  showValue = input(true);
   typesWithHiddenAmount = input<string[]>(['cloud', 'motion_photos_on']);
 }
