@@ -18,7 +18,7 @@
             class="card-row"
             [data]="item"
             [iconPosition]="getIconPosition()"
-            [hideStateToggle]="isSingleDevice()"
+            [showStateToggle]="!isSingleDevice()"
             (changeState)="changeDeviceState(item)"
           ></app-device>
         }

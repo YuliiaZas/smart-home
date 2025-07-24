@@ -1,14 +1,15 @@
 $gap-horisontal: 1rem;
 $gap-vertical: 1.5rem 0.5rem;
 
-.card-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: $gap-horisontal;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  margin-bottom: 0.5rem;
+:host ::ng-deep .card-row {
+  app-home-item {
+    display: flex;
+    gap: $gap-horisontal;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
 }
 
 .card-content-vertical {
@@ -32,7 +33,14 @@ $gap-vertical: 1.5rem 0.5rem;
   }
 }
 
-:host ::ng-deep .card-content-vertical {
+:host ::ng-deep .card-content-vertical .card-row {
+  app-home-item {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-template-rows: subgrid;
+    grid-row: 1 / 4;
+  }
+
   .item-with-icon {
     display: grid;
     grid-template-columns: subgrid;

@@ -9,6 +9,7 @@ import { IconPositionInfo } from './icon-position-info';
 })
 export class ItemWithIconDirective implements OnInit {
   iconPosition = input<IconPositionInfo>('left');
+  clickableIcon = input(false);
   activeIcon = input(false);
 
   private host = inject(ElementRef);
@@ -21,13 +22,18 @@ export class ItemWithIconDirective implements OnInit {
 
   ngOnInit() {
     this.iconElement = this.host.nativeElement.querySelector('mat-icon');
-    this.addIconPositionClass();
+    if (this.iconElement) {
+      this.addIconPositionClass();
+      this.addIconClicableClass();
+    }
   }
 
   addIconPositionClass() {
-    if (this.iconElement) {
-      this.renderer.addClass(this.iconElement, `item-icon-${this.iconPosition()}`);
-    }
+    this.renderer.addClass(this.iconElement, `item-icon-${this.iconPosition()}`);
+  }
+
+  addIconClicableClass() {
+    if (this.clickableIcon()) this.renderer.addClass(this.iconElement, `cursor-pointer`);
   }
 
   setIconState() {

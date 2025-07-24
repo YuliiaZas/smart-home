@@ -1,0 +1,15 @@
+<div
+  class="info"
+  appItemWithIcon
+  [iconPosition]="iconPosition()"
+  [clickableIcon]="clickableIcon()"
+  [activeIcon]="activeIcon()"
+>
+  <mat-icon aria-hidden="true" [fontIcon]="icon()" (click)="handleIconClick()"></mat-icon>
+  <span class="label">{{ label() }}</span>
+</div>
+@if (showValue()) {
+  <div class="value">
+    <ng-content></ng-content>
+  </div>
+}

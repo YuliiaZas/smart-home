@@ -1,7 +1,9 @@
-<div appItemWithIcon [iconPosition]="iconPosition()">
-  <mat-icon aria-hidden="true" [fontIcon]="data().icon"></mat-icon>
-  <span class="label">{{ data().label }}</span>
-</div>
-<div class="value">
+<app-home-item
+  [label]="data().label"
+  [icon]="data().icon"
+  [showValue]="showValue()"
+  [clickableIcon]="false"
+  [iconPosition]="iconPosition()"
+>
   <span>{{ data().value | appUnits: data().icon : typesWithHiddenAmount() }}</span>
-</div>
+</app-home-item>
