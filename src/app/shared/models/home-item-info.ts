@@ -1,4 +1,4 @@
-import { UnitsInfo } from '../pipes/units/units-info';
+import { UnitsInfo } from '../pipes/units-pipe/units-info';
 
 export interface ItemWithIconInfo {
   id?: string;

@@ -5,9 +5,9 @@ import { Card } from '../shared/components/card/card';
 import { Sensor } from '../sensor/sensor';
 import { Device } from '../device/device';
 import { CardLayout } from '../shared/models/card-layout.enum';
-import { StateValuePipe } from '../shared/pipes/state-value.pipe';
+import { StateValuePipe } from '../shared/pipes/state-value-pipe';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
-import { UnitsPipe } from '../shared/pipes/units/units.pipe';
+import { UnitsPipe } from '../shared/pipes/units-pipe/units-pipe';
 import { NgTemplateOutlet } from '@angular/common';
 
 @Component({

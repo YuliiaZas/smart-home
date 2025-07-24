@@ -5,7 +5,7 @@
   [clickableIcon]="clickableIcon()"
   [activeIcon]="activeIcon()"
 >
-  <mat-icon aria-hidden="true" [fontIcon]="icon()" (click)="handleIconClick()"></mat-icon>
+  <mat-icon class="icon" aria-hidden="true" [fontIcon]="icon()" (click)="handleIconClick()"></mat-icon>
   <span class="label">{{ label() }}</span>
 </div>
 @if (showValue()) {

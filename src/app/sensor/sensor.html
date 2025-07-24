@@ -1,5 +1,5 @@
 <app-home-item
-  [label]="data().label"
+  [label]="data().label | addTitleToLabel: cardTitle()"
   [icon]="data().icon"
   [showValue]="showValue()"
   [clickableIcon]="false"

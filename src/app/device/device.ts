@@ -3,15 +3,17 @@ import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { DeviceInfo } from '../shared/models/home-item-info';
 import { IconPositionInfo } from '../shared/directives/item-with-icon/icon-position-info';
 import { HomeItem } from '../home-item/home-item';
+import { AddTitleToLabelPipe } from '../shared/pipes/add-title-to-label-pipe/add-title-to-label-pipe';
 
 @Component({
   selector: 'app-device',
-  imports: [MatSlideToggle, HomeItem],
+  imports: [MatSlideToggle, HomeItem, AddTitleToLabelPipe],
   templateUrl: './device.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Device {
   data = input.required<DeviceInfo>();
+  cardTitle = input<string>('');
   iconPosition = input<IconPositionInfo>('left');
   hideStateToggle = input(false);
   showStateToggle = input(false);

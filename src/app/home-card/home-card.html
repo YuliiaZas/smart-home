@@ -13,7 +13,13 @@
     <div [class.card-content-vertical]="isContentVertical()">
       @for (item of data().items; track $index) {
         @if (item.type === 'sensor') {
-          <app-sensor class="card-row" [data]="item" [iconPosition]="iconPosition()" [showValue]="!singleItem()">
+          <app-sensor
+            class="card-row"
+            [data]="item"
+            [iconPosition]="iconPosition()"
+            [showValue]="!singleItem()"
+            [cardTitle]="singleItem() ? data().title : ''"
+          >
             <ng-container *ngTemplateOutlet="sensorValue; context: { itemData: item }"></ng-container>
           </app-sensor>
         } @else if (item.type === 'device') {
@@ -22,6 +28,7 @@
             [data]="item"
             [iconPosition]="iconPosition()"
             [showStateToggle]="!singleItem()"
+            [cardTitle]="singleItem() ? data().title : ''"
             (changeState)="changeDeviceState(item)"
           ></app-device>
         }
