@@ -1,4 +1,4 @@
-<app-card [title]="data().title" [hideTitle]="isSingleDevice()">
+<app-card [title]="data().title" [hideTitle]="!!singleItem()">
   <ng-container cardAction>
     @if (showAllDevicesState()) {
       <mat-slide-toggle
@@ -8,26 +8,40 @@
       ></mat-slide-toggle>
     }
   </ng-container>
+
   <ng-container cardContent>
     <div [class.card-content-vertical]="isContentVertical()">
       @for (item of data().items; track $index) {
         @if (item.type === 'sensor') {
-          <app-sensor class="card-row" [data]="item" [iconPosition]="getIconPosition()"></app-sensor>
+          <app-sensor class="card-row" [data]="item" [iconPosition]="iconPosition()" [showValue]="!singleItem()">
+            <ng-container *ngTemplateOutlet="sensorValue; context: { itemData: item }"></ng-container>
+          </app-sensor>
         } @else if (item.type === 'device') {
           <app-device
             class="card-row"
             [data]="item"
-            [iconPosition]="getIconPosition()"
-            [showStateToggle]="!isSingleDevice()"
+            [iconPosition]="iconPosition()"
+            [showStateToggle]="!singleItem()"
             (changeState)="changeDeviceState(item)"
           ></app-device>
         }
       }
     </div>
   </ng-container>
-  @if (isSingleDevice()) {
+
+  @if (singleItem()) {
     <ng-container cardFooter>
-      <span class="card-footer">{{ singleDeviceState() | appStateValue }}</span>
+      <div class="card-footer">
+        @if (singleDevice()) {
+          <span class="capitalize">{{ singleDevice()!.state | appStateValue }}</span>
+        } @else if (singleSensor()) {
+          <ng-container *ngTemplateOutlet="sensorValue; context: { itemData: singleSensor() }"></ng-container>
+        }
+      </div>
     </ng-container>
   }
 </app-card>
+
+<ng-template #sensorValue let-itemData="itemData">
+  <span class="capitalize">{{ itemData.value | appUnits: itemData.icon : sensorTypesWithHiddenAmount }}</span>
+</ng-template>

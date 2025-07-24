@@ -6,8 +6,8 @@ import { Pipe, type PipeTransform } from '@angular/core';
 export class StateValuePipe implements PipeTransform {
   transform(value?: boolean): string {
     if (value === undefined || value === null) {
-      return 'Unknown';
+      return 'unknown';
     }
-    return value ? 'On' : 'Off';
+    return value ? 'on' : 'off';
   }
 }

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, model, output } from '@angular/core';
-import { DeviceInfo, HomeItemInfo } from '../shared/models/home-item-info';
+import { DeviceInfo, HomeItemInfo, SensorInfo } from '../shared/models/home-item-info';
 import { HomeCardInfo } from '../shared/models/home-card-info';
 import { Card } from '../shared/card/card';
 import { Sensor } from '../sensor/sensor';
@@ -7,10 +7,12 @@ import { Device } from '../device/device';
 import { CardLayout } from '../shared/models/card-layout.enum';
 import { StateValuePipe } from '../shared/state-value.pipe';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
+import { UnitsPipe } from '../shared/units/units.pipe';
+import { NgTemplateOutlet } from '@angular/common';
 
 @Component({
   selector: 'app-home-card',
-  imports: [MatSlideToggle, Card, Sensor, Device, StateValuePipe],
+  imports: [NgTemplateOutlet, MatSlideToggle, Card, Sensor, Device, StateValuePipe, UnitsPipe],
   templateUrl: './home-card.html',
   styleUrl: './home-card.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -19,23 +21,25 @@ export class HomeCard {
   data = model.required<HomeCardInfo>();
   updateCardData = output<HomeCardInfo>();
 
-  private devices = computed(() => this.data().items.filter((item) => item.type === 'device') as DeviceInfo[]);
+  protected readonly sensorTypesWithHiddenAmount = ['cloud', 'motion_photos_on'];
+
   isContentVertical = computed(() => this.data().layout === CardLayout.VERTICAL);
-  getIconPosition = computed(() => {
-    switch (this.data().layout) {
-      case CardLayout.VERTICAL: {
-        return 'bottom';
-      }
-      case CardLayout.SINGLE: {
-        return 'right';
-      }
-      default: {
-        return 'left';
-      }
-    }
+
+  iconPosition = computed(() => this.getIconPosition(this.data().layout));
+
+  singleItem = computed(() => {
+    return this.data().layout === CardLayout.SINGLE && this.data().items.length === 1
+      ? this.data().items[0]
+      : undefined;
   });
-  isSingleDevice = computed(() => this.data().layout === CardLayout.SINGLE && this.devices().length === 1);
-  singleDeviceState = computed<boolean | undefined>(() => this.devices()[0].state);
+  singleDevice = computed<DeviceInfo | undefined>(() =>
+    this.singleItem()?.type === 'device' ? (this.singleItem() as DeviceInfo) : undefined
+  );
+  singleSensor = computed<SensorInfo | undefined>(() =>
+    this.singleItem()?.type === 'sensor' ? (this.singleItem() as SensorInfo) : undefined
+  );
+
+  private devices = computed(() => this.data().items.filter((item) => item.type === 'device') as DeviceInfo[]);
   showAllDevicesState = computed(() => this.devices().length > 1);
   allDevicesState = computed(() => this.devices().some((device) => device.state));
 
@@ -82,5 +86,19 @@ export class HomeCard {
     });
 
     this.updateCardData.emit(this.data());
+  }
+
+  private getIconPosition(layout: CardLayout) {
+    switch (layout) {
+      case CardLayout.VERTICAL: {
+        return 'bottom';
+      }
+      case CardLayout.SINGLE: {
+        return 'right';
+      }
+      default: {
+        return 'left';
+      }
+    }
   }
 }
