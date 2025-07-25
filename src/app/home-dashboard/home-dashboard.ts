@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, computed, input, signal, OnChanges } from '@angular/core';
 import { CardList } from '@shared/components';
 import { DashboardInfo, HomeCardInfo } from '@shared/models';
 import { CardSortingService } from '@shared/services';
@@ -11,15 +11,8 @@ import { HomeCard } from '../home-card/home-card';
   styleUrl: './home-dashboard.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HomeDashboard {
+export class HomeDashboard implements OnChanges {
   data = input.required<DashboardInfo>();
-
-  protected sortingByGroups = computed(() =>
-    this.cardSortingService.getCardsSorting(
-      this.data().id,
-      this.data().cards.map((card) => card.id)
-    )
-  );
 
   protected cards = computed(() => {
     const accumulator: Record<string, HomeCardInfo> = {};
@@ -29,9 +22,22 @@ export class HomeDashboard {
     return accumulator;
   });
 
+  protected sorting = signal<string[]>([]);
+
   private cardSortingService = inject(CardSortingService);
 
-  sortUpdated(sorting: string[][]) {
+  ngOnChanges() {
+    this.sorting.set(
+      this.cardSortingService.getCardsSorting(
+        this.data().id,
+        this.data().cards.map((card) => card.id)
+      )
+    );
+  }
+
+  sortUpdated(sorting: string[]) {
+    this.sorting.set(sorting);
+
     this.cardSortingService.setCardsSorting(this.data().id, sorting);
   }
 }

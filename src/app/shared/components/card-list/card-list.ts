@@ -1,40 +1,22 @@
-import {
-  CdkDrag,
-  CdkDragDrop,
-  CdkDropList,
-  CdkDropListGroup,
-  moveItemInArray,
-  transferArrayItem,
-} from '@angular/cdk/drag-drop';
+import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { NgTemplateOutlet } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, input, output, TemplateRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output, TemplateRef } from '@angular/core';
 
 @Component({
   selector: 'app-card-list',
-  imports: [NgTemplateOutlet, CdkDropListGroup, CdkDropList, CdkDrag],
+  imports: [NgTemplateOutlet, CdkDropList, CdkDrag],
   templateUrl: './card-list.html',
   styleUrl: './card-list.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CardList {
-  sortingByGroups = input.required<string[][]>();
+  sorting = input.required<string[]>();
   cardTemplateRef = input.required<TemplateRef<{ cardId: string }>>();
-  sortUpdated = output<string[][]>();
-
-  dropListsIds = computed(() => this.sortingByGroups().map((_, index) => index.toString()));
+  sortUpdated = output<string[]>();
 
   drop(event: CdkDragDrop<string[]>) {
-    console.log(event);
-    if (event.previousContainer === event.container) {
-      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
-    } else {
-      transferArrayItem(event.previousContainer.data, event.container.data, event.previousIndex, event.currentIndex);
-    }
-    const updatedGroups = {
-      [event.previousContainer.id]: event.previousContainer.data,
-      [event.container.id]: event.container.data,
-    };
+    moveItemInArray(this.sorting(), event.previousIndex, event.currentIndex);
 
-    this.sortUpdated.emit(this.sortingByGroups().map((group, id) => (id in updatedGroups ? updatedGroups[id] : group)));
+    this.sortUpdated.emit(this.sorting());
   }
 }

@@ -4,42 +4,37 @@ import { Injectable } from '@angular/core';
   providedIn: 'root',
 })
 export class CardSortingService {
-  groups = 3;
-  preferencesName = 'cardSorting';
-  emptyStorage: string[][] = [];
-
-  getCardsSorting(dashboard: string, cards: string[]): string[][] {
+  getCardsSorting(dashboard: string, cardIds: string[]): string[] {
     const cardSortingFromStorage = localStorage.getItem(dashboard);
+
     if (cardSortingFromStorage) {
-      const cardSorting = JSON.parse(cardSortingFromStorage) as string[][];
-      if (cardSorting.flat().sort().join(',') === cards.sort().join(',')) {
-        return cardSorting;
+      try {
+        const cardSorting = JSON.parse(cardSortingFromStorage);
+        if (!this.isArrayOfStrings(cardSorting)) return cardIds;
+        if (this.areCardsUpToDate(cardSorting, cardIds)) return cardSorting;
+      } catch (error) {
+        console.error('Error parsing card sorting from localStorage:', error);
+        return cardIds;
       }
     }
-    return this.getDefaultSorting(dashboard, cards);
+
+    this.setCardsSorting(dashboard, cardIds);
+    return cardIds;
   }
 
-  setCardsSorting(dashboard: string, cardSorting: string[][]): void {
-    localStorage.setItem(dashboard, JSON.stringify(cardSorting));
-  }
-
-  getDefaultSorting(dashboard: string, cards: string[]): string[][] {
-    const defaultSorting = this.calculateDefaultSorting(cards);
-    this.setCardsSorting(dashboard, defaultSorting);
-    return defaultSorting;
-  }
-
-  private calculateDefaultSorting(cards: string[]): string[][] {
-    const defaultSorting: string[][] = [];
-    let index = 0;
-    for (const cardId of cards) {
-      const groupIndex = index % this.groups;
-      if (!defaultSorting[groupIndex]) {
-        defaultSorting[groupIndex] = [];
-      }
-      defaultSorting[groupIndex].push(cardId);
-      index++;
+  setCardsSorting(dashboard: string, cardSorting: string[]): void {
+    try {
+      localStorage.setItem(dashboard, JSON.stringify(cardSorting));
+    } catch (error) {
+      console.error('Error setting card sorting:', error);
     }
-    return defaultSorting;
+  }
+
+  private areCardsUpToDate(cardSorting: string[], cardIds: string[]): boolean {
+    return [...cardSorting].sort().join(',') === [...cardIds].sort().join(',');
+  }
+
+  private isArrayOfStrings(value: unknown): value is string[] {
+    return Array.isArray(value) && value.every((item) => typeof item === 'string');
   }
 }
