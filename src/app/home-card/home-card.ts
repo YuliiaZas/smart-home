@@ -1,6 +1,8 @@
 import { NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, model, output } from '@angular/core';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
+import { SENSOR_TYPES_WITH_HIDDEN_AMOUNT } from '@shared/constants';
+import { IconPositionInfo } from '@shared/directives';
 import { DeviceInfo, HomeItemInfo, SensorInfo, HomeCardInfo, CardLayout } from '@shared/models';
 import { StateValuePipe, UnitsPipe } from '@shared/pipes';
 import { Card } from '@shared/components';
@@ -18,13 +20,13 @@ export class HomeCard {
   data = model.required<HomeCardInfo>();
   updateCardData = output<HomeCardInfo>();
 
-  protected readonly sensorTypesWithHiddenAmount = ['cloud', 'motion_photos_on'];
+  protected readonly sensorTypesWithHiddenAmount = SENSOR_TYPES_WITH_HIDDEN_AMOUNT;
 
   isContentVertical = computed(() => this.data().layout === CardLayout.VERTICAL);
 
   iconPosition = computed(() => this.getIconPosition(this.data().layout));
 
-  singleItem = computed(() => {
+  singleItem = computed<HomeItemInfo | undefined>(() => {
     return this.data().layout === CardLayout.SINGLE && this.data().items.length === 1
       ? this.data().items[0]
       : undefined;
@@ -36,7 +38,12 @@ export class HomeCard {
     this.singleItem()?.type === 'sensor' ? (this.singleItem() as SensorInfo) : undefined
   );
 
-  private devices = computed(() => this.data().items.filter((item) => item.type === 'device') as DeviceInfo[]);
+  cardTitleOnSingleItems = computed(() => (this.singleItem() ? this.data().title : ''));
+
+  private devices = computed(() => {
+    const items = this.data().items;
+    return items.filter((item) => item.type === 'device') as DeviceInfo[];
+  });
   showAllDevicesState = computed(() => this.devices().length > 1);
   allDevicesState = computed(() => this.devices().some((device) => device.state));
 
@@ -85,7 +92,7 @@ export class HomeCard {
     this.updateCardData.emit(this.data());
   }
 
-  private getIconPosition(layout: CardLayout) {
+  private getIconPosition(layout: CardLayout): IconPositionInfo {
     switch (layout) {
       case CardLayout.VERTICAL: {
         return 'bottom';

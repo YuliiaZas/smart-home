@@ -1,5 +1,6 @@
 <app-home-item
-  [label]="data().label | addTitleToLabel: cardTitle()"
+  [label]="data().label"
+  [cardTitle]="cardTitle()"
   [icon]="data().icon"
   [showValue]="showStateToggle()"
   [clickableIcon]="!showStateToggle()"

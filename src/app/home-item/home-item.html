@@ -6,7 +6,7 @@
   [activeIcon]="activeIcon()"
 >
   <mat-icon class="icon" aria-hidden="true" [fontIcon]="icon()" (click)="handleIconClick()"></mat-icon>
-  <span class="label">{{ label() }}</span>
+  <span class="label">{{ label() | addTitleToLabel: cardTitle() }}</span>
 </div>
 @if (showValue()) {
   <div class="value">

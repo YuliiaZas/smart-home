@@ -18,7 +18,7 @@
             [data]="item"
             [iconPosition]="iconPosition()"
             [showValue]="!singleItem()"
-            [cardTitle]="singleItem() ? data().title : ''"
+            [cardTitle]="cardTitleOnSingleItems()"
           >
             <ng-container *ngTemplateOutlet="sensorValue; context: { itemData: item }"></ng-container>
           </app-sensor>
@@ -28,7 +28,7 @@
             [data]="item"
             [iconPosition]="iconPosition()"
             [showStateToggle]="!singleItem()"
-            [cardTitle]="singleItem() ? data().title : ''"
+            [cardTitle]="cardTitleOnSingleItems()"
             (changeState)="changeDeviceState(item)"
           ></app-device>
         }
@@ -41,7 +41,7 @@
       <div class="card-footer">
         @if (singleDevice()) {
           <span class="capitalize">{{ singleDevice()!.state | appStateValue }}</span>
-        } @else if (singleSensor()) {
+        } @else {
           <ng-container *ngTemplateOutlet="sensorValue; context: { itemData: singleSensor() }"></ng-container>
         }
       </div>
