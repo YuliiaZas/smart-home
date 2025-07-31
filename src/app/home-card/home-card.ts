@@ -4,14 +4,25 @@ import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { SENSOR_TYPES_WITH_HIDDEN_AMOUNT } from '@shared/constants';
 import { IconPositionInfo } from '@shared/directives';
 import { DeviceInfo, HomeItemInfo, SensorInfo, HomeCardInfo, CardLayout } from '@shared/models';
-import { StateValuePipe, UnitsPipe } from '@shared/pipes';
+import { AddTitleToLabelPipe, StateValuePipe, UnitsPipe } from '@shared/pipes';
 import { Card } from '@shared/components';
 import { Sensor } from '../home-sensor/home-sensor';
 import { Device } from '../home-device/home-device';
+import { HomeItemIcon } from '../home-item-icon/home-item-icon';
 
 @Component({
   selector: 'app-home-card',
-  imports: [NgTemplateOutlet, MatSlideToggle, Card, Sensor, Device, StateValuePipe, UnitsPipe],
+  imports: [
+    NgTemplateOutlet,
+    MatSlideToggle,
+    Card,
+    Sensor,
+    Device,
+    StateValuePipe,
+    UnitsPipe,
+    AddTitleToLabelPipe,
+    HomeItemIcon,
+  ],
   templateUrl: './home-card.html',
   styleUrl: './home-card.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -38,7 +49,7 @@ export class HomeCard {
     this.singleItem()?.type === 'sensor' ? (this.singleItem() as SensorInfo) : undefined
   );
 
-  cardTitleOnSingleItems = computed(() => (this.singleItem() ? this.data().title : ''));
+  headerClass = computed(() => (this.singleItem() ? 'body-1' : 'heading-2'));
 
   private devices = computed(() => {
     const items = this.data().items;
@@ -47,8 +58,8 @@ export class HomeCard {
   showAllDevicesState = computed(() => this.devices().length > 1);
   allDevicesState = computed(() => this.devices().some((device) => device.state));
 
-  changeDeviceState(device: HomeItemInfo) {
-    if (!('state' in device)) return;
+  changeDeviceState(device?: HomeItemInfo) {
+    if (!device || !('state' in device)) return;
 
     this.data.update((currentData) => {
       const updatedItems = currentData.items.map((item) => {

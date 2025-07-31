@@ -1,9 +1,2 @@
-<app-home-item
-  [label]="data().label"
-  [cardTitle]="cardTitle()"
-  [icon]="data().icon"
-  [showValue]="showValue()"
-  [iconPosition]="iconPosition()"
->
-  <ng-content></ng-content>
-</app-home-item>
+<app-home-item-name [label]="data().label" [icon]="data().icon" [iconPosition]="iconPosition()"></app-home-item-name>
+<ng-content></ng-content>

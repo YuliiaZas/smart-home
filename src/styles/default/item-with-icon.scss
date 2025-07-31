@@ -20,6 +20,10 @@
   order: 1;
 }
 
-.item-icon-active {
-  color: #ffc108;
+.state-icon {
+  color: #44739e;
+
+  &.state-icon-active {
+    color: #ffc108;
+  }
 }

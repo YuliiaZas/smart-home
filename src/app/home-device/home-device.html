@@ -1,12 +1,13 @@
-<app-home-item
+<app-home-item-name
   [label]="data().label"
-  [cardTitle]="cardTitle()"
   [icon]="data().icon"
-  [showValue]="showStateToggle()"
-  [clickableIcon]="!showStateToggle()"
   [iconPosition]="iconPosition()"
   [activeIcon]="!!this.data().state"
-  (iconClick)="emitChangeState()"
->
-  <mat-slide-toggle [checked]="data().state" [hideIcon]="true" (change)="emitChangeState()"></mat-slide-toggle>
-</app-home-item>
+></app-home-item-name>
+
+<mat-slide-toggle
+  [checked]="data().state"
+  [hideIcon]="true"
+  aria-label="Toggle state"
+  (change)="changeState.emit(data().label)"
+></mat-slide-toggle>

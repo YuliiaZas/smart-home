@@ -10,12 +10,6 @@ $item-radius: 0.25rem;
   padding: 0;
 }
 
-.nav-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
 :host {
   @include mat.button-overrides(
     (

@@ -1,3 +1,4 @@
+import { NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import {
   MatCard,
@@ -11,12 +12,20 @@ import {
 
 @Component({
   selector: 'app-card',
-  imports: [MatCard, MatCardHeader, MatCardTitleGroup, MatCardTitle, MatCardContent, MatCardFooter, MatCardActions],
+  imports: [
+    NgClass,
+    MatCard,
+    MatCardHeader,
+    MatCardTitleGroup,
+    MatCardTitle,
+    MatCardContent,
+    MatCardFooter,
+    MatCardActions,
+  ],
   templateUrl: './card.html',
   styleUrl: './card.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Card {
-  title = input<string>('');
-  hideTitle = input(false);
+  headerClass = input<string>('');
 }
