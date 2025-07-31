@@ -1,4 +1,4 @@
-import { Directive, input, Renderer2, inject, effect, AfterViewInit } from '@angular/core';
+import { Directive, input, Renderer2, inject, effect } from '@angular/core';
 import { IconPositionInfo } from './icon-position-info';
 
 @Directive({
@@ -7,7 +7,7 @@ import { IconPositionInfo } from './icon-position-info';
     class: 'item-with-icon',
   },
 })
-export class ItemWithIconDirective implements AfterViewInit {
+export class ItemWithIconDirective {
   icon = input.required<HTMLElement>({ alias: 'appItemWithIcon' });
   iconPosition = input<IconPositionInfo>('left');
 
@@ -19,11 +19,5 @@ export class ItemWithIconDirective implements AfterViewInit {
         this.renderer.addClass(this.icon(), `item-icon-${this.iconPosition()}`);
       }
     });
-  }
-  ngAfterViewInit() {
-    if (this.icon()) {
-      console.log('ngAfterViewInit', this.icon());
-      this.renderer.addClass(this.icon(), `item-icon-${this.iconPosition()}`);
-    }
   }
 }
