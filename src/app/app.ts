@@ -1,13 +1,12 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { CardSortingService } from '@shared/services';
 import { SideNav } from '@shared/layout/side-nav/side-nav';
 import { Home } from './home/home';
 
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet, Home, SideNav],
-  providers: [CardSortingService],
+  providers: [],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })

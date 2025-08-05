@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, computed, input, signal, effect } from '@angular/core';
 import { CardList } from '@shared/components';
 import { DashboardInfo, HomeCardInfo } from '@shared/models';
 import { CardSortingService } from '@shared/services';
@@ -14,13 +14,6 @@ import { HomeCard } from '../home-card/home-card';
 export class HomeDashboard {
   data = input.required<DashboardInfo>();
 
-  protected sortingByGroups = computed(() =>
-    this.cardSortingService.getCardsSorting(
-      this.data().id,
-      this.data().cards.map((card) => card.id)
-    )
-  );
-
   protected cards = computed(() => {
     const accumulator: Record<string, HomeCardInfo> = {};
     for (const card of this.data().cards) {
@@ -29,9 +22,29 @@ export class HomeDashboard {
     return accumulator;
   });
 
+  protected sorting = signal<string[][]>([]);
+
   private cardSortingService = inject(CardSortingService);
 
+  constructor() {
+    effect(() => {
+      this.sorting.set(
+        this.cardSortingService.getCardsSorting(
+          this.data().id,
+          this.data().cards.map((card) => card.id)
+        )
+      );
+    });
+  }
+
   sortUpdated(sorting: string[][]) {
+    this.sorting.set(sorting);
+
     this.cardSortingService.setCardsSorting(this.data().id, sorting);
+  }
+
+  updateCardData(card: HomeCardInfo) {
+    //TODO: Implement the logic to update the card data on the server.
+    console.log('updateCardData', card);
   }
 }

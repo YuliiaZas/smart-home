@@ -1,9 +1,2 @@
-<app-home-item
-  [label]="data().label | addTitleToLabel: cardTitle()"
-  [icon]="data().icon"
-  [showValue]="showValue()"
-  [clickableIcon]="false"
-  [iconPosition]="iconPosition()"
->
-  <span>{{ data().value | appUnits: data().icon : typesWithHiddenAmount() }}</span>
-</app-home-item>
+<app-home-item-name [label]="data().label" [icon]="data().icon" [iconPosition]="iconPosition()"></app-home-item-name>
+<ng-content></ng-content>

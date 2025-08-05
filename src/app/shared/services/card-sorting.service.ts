@@ -5,22 +5,30 @@ import { Injectable } from '@angular/core';
 })
 export class CardSortingService {
   groups = 3;
-  preferencesName = 'cardSorting';
-  emptyStorage: string[][] = [];
 
-  getCardsSorting(dashboard: string, cards: string[]): string[][] {
+  getCardsSorting(dashboard: string, cardIds: string[]): string[][] {
     const cardSortingFromStorage = localStorage.getItem(dashboard);
+
     if (cardSortingFromStorage) {
-      const cardSorting = JSON.parse(cardSortingFromStorage) as string[][];
-      if (cardSorting.flat().sort().join(',') === cards.sort().join(',')) {
-        return cardSorting;
+      try {
+        const cardSorting = JSON.parse(cardSortingFromStorage);
+        if (!this.isArrayOfStringsArray(cardSorting)) return this.getDefaultSorting(dashboard, cardIds);
+        if (this.areCardsUpToDate(cardSorting, cardIds)) return cardSorting;
+      } catch (error) {
+        console.error('Error parsing card sorting from localStorage:', error);
+        return this.getDefaultSorting(dashboard, cardIds);
       }
     }
-    return this.getDefaultSorting(dashboard, cards);
+
+    return this.getDefaultSorting(dashboard, cardIds);
   }
 
   setCardsSorting(dashboard: string, cardSorting: string[][]): void {
-    localStorage.setItem(dashboard, JSON.stringify(cardSorting));
+    try {
+      localStorage.setItem(dashboard, JSON.stringify(cardSorting));
+    } catch (error) {
+      console.error('Error setting card sorting:', error);
+    }
   }
 
   getDefaultSorting(dashboard: string, cards: string[]): string[][] {
@@ -41,5 +49,17 @@ export class CardSortingService {
       index++;
     }
     return defaultSorting;
+  }
+
+  private areCardsUpToDate(cardSorting: string[][], cardIds: string[]): boolean {
+    return cardSorting.flat().sort().join(',') === [...cardIds].sort().join(',');
+  }
+
+  private isArrayOfStringsArray(value: unknown): value is string[][] {
+    return Array.isArray(value) && value.every((array) => this.isArrayOfStrings(array));
+  }
+
+  private isArrayOfStrings(value: unknown): value is string[] {
+    return Array.isArray(value) && value.every((item) => typeof item === 'string');
   }
 }

@@ -1,23 +1,22 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { MatIcon } from '@angular/material/icon';
+import { ChangeDetectionStrategy, Component, ElementRef, input, output, ViewChild } from '@angular/core';
 import { ItemWithIconDirective, IconPositionInfo } from '@shared/directives';
-
+import { HomeItemIcon } from '../home-item-icon/home-item-icon';
 @Component({
-  selector: 'app-home-item',
-  imports: [MatIcon, ItemWithIconDirective],
-  templateUrl: './home-item.html',
-  styleUrls: ['./home-item.scss'],
+  selector: 'app-home-item-name',
+  imports: [ItemWithIconDirective, HomeItemIcon],
+  templateUrl: './home-item-name.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HomeItem {
+export class HomeItemName {
   label = input.required<string>();
   icon = input.required<string>();
-  showValue = input(false);
   clickableIcon = input(false);
   iconPosition = input<IconPositionInfo>('left');
   activeIcon = input(false);
 
   iconClick = output<void>();
+
+  @ViewChild('iconEl', { read: ElementRef, static: true }) iconRef!: ElementRef<HTMLElement>;
 
   handleIconClick() {
     if (this.clickableIcon()) {

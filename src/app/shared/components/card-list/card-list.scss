@@ -26,6 +26,6 @@ $gap: 0.5rem;
   gap: $gap;
 }
 
-.card-box {
-  cursor: move;
+.cdk-drag-placeholder {
+  opacity: 0.5;
 }

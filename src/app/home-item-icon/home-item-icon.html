@@ -1,0 +1,13 @@
+@if (clickableIcon()) {
+  <button
+    class="button"
+    role="switch"
+    [attr.aria-label]="iconLabel()"
+    [attr.aria-checked]="activeIcon()"
+    (click)="iconClick.emit()"
+  >
+    <mat-icon appStateIcon [activeIcon]="activeIcon()" [fontIcon]="icon()"></mat-icon>
+  </button>
+} @else {
+  <mat-icon appStateIcon aria-hidden="true" [activeIcon]="activeIcon()" [fontIcon]="icon()"></mat-icon>
+}

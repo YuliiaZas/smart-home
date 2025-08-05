@@ -1,9 +1,10 @@
 <app-card-list
-  [sortingByGroups]="sortingByGroups()"
+  [sorting]="sorting()"
+  [sortingId]="data().id"
   [cardTemplateRef]="cardTemplateRef"
   (sortUpdated)="sortUpdated($event)"
 ></app-card-list>
 
 <ng-template #cardTemplateRef let-cardId="cardId">
-  <app-home-card [data]="cards()[cardId]"></app-home-card>
+  <app-home-card [data]="cards()[cardId]" (updateCardData)="updateCardData($event)"></app-home-card>
 </ng-template>
