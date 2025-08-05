@@ -1,6 +1,6 @@
-import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
+import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { NgTemplateOutlet } from '@angular/common';
-import { ChangeDetectionStrategy, Component, input, output, TemplateRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output, TemplateRef } from '@angular/core';
 
 @Component({
   selector: 'app-card-list',
@@ -10,13 +10,25 @@ import { ChangeDetectionStrategy, Component, input, output, TemplateRef } from '
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CardList {
-  sorting = input.required<string[]>();
+  sortingId = input.required<string>();
+  sorting = input.required<string[][]>();
   cardTemplateRef = input.required<TemplateRef<{ cardId: string }>>();
-  sortUpdated = output<string[]>();
+  sortUpdated = output<string[][]>();
+
+  dropListsIds = computed(() => this.sorting().map((_, index) => this.sortingId() + index.toString()));
 
   drop(event: CdkDragDrop<string[]>) {
-    moveItemInArray(this.sorting(), event.previousIndex, event.currentIndex);
+    if (event.previousContainer === event.container) {
+      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+    } else {
+      transferArrayItem(event.previousContainer.data, event.container.data, event.previousIndex, event.currentIndex);
+    }
 
-    this.sortUpdated.emit(this.sorting());
+    const updatedGroups = {
+      [event.previousContainer.id]: event.previousContainer.data,
+      [event.container.id]: event.container.data,
+    };
+
+    this.sortUpdated.emit(this.sorting().map((group, id) => (id in updatedGroups ? updatedGroups[id] : group)));
   }
 }

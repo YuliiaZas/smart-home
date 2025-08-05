@@ -1,7 +1,18 @@
-<div class="card-list" cdkDropList (cdkDropListDropped)="drop($event)">
-  @for (cardId of sorting(); track cardId) {
-    <div class="card-box" cdkDrag>
-      <ng-container *ngTemplateOutlet="cardTemplateRef(); context: { cardId }"> </ng-container>
+<div cdkDropListGroup class="card-list">
+  @for (group of sorting(); track group; let groupIndex = $index) {
+    <div
+      class="card-list-group"
+      [id]="sortingId() + groupIndex"
+      cdkDropList
+      [cdkDropListData]="group"
+      [cdkDropListConnectedTo]="dropListsIds()"
+      (cdkDropListDropped)="drop($event)"
+    >
+      @for (cardId of group; track cardId) {
+        <div class="card-box" cdkDrag>
+          <ng-container *ngTemplateOutlet="cardTemplateRef(); context: { cardId }"> </ng-container>
+        </div>
+      }
     </div>
   }
 </div>

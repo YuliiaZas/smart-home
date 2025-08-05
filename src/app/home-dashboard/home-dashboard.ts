@@ -22,7 +22,7 @@ export class HomeDashboard {
     return accumulator;
   });
 
-  protected sorting = signal<string[]>([]);
+  protected sorting = signal<string[][]>([]);
 
   private cardSortingService = inject(CardSortingService);
 
@@ -37,7 +37,7 @@ export class HomeDashboard {
     });
   }
 
-  sortUpdated(sorting: string[]) {
+  sortUpdated(sorting: string[][]) {
     this.sorting.set(sorting);
 
     this.cardSortingService.setCardsSorting(this.data().id, sorting);
