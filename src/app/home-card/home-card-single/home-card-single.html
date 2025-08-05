@@ -1,0 +1,26 @@
+<app-card [headerClass]="headerClass">
+  <ng-container cardTitle>
+    {{ singleItem().label | addTitleToLabel: data().title }}
+  </ng-container>
+
+  <ng-container cardAction>
+    <app-home-item-icon
+      [icon]="singleItem().icon"
+      [clickableIcon]="!!singleDevice()"
+      [activeIcon]="!!singleDevice()?.state"
+      (iconClick)="changeDeviceState(singleDevice())"
+    ></app-home-item-icon>
+  </ng-container>
+
+  <ng-container cardFooter>
+    <div class="card-footer body-3">
+      @if (singleDevice()) {
+        <span class="capitalize" aria-label="State value">{{ singleDevice()!.state | appStateValue }}</span>
+      } @else if (singleSensor()) {
+        <span class="capitalize">{{
+          singleSensor()!.value | appUnits: singleSensor()!.icon : sensorTypesWithHiddenAmount
+        }}</span>
+      }
+    </div>
+  </ng-container>
+</app-card>

@@ -1,0 +1,37 @@
+<app-card [headerClass]="headerClass">
+  <ng-container cardTitle>
+    {{ data().title }}
+  </ng-container>
+
+  <ng-container cardAction>
+    @if (showAllDevicesState()) {
+      <mat-slide-toggle
+        [checked]="allDevicesState()"
+        [hideIcon]="true"
+        aria-label="Toggle all devices state"
+        (change)="changeAllDevicesState()"
+      ></mat-slide-toggle>
+    }
+  </ng-container>
+
+  <ng-container cardContent>
+    <ul class="card-content" [class.card-content-vertical]="isContentVertical()">
+      @for (item of data().items; track $index) {
+        <li class="card-row">
+          @if (item.type === 'sensor') {
+            <app-sensor class="card-item" [data]="item" [iconPosition]="iconPosition()">
+              <span class="capitalize">{{ item.value | appUnits: item.icon : sensorTypesWithHiddenAmount }}</span>
+            </app-sensor>
+          } @else if (item.type === 'device') {
+            <app-device
+              class="card-item"
+              [data]="item"
+              [iconPosition]="iconPosition()"
+              (changeState)="changeDeviceState(item)"
+            ></app-device>
+          }
+        </li>
+      }
+    </ul>
+  </ng-container>
+</app-card>
