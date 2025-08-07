@@ -1,30 +1,50 @@
 <mat-sidenav-container fullscreen [hasBackdrop]="false">
   <mat-sidenav opened [style.width.px]="sideNavWidth()" aria-label="Side navigation">
     <mat-list class="nav-header" aria-label="Actions">
-      <app-menu-button
-        class="w-100"
-        mat-list-item
+      <app-side-nav-button
+        class="nav-button"
+        icon="menu"
+        label="Smart Home UI"
         [showLabel]="expanded()"
-        (toggleMenu)="toggleExpanded()"
-      ></app-menu-button>
+        (buttonClick)="toggleExpanded()"
+      ></app-side-nav-button>
     </mat-list>
 
     <mat-divider></mat-divider>
 
-    <mat-nav-list aria-label="Dashboards">
+    <mat-nav-list class="nav-content" aria-label="Dashboards">
       <ul>
         @for (nav of navItems(); track nav) {
-          <li>
-            <a mat-list-item [href]="nav.link" [activated]="!!nav.active" [attr.aria-label]="nav.label">
-              <mat-icon matListItemIcon aria-hidden="true" [fontIcon]="nav.icon"></mat-icon>
+          <li class="nav-link" routerLinkActive="nav-link__active" [routerLinkActiveOptions]="{ exact: true }">
+            <a mat-list-item [routerLink]="nav.link" [attr.aria-label]="nav.label">
+              <mat-icon class="nav-link-icon" matListItemIcon aria-hidden="true" [fontIcon]="nav.icon"></mat-icon>
               @if (expanded()) {
-                <span class="label">{{ nav.label }}</span>
+                <span class="nav-link-label">{{ nav.label }}</span>
               }
             </a>
           </li>
         }
       </ul>
     </mat-nav-list>
+
+    <div class="nav-footer">
+      <mat-divider></mat-divider>
+      <mat-list aria-label="Profile actions">
+        <app-side-nav-button
+          class="nav-button nav-button__logout"
+          icon="logout"
+          label="Logout"
+          [showLabel]="expanded()"
+          (buttonClick)="logout.emit()"
+        ></app-side-nav-button>
+
+        @if (user()) {
+          <div mat-list-item>
+            <app-side-nav-user [user]="user()!" [showLabel]="expanded()"></app-side-nav-user>
+          </div>
+        }
+      </mat-list>
+    </div>
   </mat-sidenav>
 
   <mat-sidenav-content [style.marginLeft.px]="contentMargin()" (click)="contentClick()">

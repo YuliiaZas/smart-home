@@ -1,6 +1,15 @@
-<main class="main">
-  <app-side-nav [navItems]="navItems">
-    <router-outlet />
-    <app-home />
+@if (isLoading()) {
+  <app-spinner></app-spinner>
+}
+
+@if (isAuthenticated$ | async) {
+  <app-side-nav [navItems]="navItems" [user]="currentUser$ | async" (logout)="logout()">
+    <main class="main">
+      <router-outlet />
+    </main>
   </app-side-nav>
-</main>
+} @else {
+  <main>
+    <router-outlet />
+  </main>
+}

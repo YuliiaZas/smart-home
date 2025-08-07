@@ -1,0 +1,37 @@
+<form [formGroup]="loginForm" class="form" (focusin)="formFocus()">
+  <mat-form-field appearance="fill">
+    <mat-label>Username</mat-label>
+    <input matInput [formControl]="username" required autocomplete="on" />
+    @if (username.touched && username.invalid) {
+      <mat-error>{{ getErrorMessage(username) }}</mat-error>
+    }
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Password</mat-label>
+    <input
+      matInput
+      formControlName="password"
+      [type]="hidePassword() ? 'password' : 'text'"
+      required
+      autocomplete="on"
+    />
+    <button
+      matIconButton
+      matSuffix
+      [attr.aria-label]="'Hide password'"
+      [attr.aria-pressed]="hidePassword()"
+      (click)="togglePasswordVisibility($event)"
+    >
+      <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+    </button>
+    @if (password.touched && password.invalid) {
+      <mat-error>{{ getErrorMessage(password) }}</mat-error>
+    }
+  </mat-form-field>
+
+  <mat-error>{{ isDataInvalid() ? 'Invalid login or password' : '' }}</mat-error>
+  @if (isDataInvalid()) {}
+
+  <button mat-raised-button color="primary" [disabled]="loginForm.invalid" (click)="login()">Log in</button>
+</form>

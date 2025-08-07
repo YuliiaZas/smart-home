@@ -4,12 +4,15 @@ import { MatIcon } from '@angular/material/icon';
 import { MatListItemIcon } from '@angular/material/list';
 
 @Component({
-  selector: 'app-menu-button',
+  selector: 'app-side-nav-button',
   imports: [MatIcon, MatListItemIcon, MatButton],
-  templateUrl: './menu-button.html',
-  styleUrl: './menu-button.scss',
+  templateUrl: './side-nav-button.html',
+  styleUrl: './side-nav-button.scss',
 })
-export class MenuButton {
+export class SideNavButton {
   showLabel = input<boolean>(true);
-  toggleMenu = output<void>();
+  label = input.required<string>();
+  icon = input.required<string>();
+
+  buttonClick = output<void>();
 }

@@ -2,12 +2,48 @@
 @use '/styles/variables' as vars;
 
 $item-radius: 0.25rem;
+$item-margin: 0.25rem;
+
+:host::ng-deep .mat-drawer-inner-container {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
 
 .nav-header {
   height: vars.$header-height;
   display: flex;
   align-items: center;
   padding: 0;
+}
+
+.nav-content {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.nav-footer {
+  margin-top: auto;
+}
+
+.nav-link {
+  margin: $item-margin;
+  border-radius: $item-radius;
+
+  &__active {
+    background-color: #182e37;
+
+    .nav-link-label,
+    .nav-link-icon {
+      color: #07a9f4;
+    }
+  }
+}
+
+.nav-button {
+  width: 100%;
+  margin-inline: $item-margin;
 }
 
 :host {
@@ -22,4 +58,12 @@ $item-radius: 0.25rem;
       active-indicator-shape: $item-radius,
     )
   );
+
+  .nav-button__logout {
+    @include mat.button-overrides(
+      (
+        text-label-text-color: #e23535,
+      )
+    );
+  }
 }

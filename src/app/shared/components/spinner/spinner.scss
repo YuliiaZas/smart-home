@@ -1,0 +1,31 @@
+.spinner-wrapper {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  user-select: none;
+
+  &::before {
+    position: absolute;
+    inset: 0;
+    content: '';
+    background-color: rgba(#1b1b1a, 0.8);
+  }
+}
+
+.spinner-border {
+  height: 1.25rem;
+  width: 1.25rem;
+  border: 0.2rem solid #c7cad1;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spinner-border 0.75s linear infinite;
+}
+
+@keyframes spinner-border {
+  to {
+    transform: rotate(360deg);
+  }
+}
