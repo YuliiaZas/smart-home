@@ -1,18 +1,14 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import {
-  NavigationCancel,
-  NavigationEnd,
-  NavigationError,
-  NavigationStart,
-  Router,
-  RouterOutlet,
-} from '@angular/router';
+import { ActivatedRoute, NavigationEnd, NavigationError, NavigationStart, Router, RouterOutlet } from '@angular/router';
+import { BehaviorSubject, combineLatest, filter, map, Observable, switchMap } from 'rxjs';
 import { SideNav } from '@shared/layout/side-nav/side-nav';
 import { Spinner } from '@shared/components';
 import { Auth } from '@shared/auth';
 import { ROUTING_PATHS } from '@shared/constants';
+import { NavInfo } from '@shared/models';
+import { UserDashboards } from '@shared/dashboards/services';
 
 @Component({
   selector: 'app-root',
@@ -22,34 +18,51 @@ import { ROUTING_PATHS } from '@shared/constants';
   styleUrl: './app.scss',
 })
 export class App {
-  protected navItems = [
-    { label: 'Overview', icon: 'dashboard', link: '/dashboard', active: true },
-    { label: 'About', icon: 'info', link: '/about' },
-  ];
-
   private router = inject(Router);
   private authService = inject(Auth);
+  private dashboardsService = inject(UserDashboards);
+  private activatedRoute = inject(ActivatedRoute);
 
-  readonly isLoading = signal(false);
-  readonly isAuthenticated$ = this.authService.isAuthenticated$;
+  readonly isLoading$ = new BehaviorSubject<boolean>(false);
   readonly currentUser$ = this.authService.currentUser$;
+  readonly isLoginPage$ = this.router.events.pipe(
+    filter((event) => event instanceof NavigationEnd),
+    map(() => this.router.url === `/${ROUTING_PATHS.LOGIN}`)
+  );
+  readonly showSideNav$ = combineLatest([this.authService.isAuthenticated$, this.isLoginPage$]).pipe(
+    map(([isAuthenticated, isLogin]) => isAuthenticated && !isLogin)
+  );
+
+  dashboards$: Observable<NavInfo[]> = this.dashboardsService.userDashboards$.pipe(
+    map((dashboards) =>
+      (dashboards || []).map((dashboard) => ({
+        ...dashboard,
+        link: `/${ROUTING_PATHS.DASHBOARD}/${dashboard.id}`,
+      }))
+    )
+  );
 
   constructor() {
+    this.currentUser$
+      .pipe(
+        takeUntilDestroyed(),
+        filter((user) => !!user),
+        switchMap(() => this.dashboardsService.getUserDashboards())
+      )
+      .subscribe();
+
     this.router.events.pipe(takeUntilDestroyed()).subscribe((event) => {
       if (event instanceof NavigationStart) {
-        this.isLoading.set(true);
+        this.isLoading$.next(true);
         this.authService.checkAuthentication();
-      } else if (
-        event instanceof NavigationEnd ||
-        event instanceof NavigationCancel ||
-        event instanceof NavigationError
-      ) {
-        this.isLoading.set(false);
+      } else if (event instanceof NavigationEnd || event instanceof NavigationError) {
+        this.isLoading$.next(false);
       }
     });
   }
 
   logout() {
+    this.dashboardsService.resetDashboardsData();
     this.authService.logout();
     this.router.navigate([ROUTING_PATHS.LOGIN]);
   }

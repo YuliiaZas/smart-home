@@ -1,6 +1,5 @@
-import { ItemWithIconInfo } from './home-item-info';
+import { DashboardInfo } from './dashboard-info';
 
-export interface NavInfo extends ItemWithIconInfo {
+export interface NavInfo extends DashboardInfo {
   link: string;
-  active?: boolean;
 }

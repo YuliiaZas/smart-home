@@ -1,22 +1,33 @@
-import { Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { AsyncPipe } from '@angular/common';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { BehaviorSubject, catchError, finalize, of } from 'rxjs';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { Auth, LoginRequestInfo } from '@shared/auth';
-import { ROUTING_PATHS } from '@shared/constants';
+import { ERROR_MESSAGES, ROUTING_PATHS } from '@shared/constants';
+import { MatButton } from '@angular/material/button';
+import { Spinner } from '@shared/components';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatIcon],
+  imports: [ReactiveFormsModule, AsyncPipe, MatFormFieldModule, MatInputModule, MatIcon, MatButton, Spinner],
   templateUrl: './login.html',
   styleUrl: './login.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Login {
   private formBuilder = inject(FormBuilder);
   private authService = inject(Auth);
   private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
+
+  invalidErrorMessage = ERROR_MESSAGES.login.invalid;
+
+  readonly isLoading$ = new BehaviorSubject<boolean>(false);
 
   loginForm = this.formBuilder.nonNullable.group({
     username: ['', [Validators.required, Validators.minLength(2)]],
@@ -40,14 +51,23 @@ export class Login {
       userName: this.username.value,
       password: this.password.value,
     };
-    this.authService.login(loginRequest).subscribe({
-      next: () => this.router.navigate([ROUTING_PATHS.DASHBOARD]),
-      error: (error) => {
-        if (error.status === 401) {
-          this.markIsDataInvalid(true);
-        }
-      },
-    });
+
+    this.isLoading$.next(true);
+
+    this.authService
+      .login(loginRequest)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        catchError((error) => {
+          if (error.status === 401) {
+            this.markIsDataInvalid(true);
+            return of();
+          }
+          throw error;
+        }),
+        finalize(() => this.isLoading$.next(false))
+      )
+      .subscribe(() => this.router.navigate([ROUTING_PATHS.DASHBOARD]));
   }
 
   togglePasswordVisibility(event: MouseEvent) {
@@ -57,10 +77,10 @@ export class Login {
 
   getErrorMessage(formControl: FormControl): string {
     if (formControl.hasError('required')) {
-      return 'This field is required';
+      return ERROR_MESSAGES.login.required;
     }
     if (formControl.hasError('minlength')) {
-      return `Minimum length is ${formControl.getError('minlength')?.requiredLength}`;
+      return ERROR_MESSAGES.login.minlength(formControl.getError('minlength').requiredLength);
     }
     return '';
   }

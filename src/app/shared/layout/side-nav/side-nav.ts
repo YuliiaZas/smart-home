@@ -1,4 +1,14 @@
-import { Component, inject, signal, input, OnInit, DestroyRef, computed, output } from '@angular/core';
+import {
+  Component,
+  inject,
+  signal,
+  input,
+  OnInit,
+  DestroyRef,
+  computed,
+  output,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { MatDivider, MatList, MatListItemIcon, MatNavList } from '@angular/material/list';
@@ -31,6 +41,7 @@ import { SideNavUser } from '../side-nav-user/side-nav-user';
   ],
   templateUrl: './side-nav.html',
   styleUrls: ['./side-nav.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SideNav implements OnInit {
   navItems = input.required<NavInfo[]>();

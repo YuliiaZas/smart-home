@@ -1,6 +1,6 @@
 <app-card-list
   [sorting]="sorting()"
-  [sortingId]="data().id"
+  [sortingId]="sortingId()"
   [cardTemplateRef]="cardTemplateRef"
   (sortUpdated)="sortUpdated($event)"
 ></app-card-list>

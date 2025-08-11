@@ -1,7 +1,17 @@
-<mat-tab-group animationDuration="0ms" mat-stretch-tabs="false">
-  @for (tab of data().tabs; track $index) {
-    <mat-tab [label]="tab.title">
-      <app-home-dashboard class="tab-content" [data]="tab"></app-home-dashboard>
-    </mat-tab>
+<nav mat-tab-nav-bar [tabPanel]="tabPanel">
+  @for (tab of tabs(); track tab) {
+    <a
+      mat-tab-link
+      #linkActive="routerLinkActive"
+      [routerLink]="tab.link"
+      routerLinkActive
+      [routerLinkActiveOptions]="{ exact: false }"
+      [active]="linkActive.isActive"
+    >
+      {{ tab.title }}
+    </a>
   }
-</mat-tab-group>
+</nav>
+<mat-tab-nav-panel #tabPanel class="tab-content">
+  <router-outlet></router-outlet>
+</mat-tab-nav-panel>

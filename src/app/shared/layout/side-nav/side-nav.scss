@@ -3,6 +3,9 @@
 
 $item-radius: 0.25rem;
 $item-margin: 0.25rem;
+$logout-color: #e23535;
+$active-color: #07a9f4;
+$active-bg-color: #182e37;
 
 :host::ng-deep .mat-drawer-inner-container {
   display: flex;
@@ -31,12 +34,16 @@ $item-margin: 0.25rem;
   margin: $item-margin;
   border-radius: $item-radius;
 
+  .nav-link-label {
+    text-transform: capitalize;
+  }
+
   &__active {
-    background-color: #182e37;
+    background-color: $active-bg-color;
 
     .nav-link-label,
     .nav-link-icon {
-      color: #07a9f4;
+      color: $active-color;
     }
   }
 }
@@ -62,7 +69,7 @@ $item-margin: 0.25rem;
   .nav-button__logout {
     @include mat.button-overrides(
       (
-        text-label-text-color: #e23535,
+        text-label-text-color: $logout-color,
       )
     );
   }

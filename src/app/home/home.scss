@@ -4,7 +4,14 @@
 $gap: 1rem;
 $tab-bg: #111f24;
 
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 .tab-content {
+  flex-grow: 1;
   padding: $gap;
 }
 
@@ -16,9 +23,13 @@ $tab-bg: #111f24;
     )
   );
 
-  .mat-mdc-tab-label-container {
+  .mat-mdc-tab-link-container {
     padding: 0 $gap;
     background-color: $tab-bg;
     height: vars.$header-height;
+  }
+
+  .mat-mdc-tab-list {
+    flex-grow: initial;
   }
 }
