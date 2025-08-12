@@ -10,6 +10,6 @@ import { HomeItemName } from '../home-item-name/home-item-name';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Sensor {
-  data = input.required<SensorInfo>();
+  sensorData = input.required<SensorInfo>();
   iconPosition = input<IconPositionInfo>('left');
 }

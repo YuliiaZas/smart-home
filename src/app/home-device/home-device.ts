@@ -11,7 +11,7 @@ import { HomeItemName } from '../home-item-name/home-item-name';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Device {
-  data = input.required<DeviceInfo>();
+  deviceData = input.required<DeviceInfo>();
   iconPosition = input<IconPositionInfo>('left');
 
   changeState = output<string>();

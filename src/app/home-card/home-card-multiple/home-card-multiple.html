@@ -1,6 +1,6 @@
 <app-card [headerClass]="headerClass">
   <ng-container cardTitle>
-    {{ data().title }}
+    {{ cardData().title }}
   </ng-container>
 
   <ng-container cardAction>
@@ -16,19 +16,22 @@
 
   <ng-container cardContent>
     <ul class="card-content" [class.card-content-vertical]="isContentVertical()">
-      @for (item of data().items; track $index) {
+      @for (item of cardData().items; track $index) {
         <li class="card-row">
-          @if (item.type === 'sensor') {
-            <app-sensor class="card-item" [data]="item" [iconPosition]="iconPosition()">
-              <span class="capitalize">{{ item.value | appUnits: item.icon : sensorTypesWithHiddenAmount }}</span>
-            </app-sensor>
-          } @else if (item.type === 'device') {
-            <app-device
-              class="card-item"
-              [data]="item"
-              [iconPosition]="iconPosition()"
-              (changeState)="changeDeviceState(item)"
-            ></app-device>
+          @switch (item.type) {
+            @case ('sensor') {
+              <app-sensor class="card-item" [sensorData]="item" [iconPosition]="iconPosition()">
+                <span class="capitalize">{{ item.value | appUnits: item.icon : sensorTypesWithHiddenAmount }}</span>
+              </app-sensor>
+            }
+            @case ('device') {
+              <app-device
+                class="card-item"
+                [deviceData]="item"
+                [iconPosition]="iconPosition()"
+                (changeState)="changeDeviceState(item)"
+              ></app-device>
+            }
           }
         </li>
       }

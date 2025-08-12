@@ -27,14 +27,14 @@ export class HomeTab {
   sortingId = computed(() => `${this.dashboardId()}-${this.tabId()}`);
 
   dashboardData = toSignal(this.dashboardsService.currentDashboardData$);
-  data = computed(() => {
+  tabData = computed(() => {
     const tabId = this.tabId() || '';
     return (this.dashboardData() || {})[tabId] || { id: tabId, cards: [] };
   });
 
   protected cards = computed(() => {
     const accumulator: Record<string, HomeCardInfo> = {};
-    for (const card of this.data().cards) {
+    for (const card of this.tabData().cards) {
       accumulator[card.id] = card;
     }
     return accumulator;
@@ -46,8 +46,8 @@ export class HomeTab {
     effect(() => {
       this.sorting.set(
         this.cardSortingService.getCardsSorting(
-          this.data().id,
-          this.data().cards.map((card) => card.id)
+          this.tabData().id,
+          this.tabData().cards.map((card) => card.id)
         )
       );
     });
@@ -56,7 +56,7 @@ export class HomeTab {
   sortUpdated(sorting: string[][]) {
     this.sorting.set(sorting);
 
-    this.cardSortingService.setCardsSorting(this.data().id, sorting);
+    this.cardSortingService.setCardsSorting(this.tabData().id, sorting);
   }
 
   updateCardData(card: HomeCardInfo) {

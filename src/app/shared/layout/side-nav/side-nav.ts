@@ -17,8 +17,8 @@ import { MatListItem } from '@angular/material/list';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { MatIcon } from '@angular/material/icon';
 import { UserProfileInfo } from '@shared/auth';
-import { NavInfo } from '../../models/nav-item-info';
-import { BREAKPOINT_MAX_WIDTH } from '../../constants/breakpoint';
+import { NavInfo } from '@shared/models/nav-item-info';
+import { SIDE_NAV_WIDTH, BREAKPOINT_MAX_WIDTH } from '@shared/constants';
 import { SideNavButton } from '../side-nav-button/side-nav-button';
 import { SideNavUser } from '../side-nav-user/side-nav-user';
 
@@ -50,12 +50,12 @@ export class SideNav implements OnInit {
 
   expanded = signal(true);
 
-  sideNavWidth = computed(() => (this.expanded() ? this.widthBig : this.widthSmall));
-  contentMargin = computed(() => (this.expanded() && !this.isTablet() ? this.widthBig : this.widthSmall));
+  sideNavWidth = computed(() => (this.expanded() ? this.widthExpanded : this.widthSmall));
+  contentMargin = computed(() => (this.expanded() && !this.isTablet() ? this.widthExpanded : this.widthSmall));
 
   protected readonly isTablet = signal(false);
-  protected readonly widthSmall = 65;
-  protected readonly widthBig = 185;
+  protected readonly widthSmall = SIDE_NAV_WIDTH.small;
+  protected readonly widthExpanded = SIDE_NAV_WIDTH.expanded;
 
   private breakpointObserver = inject(BreakpointObserver);
   private destroyRef = inject(DestroyRef);
