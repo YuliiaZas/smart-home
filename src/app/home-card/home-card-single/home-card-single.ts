@@ -4,6 +4,7 @@ import { AddTitleToLabelPipe, StateValuePipe, UnitsPipe } from '@shared/pipes';
 import { Card } from '@shared/components';
 import { HomeCardBase } from '../home-card-base/home-card-base';
 import { HomeItemIcon } from '../../home-item-icon/home-item-icon';
+import { isDeviceInfo, isSensorInfo } from '@shared/utils';
 
 @Component({
   selector: 'app-home-card-single',
@@ -15,11 +16,11 @@ import { HomeItemIcon } from '../../home-item-icon/home-item-icon';
 export class HomeCardSingle extends HomeCardBase {
   headerClass = 'body-1';
 
-  singleItem = computed<HomeItemInfo>(() => this.data().items[0]);
+  singleItem = computed<HomeItemInfo>(() => this.cardData().items[0]);
   singleDevice = computed<DeviceInfo | undefined>(() =>
-    this.singleItem()?.type === 'device' ? (this.singleItem() as DeviceInfo) : undefined
+    isDeviceInfo(this.singleItem()) ? (this.singleItem() as DeviceInfo) : undefined
   );
   singleSensor = computed<SensorInfo | undefined>(() =>
-    this.singleItem()?.type === 'sensor' ? (this.singleItem() as SensorInfo) : undefined
+    isSensorInfo(this.singleItem()) ? (this.singleItem() as SensorInfo) : undefined
   );
 }

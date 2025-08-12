@@ -8,6 +8,7 @@ import { NavInfo } from '../../models/nav-item-info';
 import { MenuButton } from '../menu-button/menu-button';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { BREAKPOINT_MAX_WIDTH } from '../../constants/breakpoint';
+import { SIDE_NAV_WIDTH } from '@shared/constants';
 
 @Component({
   selector: 'app-side-nav',
@@ -31,12 +32,12 @@ export class SideNav implements OnInit {
 
   expanded = signal(true);
 
-  sideNavWidth = computed(() => (this.expanded() ? this.widthBig : this.widthSmall));
-  contentMargin = computed(() => (this.expanded() && !this.isTablet() ? this.widthBig : this.widthSmall));
+  sideNavWidth = computed(() => (this.expanded() ? this.widthExpanded : this.widthSmall));
+  contentMargin = computed(() => (this.expanded() && !this.isTablet() ? this.widthExpanded : this.widthSmall));
 
   protected readonly isTablet = signal(false);
-  protected readonly widthSmall = 65;
-  protected readonly widthBig = 185;
+  protected readonly widthSmall = SIDE_NAV_WIDTH.small;
+  protected readonly widthExpanded = SIDE_NAV_WIDTH.expanded;
 
   private breakpointObserver = inject(BreakpointObserver);
   private destroyRef = inject(DestroyRef);

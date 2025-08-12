@@ -11,5 +11,5 @@ import { HomeInfo } from './home-info';
   styleUrl: './home.scss',
 })
 export class Home {
-  data = input<HomeInfo>(mockData as HomeInfo);
+  dashboardData = input<HomeInfo>(mockData as HomeInfo);
 }

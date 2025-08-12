@@ -12,11 +12,11 @@ import { HomeCard } from '../home-card/home-card';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeDashboard {
-  data = input.required<DashboardInfo>();
+  tabData = input.required<DashboardInfo>();
 
   protected cards = computed(() => {
     const accumulator: Record<string, HomeCardInfo> = {};
-    for (const card of this.data().cards) {
+    for (const card of this.tabData().cards) {
       accumulator[card.id] = card;
     }
     return accumulator;
@@ -30,8 +30,8 @@ export class HomeDashboard {
     effect(() => {
       this.sorting.set(
         this.cardSortingService.getCardsSorting(
-          this.data().id,
-          this.data().cards.map((card) => card.id)
+          this.tabData().id,
+          this.tabData().cards.map((card) => card.id)
         )
       );
     });
@@ -40,7 +40,7 @@ export class HomeDashboard {
   sortUpdated(sorting: string[][]) {
     this.sorting.set(sorting);
 
-    this.cardSortingService.setCardsSorting(this.data().id, sorting);
+    this.cardSortingService.setCardsSorting(this.tabData().id, sorting);
   }
 
   updateCardData(card: HomeCardInfo) {

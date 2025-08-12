@@ -11,8 +11,10 @@ import { CardLayout, HomeCardInfo } from '@shared/models';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeCard {
-  data = model.required<HomeCardInfo>();
+  cardData = model.required<HomeCardInfo>();
   updateCardData = output<HomeCardInfo>();
 
-  isSingleItem = computed<boolean>(() => this.data().layout === CardLayout.SINGLE && this.data().items.length === 1);
+  isSingleItem = computed<boolean>(
+    () => this.cardData().layout === CardLayout.SINGLE && this.cardData().items.length === 1
+  );
 }
