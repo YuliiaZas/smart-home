@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { BehaviorSubject, catchError, map, Observable, of, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, map, Observable, of, switchMap, tap } from 'rxjs';
 import { DashboardDataInfo, DashboardInfo, DashboardTabInfo, TabInfo } from '@shared/models';
 import { environment } from 'src/environments/environments';
 
@@ -9,7 +9,7 @@ import { environment } from 'src/environments/environments';
 })
 export class UserDashboards {
   private http = inject(HttpClient);
-  readonly dashboardsPath = '/api/dashboards';
+  readonly dashboardsPath = `${environment.apiUrl}/api/dashboards`;
 
   private isDashboardsFetchingSubject = new BehaviorSubject<boolean | undefined>(undefined);
   private isCurrentDashboardDataFetchingSubject = new BehaviorSubject<boolean | undefined>(undefined);
@@ -46,14 +46,8 @@ export class UserDashboards {
   constructor() {
     this.currentDashboardId$
       .pipe(
-        switchMap((dashboardId) => {
-          return dashboardId
-            ? this.fetchDashboardData(dashboardId).pipe(
-                catchError(() => of()),
-                map((dashboardData: DashboardDataInfo) => this.transformDashboardData(dashboardData))
-              )
-            : of(this.transformDashboardData());
-        })
+        switchMap((dashboardId) => this.fetchDashboardData(dashboardId)),
+        map((dashboardData) => this.transformDashboardData(dashboardData))
       )
       .subscribe(({ tabsInfo, tabsData }) => {
         this.currentDashboardTabsSubject.next(tabsInfo);
@@ -73,7 +67,7 @@ export class UserDashboards {
     );
   }
 
-  private transformDashboardData(dashboardData?: DashboardDataInfo): {
+  private transformDashboardData(dashboardData: DashboardDataInfo | null): {
     tabsInfo: TabInfo[];
     tabsData: Record<string, DashboardTabInfo>;
   } {
@@ -93,11 +87,28 @@ export class UserDashboards {
     return { tabsInfo, tabsData };
   }
 
-  private fetchUserDashboards(): Observable<DashboardInfo[]> {
-    return this.http.get<DashboardInfo[]>(`${environment.apiUrl}${this.dashboardsPath}`);
+  fetchUserDashboards(): Observable<DashboardInfo[]> {
+    return this.http.get<DashboardInfo[]>(this.dashboardsPath);
   }
 
-  private fetchDashboardData(dashboardId: string | null): Observable<DashboardDataInfo> {
-    return this.http.get<DashboardDataInfo>(`${environment.apiUrl}${this.dashboardsPath}/${dashboardId}`);
+  fetchDashboardData(dashboardId: string | null): Observable<DashboardDataInfo | null> {
+    if (!dashboardId) return of(null);
+    return this.http.get<DashboardDataInfo>(`${this.dashboardsPath}/${dashboardId}`);
+  }
+
+  addDashboard(dashboardInfo: DashboardInfo): Observable<DashboardInfo> {
+    return this.http.post<DashboardInfo>(this.dashboardsPath, dashboardInfo);
+  }
+
+  deleteDashboard(dashboardId: string): Observable<void> {
+    return this.http.delete<void>(`${this.dashboardsPath}/${dashboardId}`);
+  }
+
+  updateDashboardInfo({ id, title, icon }: DashboardInfo): Observable<DashboardInfo> {
+    return this.http.put<DashboardInfo>(`${this.dashboardsPath}/${id}`, { title, icon });
+  }
+
+  updateDashboardData(dashboardId: string, dashboardData: DashboardDataInfo): Observable<DashboardDataInfo> {
+    return this.http.put<DashboardDataInfo>(`${this.dashboardsPath}/${dashboardId}`, dashboardData);
   }
 }
