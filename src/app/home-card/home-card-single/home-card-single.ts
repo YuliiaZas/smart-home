@@ -17,10 +17,12 @@ export class HomeCardSingle extends HomeCardBase {
   headerClass = 'body-1';
 
   singleItem = computed<HomeItemInfo>(() => this.cardData().items[0]);
-  singleDevice = computed<DeviceInfo | undefined>(() =>
-    isDeviceInfo(this.singleItem()) ? (this.singleItem() as DeviceInfo) : undefined
-  );
-  singleSensor = computed<SensorInfo | undefined>(() =>
-    isSensorInfo(this.singleItem()) ? (this.singleItem() as SensorInfo) : undefined
-  );
+  singleDevice = computed<DeviceInfo | undefined>(() => {
+    const item = this.singleItem();
+    return isDeviceInfo(item) ? item : undefined;
+  });
+  singleSensor = computed<SensorInfo | undefined>(() => {
+    const item = this.singleItem();
+    return isSensorInfo(item) ? item : undefined;
+  });
 }
