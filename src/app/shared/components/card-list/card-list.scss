@@ -1,0 +1,31 @@
+@use '/styles/breakpoints';
+
+$gap: 0.5rem;
+
+.card-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $gap;
+  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+
+  @media (max-width: breakpoints.$grid-breakpoint-md) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: breakpoints.$grid-breakpoint-sm) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card-list-group {
+  min-width: 225px;
+  display: flex;
+  flex-direction: column;
+  gap: $gap;
+}
+
+.cdk-drag-placeholder {
+  opacity: 0.5;
+}

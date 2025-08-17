@@ -1,0 +1,25 @@
+@use '@angular/material' as mat;
+@use '/styles/variables' as vars;
+
+$item-radius: 0.25rem;
+
+.nav-header {
+  height: vars.$header-height;
+  display: flex;
+  align-items: center;
+  padding: 0;
+}
+
+:host {
+  @include mat.button-overrides(
+    (
+      text-container-shape: $item-radius,
+    )
+  );
+
+  @include mat.list-overrides(
+    (
+      active-indicator-shape: $item-radius,
+    )
+  );
+}

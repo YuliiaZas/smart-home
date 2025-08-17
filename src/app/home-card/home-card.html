@@ -1,0 +1,10 @@
+<article>
+  @if (isSingleItem()) {
+    <app-home-card-single [cardData]="cardData()" (updateCardData)="updateCardData.emit($event)"></app-home-card-single>
+  } @else {
+    <app-home-card-multiple
+      [cardData]="cardData()"
+      (updateCardData)="updateCardData.emit($event)"
+    ></app-home-card-multiple>
+  }
+</article>

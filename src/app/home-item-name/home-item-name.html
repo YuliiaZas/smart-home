@@ -1,0 +1,10 @@
+<div [appItemWithIcon]="iconRef.nativeElement" [iconPosition]="iconPosition()">
+  <app-home-item-icon
+    #iconEl
+    [icon]="icon()"
+    [clickableIcon]="clickableIcon()"
+    [activeIcon]="activeIcon()"
+    (iconClick)="handleIconClick()"
+  ></app-home-item-icon>
+  <span>{{ label() }}</span>
+</div>

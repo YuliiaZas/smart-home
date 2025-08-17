@@ -1,0 +1,35 @@
+.card {
+  padding: 1.5rem 1rem;
+}
+
+.card-header {
+  padding: 0 0 1.5rem;
+}
+
+.card-title-group {
+  align-items: center;
+}
+
+.card-title {
+  margin: 0;
+}
+
+.card-content {
+  &,
+  &:first-child {
+    padding: 0;
+  }
+
+  &:empty {
+    display: none;
+  }
+}
+
+.card-action {
+  min-height: auto;
+  padding: 0 0 0 1rem;
+
+  &:empty {
+    display: none;
+  }
+}

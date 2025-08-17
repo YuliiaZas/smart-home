@@ -1,0 +1,24 @@
+@use '@angular/material' as mat;
+@use '/styles/variables' as vars;
+
+$gap: 1rem;
+$tab-bg: #111f24;
+
+.tab-content {
+  padding: $gap;
+}
+
+:host::ng-deep {
+  @include mat.tabs-overrides(
+    (
+      divider-height: 1,
+      divider-color: $tab-bg,
+    )
+  );
+
+  .mat-mdc-tab-label-container {
+    padding: 0 $gap;
+    background-color: $tab-bg;
+    height: vars.$header-height;
+  }
+}

@@ -1,0 +1,29 @@
+.item-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  &:has(.item-icon-bottom) {
+    flex-direction: column;
+  }
+}
+
+.item-icon-left {
+  order: -1;
+}
+
+.item-icon-right {
+  order: 1;
+}
+
+.item-icon-bottom {
+  order: 1;
+}
+
+.state-icon {
+  color: #44739e;
+
+  &.state-icon-active {
+    color: #ffc108;
+  }
+}

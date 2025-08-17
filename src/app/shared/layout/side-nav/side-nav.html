@@ -1,0 +1,33 @@
+<mat-sidenav-container fullscreen [hasBackdrop]="false">
+  <mat-sidenav opened [style.width.px]="sideNavWidth()" aria-label="Side navigation">
+    <mat-list class="nav-header" aria-label="Actions">
+      <app-menu-button
+        class="w-100"
+        mat-list-item
+        [showLabel]="expanded()"
+        (toggleMenu)="toggleExpanded()"
+      ></app-menu-button>
+    </mat-list>
+
+    <mat-divider></mat-divider>
+
+    <mat-nav-list aria-label="Dashboards">
+      <ul>
+        @for (nav of navItems(); track nav) {
+          <li>
+            <a mat-list-item [href]="nav.link" [activated]="!!nav.active" [attr.aria-label]="nav.label">
+              <mat-icon matListItemIcon aria-hidden="true" [fontIcon]="nav.icon"></mat-icon>
+              @if (expanded()) {
+                <span class="label">{{ nav.label }}</span>
+              }
+            </a>
+          </li>
+        }
+      </ul>
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content [style.marginLeft.px]="contentMargin()" (click)="contentClick()">
+    <ng-content></ng-content>
+  </mat-sidenav-content>
+</mat-sidenav-container>

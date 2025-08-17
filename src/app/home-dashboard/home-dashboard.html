@@ -1,0 +1,10 @@
+<app-card-list
+  [sorting]="sorting()"
+  [sortingId]="tabData().id"
+  [cardTemplateRef]="cardTemplateRef"
+  (sortUpdated)="sortUpdated($event)"
+></app-card-list>
+
+<ng-template #cardTemplateRef let-cardId="cardId">
+  <app-home-card [cardData]="cards()[cardId]" (updateCardData)="updateCardData($event)"></app-home-card>
+</ng-template>

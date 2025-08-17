@@ -1,0 +1,13 @@
+<app-home-item-name
+  [label]="deviceData().label"
+  [icon]="deviceData().icon"
+  [iconPosition]="iconPosition()"
+  [activeIcon]="!!this.deviceData().state"
+></app-home-item-name>
+
+<mat-slide-toggle
+  [checked]="deviceData().state"
+  [hideIcon]="true"
+  aria-label="Toggle state"
+  (change)="changeState.emit(deviceData().label)"
+></mat-slide-toggle>
