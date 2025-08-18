@@ -1,7 +1,7 @@
 import { UnitsInfo } from '../pipes/units-pipe/units-info';
 
 export interface ItemWithIconInfo {
-  id?: string;
+  id: string;
   icon: string;
   label: string;
 }

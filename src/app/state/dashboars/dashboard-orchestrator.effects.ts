@@ -9,6 +9,7 @@ import { tabsActions, tabsFeature } from '@state/tabs';
 import { cardsActions, cardsFeature } from '@state/cards';
 import { dashboardsListActions } from './dashboards-list';
 import { currentDashboardActions, currentDashboardFeature, dashboardApiActions } from './current-dashboard';
+import { homeItemsActions } from '@state/home-items';
 
 @Injectable()
 export class DashboardsOrchestratorEffects {
@@ -18,7 +19,12 @@ export class DashboardsOrchestratorEffects {
   resetCurrentDashboard$ = createEffect(() =>
     this.actions$.pipe(
       ofType(currentDashboardActions.resetCurrentDashboard),
-      map(() => currentDashboardActions.setCurrentDashboardData({ dashboardData: null }))
+      switchMap(() =>
+        from([
+          currentDashboardActions.setCurrentDashboardData({ dashboardData: null }),
+          homeItemsActions.resetHomeItems(),
+        ])
+      )
     )
   );
 
@@ -30,7 +36,7 @@ export class DashboardsOrchestratorEffects {
         return from([
           tabsActions.setTabsData({ tabs }),
           cardsActions.setCardsData({ tabs }),
-          // devicesActions.setDevicesData({ tabs }),
+          homeItemsActions.setCurrentDashboardHomeItems({ tabs }),
         ]);
       })
     )
@@ -40,11 +46,7 @@ export class DashboardsOrchestratorEffects {
     this.actions$.pipe(
       ofType(currentDashboardActions.enterEditMode),
       switchMap(() => {
-        return from([
-          tabsActions.enterEditMode(),
-          cardsActions.enterEditMode(),
-          // devicesActions.enterEditMode(),
-        ]);
+        return from([tabsActions.enterEditMode(), cardsActions.enterEditMode()]);
       })
     )
   );
@@ -53,11 +55,7 @@ export class DashboardsOrchestratorEffects {
     this.actions$.pipe(
       ofType(currentDashboardActions.exitEditMode),
       switchMap(() => {
-        return from([
-          tabsActions.exitEditMode(),
-          cardsActions.exitEditMode(),
-          // devicesActions.exitEditMode(),
-        ]);
+        return from([tabsActions.exitEditMode(), cardsActions.exitEditMode()]);
       })
     )
   );
@@ -69,7 +67,6 @@ export class DashboardsOrchestratorEffects {
         return from([
           tabsActions.discardChanges(),
           cardsActions.discardChanges(),
-          // devicesActions.discardChanges(),
           currentDashboardActions.exitEditMode(),
         ]);
       })

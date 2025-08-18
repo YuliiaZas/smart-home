@@ -5,6 +5,7 @@ import { Store } from '@ngrx/store';
 import { currentDashboardFeature } from './current-dashboard/current-dashboard.state';
 import { dashboardsListActions, dashboardsListFeature } from '@state/dashboars/dashboards-list';
 import { currentDashboardActions } from './current-dashboard/current-dashboard.actions';
+import { homeItemsActions } from '@state/home-items';
 
 @Injectable({
   providedIn: 'root',
@@ -68,5 +69,6 @@ export class DashboardsFacade {
   resetDashboards(): void {
     this.#store.dispatch(dashboardsListActions.resetUserDashboards());
     this.#store.dispatch(currentDashboardActions.resetCurrentDashboard());
+    this.#store.dispatch(homeItemsActions.resetHomeItems());
   }
 }
