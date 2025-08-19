@@ -5,8 +5,8 @@
 }
 
 .nav-user-logo {
-  width: 40px;
-  height: 40px;
+  width: 35px;
+  height: 35px;
   border-radius: 50%;
   background-color: #44749f;
   color: #1a1b1f;
@@ -15,6 +15,7 @@
   justify-content: center;
   font-weight: bold;
   font-size: 1.25rem;
+  user-select: none;
 }
 
 .nav-user-label {

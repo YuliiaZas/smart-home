@@ -5,16 +5,24 @@ import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angu
 import { Router } from '@angular/router';
 import { BehaviorSubject, catchError, finalize, of } from 'rxjs';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIcon } from '@angular/material/icon';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { Auth, LoginRequestInfo } from '@shared/auth';
 import { ERROR_MESSAGES, ROUTING_PATHS } from '@shared/constants';
-import { MatButton } from '@angular/material/button';
+import { MatButtonModule } from '@angular/material/button';
 import { Spinner } from '@shared/components';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, AsyncPipe, MatFormFieldModule, MatInputModule, MatIcon, MatButton, Spinner],
+  imports: [
+    ReactiveFormsModule,
+    AsyncPipe,
+    MatFormFieldModule,
+    MatInputModule,
+    MatIconModule,
+    MatButtonModule,
+    Spinner,
+  ],
   templateUrl: './login.html',
   styleUrl: './login.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -46,6 +46,7 @@ import { SideNavUser } from '../side-nav-user/side-nav-user';
 export class SideNav implements OnInit {
   navItems = input.required<NavInfo[]>();
   user = input.required<UserProfileInfo | null>();
+  addDashboard = output<void>();
   logout = output<void>();
 
   expanded = signal(true);

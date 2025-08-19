@@ -5,7 +5,7 @@
 <div class="container">
   <h1 class="title">Welcome home!</h1>
   <form [formGroup]="loginForm" class="form" (focusin)="formFocus()">
-    <mat-form-field appearance="fill" class="input">
+    <mat-form-field class="input">
       <mat-label>Username</mat-label>
       <input matInput [formControl]="username" required autocomplete="on" />
       @if (username.touched && username.invalid) {
@@ -13,7 +13,7 @@
       }
     </mat-form-field>
 
-    <mat-form-field appearance="fill" class="input">
+    <mat-form-field class="input">
       <mat-label>Password</mat-label>
       <input
         matInput
