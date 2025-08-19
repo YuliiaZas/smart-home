@@ -19,7 +19,7 @@ export class TabsFacade {
     return this.#store.select(tabsFeature.selectCurrentTabdId);
   }
 
-  enterCardEditMode(tabId: string): void {
+  setCurrentTab(tabId: string): void {
     this.#store.dispatch(tabsActions.setCurrentTabId({ tabId }));
   }
 
@@ -27,7 +27,7 @@ export class TabsFacade {
     this.#store.dispatch(tabsActions.renameCurrentTab({ title }));
   }
 
-  reorderTabs(tabId: string, tabsOrdered: string[]): void {
+  reorderTabs(tabsOrdered: string[]): void {
     this.#store.dispatch(tabsActions.reorderTabs({ tabsOrdered }));
   }
 

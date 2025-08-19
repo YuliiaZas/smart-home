@@ -9,6 +9,8 @@ interface TabsState extends EntityState<TabInfo> {
 
   originalTabs: TabInfo[];
   originalTabsOrdered: string[];
+
+  isChanged: boolean;
 }
 
 const tabsAdapter = createEntityAdapter<TabInfo>({
@@ -21,6 +23,8 @@ const initialState: TabsState = tabsAdapter.getInitialState({
 
   originalTabs: [],
   originalTabsOrdered: [],
+
+  isChanged: false,
 });
 
 // const getNewTab = (title: string, tabIds: string[]): DashboardTabInfo => ({
@@ -60,6 +64,7 @@ const reducer = createReducer<TabsState>(
       ...state,
       originalTabs: [],
       originalTabsOrdered: [],
+      isChanged: false,
     })
   ),
   on(tabsActions.discardChanges, (state): TabsState => {
@@ -73,15 +78,16 @@ const reducer = createReducer<TabsState>(
   on(tabsActions.renameCurrentTab, (state, { title }): TabsState => {
     const currentTabId = state.currentTabdId;
     if (!currentTabId) return state;
-    return tabsAdapter.updateOne({ id: currentTabId, changes: { title } }, state);
+    return tabsAdapter.updateOne({ id: currentTabId, changes: { title } }, { ...state, isChanged: true });
   }),
 
-  on(tabsActions.reorderTabs, (state, { tabsOrdered }): TabsState => ({ ...state, tabsOrdered })),
+  on(tabsActions.reorderTabs, (state, { tabsOrdered }): TabsState => ({ ...state, tabsOrdered, isChanged: true })),
 
   on(tabsActions.addTab, (state, { tabInfo }): TabsState => {
     return tabsAdapter.addOne(tabInfo, {
       ...state,
       tabsOrdered: [...state.tabsOrdered, tabInfo.id],
+      isChanged: true,
     });
   }),
 
@@ -91,6 +97,7 @@ const reducer = createReducer<TabsState>(
     return tabsAdapter.removeOne(currentTabId, {
       ...state,
       tabsOrdered: state.tabsOrdered.filter((id) => id !== currentTabId),
+      isChanged: true,
     });
   })
 );

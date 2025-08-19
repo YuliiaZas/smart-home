@@ -11,6 +11,8 @@ interface CardsState extends EntityState<HomeCardInfo> {
 
   currentCardId: string | null;
   originalCurrentCardData: HomeCardInfo | null;
+
+  isChanged: boolean;
 }
 
 const cardsAdapter = createEntityAdapter<HomeCardInfo>({
@@ -25,6 +27,8 @@ const initialState: CardsState = cardsAdapter.getInitialState({
 
   currentCardId: null,
   originalCurrentCardData: null,
+
+  isChanged: false,
 });
 
 const reducer = createReducer<CardsState>(
@@ -52,6 +56,7 @@ const reducer = createReducer<CardsState>(
       ...state,
       originalCards: null,
       originalCardsOrderedByTab: {},
+      isChanged: false,
     })
   ),
   on(cardsActions.discardChanges, (state): CardsState => {
@@ -90,16 +95,16 @@ const reducer = createReducer<CardsState>(
   on(cardsActions.renameCurrentCard, (state, { title }): CardsState => {
     const currentCardId = state.currentCardId;
     if (!currentCardId) return state;
-    return cardsAdapter.updateOne({ id: currentCardId, changes: { title } }, state);
+    return cardsAdapter.updateOne({ id: currentCardId, changes: { title } }, { ...state, isChanged: true });
   }),
 
   on(cardsActions.addItemToCurrentCard, (state, { item }): CardsState => {
     const updatedCard = addItemToCurrentCard(state, item);
-    return updatedCard ? cardsAdapter.upsertOne(updatedCard, state) : state;
+    return updatedCard ? cardsAdapter.upsertOne(updatedCard, { ...state, isChanged: true }) : state;
   }),
   on(cardsActions.removeItemFromCurrentCard, (state, { orderIndex }): CardsState => {
     const updatedCard = removeItemByIndexFromCurrentCard(state, orderIndex);
-    return updatedCard ? cardsAdapter.upsertOne(updatedCard, state) : state;
+    return updatedCard ? cardsAdapter.upsertOne(updatedCard, { ...state, isChanged: true }) : state;
   }),
 
   on(
@@ -110,6 +115,7 @@ const reducer = createReducer<CardsState>(
         ...state.cardsOrderedByTab,
         [tabId]: cardsIdsOrdered,
       },
+      isChanged: true,
     })
   ),
 
@@ -121,6 +127,7 @@ const reducer = createReducer<CardsState>(
         ...state.cardsOrderedByTab,
         [tabId]: [...(state.cardsOrderedByTab[tabId] || []), card.id],
       },
+      isChanged: true,
     });
   }),
 
@@ -131,6 +138,7 @@ const reducer = createReducer<CardsState>(
         ...state.cardsOrderedByTab,
         [tabId]: state.cardsOrderedByTab[tabId].filter((id) => id !== cardId),
       },
+      isChanged: true,
     });
   })
 );

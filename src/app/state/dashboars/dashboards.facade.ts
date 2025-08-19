@@ -2,10 +2,11 @@ import { inject, Injectable } from '@angular/core';
 import { combineLatest, EMPTY, map, Observable, switchMap } from 'rxjs';
 import { DashboardInfo } from '@shared/models';
 import { Store } from '@ngrx/store';
-import { currentDashboardFeature } from './current-dashboard/current-dashboard.state';
-import { dashboardsListActions, dashboardsListFeature } from '@state/dashboars/dashboards-list';
-import { currentDashboardActions } from './current-dashboard/current-dashboard.actions';
 import { homeItemsActions } from '@state/home-items';
+import { cardsFeature } from '@state/cards';
+import { tabsFeature } from '@state/tabs';
+import { dashboardsListActions, dashboardsListFeature } from './dashboards-list';
+import { currentDashboardActions, currentDashboardFeature } from './current-dashboard';
 
 @Injectable({
   providedIn: 'root',
@@ -40,6 +41,13 @@ export class DashboardsFacade {
     ]).pipe(
       map(([currentDashboardId, dashboards]) => (currentDashboardId ? dashboards[currentDashboardId] || null : null))
     );
+  }
+
+  get isChangedState$(): Observable<boolean> {
+    return combineLatest([
+      this.#store.select(tabsFeature.selectIsChanged),
+      this.#store.select(cardsFeature.selectIsChanged),
+    ]).pipe(map(([isTabsChanged, isCardsChanged]) => isTabsChanged || isCardsChanged));
   }
 
   setCurrentDashboardId(dashboardId: string | null): void {
