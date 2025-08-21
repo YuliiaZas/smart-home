@@ -1,10 +1,8 @@
-<app-card-list
-  [sorting]="sorting()"
-  [sortingId]="sortingId()"
-  [cardTemplateRef]="cardTemplateRef"
-  (sortUpdated)="sortUpdated($event)"
-></app-card-list>
+<app-card-list [cardIds]="cardIds()" [cardTemplateRef]="cardTemplateRef"></app-card-list>
 
 <ng-template #cardTemplateRef let-cardId="cardId">
-  <app-home-card [cardData]="cards()[cardId]" (updateCardData)="updateCardData($event)"></app-home-card>
+  @let cardData = cardsEntities()[cardId];
+  @if (cardData) {
+    <app-home-card [cardData]="cardData"></app-home-card>
+  }
 </ng-template>

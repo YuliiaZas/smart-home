@@ -1,14 +1,21 @@
 import { Component, inject } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, NavigationEnd, NavigationError, NavigationStart, Router, RouterOutlet } from '@angular/router';
-import { BehaviorSubject, combineLatest, filter, map, Observable, switchMap } from 'rxjs';
+import {
+  NavigationEnd,
+  NavigationError,
+  NavigationSkipped,
+  NavigationStart,
+  Router,
+  RouterOutlet,
+} from '@angular/router';
+import { BehaviorSubject, combineLatest, filter, map, Observable } from 'rxjs';
 import { SideNav } from '@shared/layout/side-nav/side-nav';
 import { Spinner } from '@shared/components';
 import { Auth } from '@shared/auth';
 import { ROUTING_PATHS } from '@shared/constants';
 import { NavInfo } from '@shared/models';
-import { UserDashboards } from '@shared/dashboards/services';
+import { DashboardsFacade } from '@state';
 
 @Component({
   selector: 'app-root',
@@ -20,8 +27,7 @@ import { UserDashboards } from '@shared/dashboards/services';
 export class App {
   private router = inject(Router);
   private authService = inject(Auth);
-  private dashboardsService = inject(UserDashboards);
-  private activatedRoute = inject(ActivatedRoute);
+  private dashboardsFacade = inject(DashboardsFacade);
 
   readonly isLoading$ = new BehaviorSubject<boolean>(false);
   readonly currentUser$ = this.authService.currentUser$;
@@ -33,7 +39,7 @@ export class App {
     map(([isAuthenticated, isLogin]) => isAuthenticated && !isLogin)
   );
 
-  dashboards$: Observable<NavInfo[]> = this.dashboardsService.userDashboards$.pipe(
+  dashboards$: Observable<NavInfo[]> = this.dashboardsFacade.userDashboards$.pipe(
     map((dashboards) =>
       (dashboards || []).map((dashboard) => ({
         ...dashboard,
@@ -43,26 +49,22 @@ export class App {
   );
 
   constructor() {
-    this.currentUser$
-      .pipe(
-        takeUntilDestroyed(),
-        filter((user) => !!user),
-        switchMap(() => this.dashboardsService.getUserDashboards())
-      )
-      .subscribe();
-
     this.router.events.pipe(takeUntilDestroyed()).subscribe((event) => {
       if (event instanceof NavigationStart) {
         this.isLoading$.next(true);
         this.authService.checkAuthentication();
-      } else if (event instanceof NavigationEnd || event instanceof NavigationError) {
+      } else if (
+        event instanceof NavigationEnd ||
+        event instanceof NavigationError ||
+        event instanceof NavigationSkipped
+      ) {
         this.isLoading$.next(false);
       }
     });
   }
 
   logout() {
-    this.dashboardsService.resetDashboardsData();
+    this.dashboardsFacade.resetDashboards();
     this.authService.logout();
     this.router.navigate([ROUTING_PATHS.LOGIN]);
   }

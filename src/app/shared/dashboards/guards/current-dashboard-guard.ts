@@ -1,15 +1,12 @@
 import { inject } from '@angular/core';
 import { CanActivateFn } from '@angular/router';
-import { filter, map } from 'rxjs';
-import { UserDashboards } from '../services';
+import { filter } from 'rxjs';
+import { DashboardsFacade } from '@state';
 
 export const currentDashboardGuard: CanActivateFn = (route) => {
-  const dashboardsService = inject(UserDashboards);
+  const dashboardsFacade = inject(DashboardsFacade);
 
-  dashboardsService.setCurrentDashboardId(route.paramMap.get('dashboardId'));
+  dashboardsFacade.setCurrentDashboardId(route.paramMap.get('dashboardId'));
 
-  return dashboardsService.isCurrentDashboardDataFetching$.pipe(
-    filter((isFetching) => isFetching === false),
-    map(() => true)
-  );
+  return dashboardsFacade.isCurrentDashboardLoaded$.pipe(filter((isLoaded) => isLoaded));
 };

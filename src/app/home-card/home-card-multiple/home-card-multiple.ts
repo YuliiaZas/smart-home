@@ -1,12 +1,13 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import { Dictionary } from '@ngrx/entity';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
-import { CardLayout } from '@shared/models';
+import { CardLayout, DeviceInfo, HomeItemInfo } from '@shared/models';
 import { UnitsPipe } from '@shared/pipes';
 import { Card } from '@shared/components';
+import { isDeviceInfo } from '@shared/utils';
 import { Sensor } from '../../home-sensor/home-sensor';
 import { Device } from '../../home-device/home-device';
 import { HomeCardBase } from '../home-card-base/home-card-base';
-import { isDeviceInfo } from '@shared/utils';
 
 @Component({
   selector: 'app-home-card-multiple',
@@ -21,22 +22,16 @@ export class HomeCardMultiple extends HomeCardBase {
   isContentVertical = computed(() => this.cardData().layout === CardLayout.VERTICAL);
   iconPosition = computed(() => (this.isContentVertical() ? 'bottom' : 'left'));
 
-  private devices = computed(() => {
-    const items = this.cardData().items;
-    return items.filter((item) => isDeviceInfo(item));
-  });
-  showAllDevicesState = computed(() => this.devices().length > 1);
-  allDevicesState = computed(() => this.devices().some((device) => device.state));
+  #devices = computed(() => this.#selectDevices(this.cardData().items, this.homeItemsEntities()));
+  #devicesIds = computed(() => this.#devices().map((device) => device.id));
+  showAllDevicesState = computed(() => this.#devices().length > 1);
+  allDevicesState = computed(() => this.#devices().some((device) => device.state));
 
   changeAllDevicesState() {
-    const newState = !this.allDevicesState();
+    this.homeItemsFacade.setStateForDevices(this.#devicesIds(), !this.allDevicesState());
+  }
 
-    this.cardData.update((currentCardData) => {
-      const updatedItems = currentCardData.items.map((item) => ('state' in item ? { ...item, state: newState } : item));
-
-      return { ...currentCardData, items: updatedItems };
-    });
-
-    this.updateCardData.emit(this.cardData());
+  #selectDevices(itemsIds: string[], homeItemsEntities: Dictionary<HomeItemInfo>): DeviceInfo[] {
+    return itemsIds.map((id) => homeItemsEntities[id]).filter((item) => isDeviceInfo(item));
   }
 }

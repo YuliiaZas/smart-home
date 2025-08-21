@@ -1,24 +1,27 @@
 <app-card [headerClass]="headerClass">
   <ng-container cardTitle>
-    {{ singleItem().label | addTitleToLabel: cardData().title }}
+    {{ label() | addTitleToLabel: cardData().title }}
   </ng-container>
+
+  @let singleDeviceValue = singleDevice();
+  @let singleSensorValue = singleSensor();
 
   <ng-container cardAction>
     <app-home-item-icon
-      [icon]="singleItem().icon"
-      [clickableIcon]="!!singleDevice()"
-      [activeIcon]="!!singleDevice()?.state"
-      (iconClick)="changeDeviceState(singleDevice())"
+      [icon]="icon()"
+      [clickableIcon]="!!singleDeviceValue"
+      [activeIcon]="!!singleDeviceValue?.state"
+      (iconClick)="singleDeviceValue && changeDeviceState(singleDeviceValue)"
     ></app-home-item-icon>
   </ng-container>
 
   <ng-container cardFooter>
     <div class="card-footer body-3">
-      @if (singleDevice()) {
-        <span class="capitalize" aria-label="State value">{{ singleDevice()!.state | appStateValue }}</span>
-      } @else if (singleSensor()) {
+      @if (singleDeviceValue) {
+        <span class="capitalize" aria-label="State value">{{ singleDeviceValue.state | appStateValue }}</span>
+      } @else if (singleSensorValue) {
         <span class="capitalize">{{
-          singleSensor()!.value | appUnits: singleSensor()!.icon : sensorTypesWithHiddenAmount
+          singleSensorValue.value | appUnits: singleSensorValue.icon : sensorTypesWithHiddenAmount
         }}</span>
       }
     </div>

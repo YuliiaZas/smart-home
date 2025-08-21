@@ -1,11 +1,9 @@
-import { ChangeDetectionStrategy, Component, inject, computed, signal, effect } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, computed } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { ActivatedRoute } from '@angular/router';
-import { of } from 'rxjs';
+import { Dictionary } from '@ngrx/entity';
 import { CardList } from '@shared/components';
-import { HomeCardInfo } from '@shared/models';
-import { CardSortingService } from '@shared/services';
-import { UserDashboards } from '@shared/dashboards/services';
+import { HomeCardWithItemsIdsInfo } from '@shared/models';
+import { TabsFacade, CardsFacade } from '@state';
 import { HomeCard } from '../home-card/home-card';
 
 @Component({
@@ -16,51 +14,19 @@ import { HomeCard } from '../home-card/home-card';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeTab {
-  private activatedRoute = inject(ActivatedRoute);
-  private dashboardsService = inject(UserDashboards);
-  private cardSortingService = inject(CardSortingService);
+  #tabsFacade = inject(TabsFacade);
+  #cardsFacade = inject(CardsFacade);
 
-  parentParameters = toSignal(this.activatedRoute.parent?.paramMap || of(null));
-  parameters = toSignal(this.activatedRoute.paramMap);
-  dashboardId = computed(() => this.parentParameters()?.get('dashboardId'));
-  tabId = computed(() => this.parameters()?.get('tabId'));
-  sortingId = computed(() => `${this.dashboardId()}-${this.tabId()}`);
-
-  dashboardData = toSignal(this.dashboardsService.currentDashboardData$);
-  tabData = computed(() => {
-    const tabId = this.tabId() || '';
-    return (this.dashboardData() || {})[tabId] || { id: tabId, cards: [] };
+  cardsEntities = toSignal(this.#cardsFacade.cardsEntities$, {
+    initialValue: {} as Dictionary<HomeCardWithItemsIdsInfo>,
   });
 
-  protected cards = computed(() => {
-    const accumulator: Record<string, HomeCardInfo> = {};
-    for (const card of this.tabData().cards) {
-      accumulator[card.id] = card;
-    }
-    return accumulator;
+  #tabId = toSignal(this.#tabsFacade.currentTabId$);
+  #cardsOrderedByTab = toSignal(this.#cardsFacade.cardsOrderedByTab$, { initialValue: {} as Record<string, string[]> });
+
+  cardIds = computed(() => {
+    const tabId = this.#tabId();
+    if (!tabId) return [];
+    return this.#cardsOrderedByTab()[tabId];
   });
-
-  protected sorting = signal<string[][]>([]);
-
-  constructor() {
-    effect(() => {
-      this.sorting.set(
-        this.cardSortingService.getCardsSorting(
-          this.tabData().id,
-          this.tabData().cards.map((card) => card.id)
-        )
-      );
-    });
-  }
-
-  sortUpdated(sorting: string[][]) {
-    this.sorting.set(sorting);
-
-    this.cardSortingService.setCardsSorting(this.tabData().id, sorting);
-  }
-
-  updateCardData(card: HomeCardInfo) {
-    //TODO: Implement the logic to update the card data on the server.
-    console.log('updateCardData', card);
-  }
 }

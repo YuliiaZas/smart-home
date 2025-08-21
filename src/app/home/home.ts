@@ -3,7 +3,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { MatTabLink, MatTabNav, MatTabNavPanel } from '@angular/material/tabs';
 import { TabInfo, TabItemInfo } from '@shared/models';
-import { UserDashboards } from '@shared/dashboards/services';
+import { TabsFacade } from '@state';
 
 @Component({
   selector: 'app-home',
@@ -13,12 +13,12 @@ import { UserDashboards } from '@shared/dashboards/services';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Home {
-  private dashboardsService = inject(UserDashboards);
+  #tabsFacade = inject(TabsFacade);
 
-  dashboardTabs = toSignal<TabInfo[]>(this.dashboardsService.currentDashboardTabs$);
+  #dashboardTabs = toSignal<TabInfo[]>(this.#tabsFacade.tabsInfo$);
 
   tabs = computed<TabItemInfo[]>(() => {
-    const tabs = this.dashboardTabs();
+    const tabs = this.#dashboardTabs();
     return (tabs || []).map((tab) => ({ ...tab, link: tab.id }));
   });
 }

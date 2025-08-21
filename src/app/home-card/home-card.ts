@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, model, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, model } from '@angular/core';
 import { HomeCardSingle } from './home-card-single/home-card-single';
 import { HomeCardMultiple } from './home-card-multiple/home-card-multiple';
-import { CardLayout, HomeCardInfo } from '@shared/models';
+import { CardLayout, HomeCardWithItemsIdsInfo } from '@shared/models';
 
 @Component({
   selector: 'app-home-card',
@@ -11,8 +11,8 @@ import { CardLayout, HomeCardInfo } from '@shared/models';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeCard {
-  cardData = model.required<HomeCardInfo>();
-  updateCardData = output<HomeCardInfo>();
+  cardData = model.required<HomeCardWithItemsIdsInfo>();
+  // updateCardData = output<HomeCardInfo>();
 
   isSingleItem = computed<boolean>(
     () => this.cardData().layout === CardLayout.SINGLE && this.cardData().items.length === 1
