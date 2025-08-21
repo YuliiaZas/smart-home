@@ -17,11 +17,11 @@
     <mat-nav-list class="nav-content" aria-label="Dashboards">
       <ul>
         @for (nav of navItems(); track nav) {
-          <li class="nav-item" routerLinkActive="nav-link__active" [routerLinkActiveOptions]="{ exact: false }">
+          <li class="nav-item" routerLinkActive="nav-item__active" [routerLinkActiveOptions]="{ exact: false }">
             <a mat-list-item [routerLink]="nav.link" [attr.aria-label]="nav.title">
-              <mat-icon class="nav-link-icon" matListItemIcon aria-hidden="true" [fontIcon]="nav.icon"></mat-icon>
+              <mat-icon class="nav-item-icon" matListItemIcon aria-hidden="true" [fontIcon]="nav.icon"></mat-icon>
               @if (expanded()) {
-                <span class="nav-link-label">{{ nav.title }}</span>
+                <span class="nav-item-label">{{ nav.title }}</span>
               }
             </a>
           </li>

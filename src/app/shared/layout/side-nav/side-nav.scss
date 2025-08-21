@@ -40,15 +40,15 @@ $active-bg-color: #182e37;
   margin: $item-margin;
   border-radius: $item-radius;
 
-  .nav-link-label {
+  .nav-item-label {
     text-transform: capitalize;
   }
 
   &__active {
     background-color: $active-bg-color;
 
-    .nav-link-label,
-    .nav-link-icon {
+    .nav-item-label,
+    .nav-item-icon {
       color: $active-color;
     }
   }
