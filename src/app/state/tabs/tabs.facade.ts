@@ -11,7 +11,11 @@ import { tabsActions } from './tabs.actions';
 export class TabsFacade {
   #store = inject(Store);
 
-  get tabInfo$(): Observable<TabInfo[]> {
+  get tabsIds$(): Observable<string[]> {
+    return this.#store.select(tabsFeature.selectTabsIdsOrdered);
+  }
+
+  get tabsInfo$(): Observable<TabInfo[]> {
     return this.#store.select(tabsFeature.selectOrderedTabs);
   }
 
@@ -27,8 +31,8 @@ export class TabsFacade {
     this.#store.dispatch(tabsActions.renameCurrentTab({ title }));
   }
 
-  reorderTabs(tabsOrdered: string[]): void {
-    this.#store.dispatch(tabsActions.reorderTabs({ tabsOrdered }));
+  reorderTabs(tabsIdsOrdered: string[]): void {
+    this.#store.dispatch(tabsActions.reorderTabs({ tabsIdsOrdered }));
   }
 
   addTab(tabInfo: TabInfo): void {

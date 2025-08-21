@@ -14,7 +14,7 @@ export const tabsActions = createActionGroup({
 
     'Rename Current Tab': props<{ title: string }>(),
 
-    'Reorder Tabs': props<{ tabsOrdered: string[] }>(),
+    'Reorder Tabs': props<{ tabsIdsOrdered: string[] }>(),
 
     'Add Tab': props<{ tabInfo: TabInfo }>(),
 

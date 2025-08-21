@@ -1,12 +1,12 @@
 import { inject, Injectable } from '@angular/core';
-import { combineLatest, EMPTY, map, Observable, switchMap } from 'rxjs';
-import { DashboardInfo } from '@shared/models';
+import { combineLatest, EMPTY, map, Observable, switchMap, take } from 'rxjs';
+import { DashboardInfo, LoadingStatus } from '@shared/models';
 import { Store } from '@ngrx/store';
 import { homeItemsActions } from '@state/home-items';
 import { cardsFeature } from '@state/cards';
 import { tabsFeature } from '@state/tabs';
 import { dashboardsListActions, dashboardsListFeature } from './dashboards-list';
-import { currentDashboardActions, currentDashboardFeature } from './current-dashboard';
+import { currentDashboardActions, currentDashboardFeature, dashboardApiActions } from './current-dashboard';
 
 @Injectable({
   providedIn: 'root',
@@ -14,20 +14,22 @@ import { currentDashboardActions, currentDashboardFeature } from './current-dash
 export class DashboardsFacade {
   #store = inject(Store);
 
-  get isUserDashboardsListLoading$(): Observable<boolean> {
-    return this.#store.select(dashboardsListFeature.isLoading);
-  }
-
   get userDashboards$(): Observable<DashboardInfo[]> {
-    return this.#store.select(dashboardsListFeature.isLoadingNotStarted).pipe(
-      switchMap((isLoadingNotStarted) => {
-        if (isLoadingNotStarted) {
-          this.#store.dispatch(dashboardsListActions.loadUserDashboards());
-          return EMPTY;
+    return this.#store.select(dashboardsListFeature.selectLoadingStatus).pipe(
+      switchMap((loadingStatus) => {
+        if (loadingStatus === LoadingStatus.Success || loadingStatus === LoadingStatus.Failure) {
+          return this.#store.select(dashboardsListFeature.selectAll);
         }
-        return this.#store.select(dashboardsListFeature.selectAll);
+        if (loadingStatus === LoadingStatus.NotStarted) {
+          this.#store.dispatch(dashboardsListActions.loadUserDashboards());
+        }
+        return EMPTY;
       })
     );
+  }
+
+  get isCurrentDashboardLoaded$(): Observable<boolean> {
+    return this.#store.select(currentDashboardFeature.selectIsDashboardDataApplied);
   }
 
   get currentDashboardId$(): Observable<string | null> {
@@ -51,7 +53,19 @@ export class DashboardsFacade {
   }
 
   setCurrentDashboardId(dashboardId: string | null): void {
-    this.#store.dispatch(currentDashboardActions.setCurrentDashboardId({ dashboardId }));
+    this.#store
+      .select(currentDashboardFeature.selectDashboardId)
+      .pipe(take(1))
+      .subscribe((currentId) => {
+        if (currentId === dashboardId) return;
+
+        this.#store.dispatch(currentDashboardActions.setCurrentDashboardId({ dashboardId }));
+        if (dashboardId) {
+          this.#store.dispatch(dashboardApiActions.loadDashboardData({ dashboardId }));
+        } else {
+          this.#store.dispatch(currentDashboardActions.resetCurrentDashboard());
+        }
+      });
   }
 
   addDashboard(dashboardInfo: DashboardInfo): void {

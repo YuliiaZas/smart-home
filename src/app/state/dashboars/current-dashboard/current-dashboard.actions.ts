@@ -2,7 +2,7 @@ import { createActionGroup, emptyProps, props } from '@ngrx/store';
 import { DashboardDataInfo, FailureAction } from '@shared/models';
 
 export const dashboardApiActions = createActionGroup({
-  source: 'Dashboard API',
+  source: 'Current Dashboard API',
   events: {
     'Load Dashboard Data': props<{ dashboardId: string | null }>(),
     'Load Dashboard Data Success': props<{ dashboardData: DashboardDataInfo | null }>(),
@@ -20,6 +20,7 @@ export const currentDashboardActions = createActionGroup({
     'Set Current Dashboard Id': props<{ dashboardId: string | null }>(),
 
     'Set Current Dashboard Data': props<{ dashboardData: DashboardDataInfo | null }>(),
+    'Set Current Dashboard Data Success': emptyProps(),
 
     'Enter Edit Mode': emptyProps(),
     'Exit Edit Mode': emptyProps(),

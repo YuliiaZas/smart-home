@@ -14,7 +14,7 @@ export class DashboardsListEffects {
   private store = inject(Store);
   private actions$ = inject(Actions);
   private dashboardsService = inject(UserDashboards);
-  private roter = inject(Router);
+  private router = inject(Router);
 
   loadUserDashboards$ = createEffect(() =>
     this.actions$.pipe(
@@ -40,7 +40,7 @@ export class DashboardsListEffects {
       ofType(dashboardsListActions.addDashboard),
       switchMap(({ dashboardInfo }) =>
         this.dashboardsService.addDashboard(dashboardInfo).pipe(
-          tap(({ id }) => this.roter.navigate([ROUTING_PATHS.DASHBOARD, id])),
+          tap(({ id }) => this.router.navigate([ROUTING_PATHS.DASHBOARD, id])),
           map(({ id }) => dashboardsListActions.addDashboardSuccess({ dashboardId: id })),
           catchError((error) =>
             of(dashboardsListActions.addDashboardFailure({ error, action: FailureAction.AddDashboard }))
@@ -50,7 +50,7 @@ export class DashboardsListEffects {
     )
   );
 
-  updateDashboardInfo$ = createEffect(() =>
+  updateCurrentDashboardInfo$ = createEffect(() =>
     this.actions$.pipe(
       ofType(dashboardsListActions.updateCurrentDashboardInfo),
       switchMap(() => this.store.select(dashboardsListActions.changeCurrentDashboardInfo)),
@@ -77,7 +77,7 @@ export class DashboardsListEffects {
       ofType(dashboardsListActions.deleteDashboard),
       switchMap(({ dashboardId }) =>
         this.dashboardsService.deleteDashboard(dashboardId).pipe(
-          tap(() => this.roter.navigate([ROUTING_PATHS.DASHBOARD])),
+          tap(() => this.router.navigate([ROUTING_PATHS.DASHBOARD])),
           map(() => dashboardsListActions.deleteDashboardSuccess()),
           catchError((error) =>
             of(

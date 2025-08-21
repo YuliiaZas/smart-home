@@ -4,12 +4,13 @@ import { Store } from '@ngrx/store';
 import { from } from 'rxjs';
 import { filter, map, switchMap, withLatestFrom } from 'rxjs/operators';
 import { isString } from '@shared/utils';
-import { DashboardDataInfo, HomeCardInfo, TabInfo } from '@shared/models';
+import { DashboardDataInfo, HomeCardWithItemsIdsInfo, HomeItemInfo, TabInfo } from '@shared/models';
 import { tabsActions, tabsFeature } from '@state/tabs';
 import { cardsActions, cardsFeature } from '@state/cards';
 import { dashboardsListActions } from './dashboards-list';
 import { currentDashboardActions, currentDashboardFeature, dashboardApiActions } from './current-dashboard';
-import { homeItemsActions } from '@state/home-items';
+import { homeItemsActions, homeItemsFeature } from '@state/home-items';
+import { Dictionary } from '@ngrx/entity';
 
 @Injectable()
 export class DashboardsOrchestratorEffects {
@@ -19,12 +20,7 @@ export class DashboardsOrchestratorEffects {
   resetCurrentDashboard$ = createEffect(() =>
     this.actions$.pipe(
       ofType(currentDashboardActions.resetCurrentDashboard),
-      switchMap(() =>
-        from([
-          currentDashboardActions.setCurrentDashboardData({ dashboardData: null }),
-          homeItemsActions.resetHomeItems(),
-        ])
-      )
+      map(() => currentDashboardActions.setCurrentDashboardData({ dashboardData: null }))
     )
   );
 
@@ -37,6 +33,7 @@ export class DashboardsOrchestratorEffects {
           tabsActions.setTabsData({ tabs }),
           cardsActions.setCardsData({ tabs }),
           homeItemsActions.setCurrentDashboardHomeItems({ tabs }),
+          currentDashboardActions.setCurrentDashboardDataSuccess(),
         ]);
       })
     )
@@ -81,11 +78,12 @@ export class DashboardsOrchestratorEffects {
       filter((currentDashboardId) => isString(currentDashboardId)),
       withLatestFrom(
         this.store.select(tabsFeature.selectOrderedTabs),
-        this.store.select(cardsFeature.selectCardsByTabs)
+        this.store.select(cardsFeature.selectCardsByTabs),
+        this.store.select(homeItemsFeature.selectEntities)
       ),
-      map(([dashboardId, tabs, cardsByTabs]) => ({
+      map(([dashboardId, tabs, cardsByTabs, homeItemEntities]) => ({
         dashboardId,
-        dashboardData: getherDashboardData(tabs, cardsByTabs),
+        dashboardData: getherDashboardData(tabs, cardsByTabs, homeItemEntities),
       })),
       switchMap(({ dashboardId, dashboardData }) => {
         return from([
@@ -97,10 +95,18 @@ export class DashboardsOrchestratorEffects {
   );
 }
 
-function getherDashboardData(tabs: TabInfo[], cardsByTabs: Record<string, HomeCardInfo[]>): DashboardDataInfo {
+function getherDashboardData(
+  tabs: TabInfo[],
+  cardsByTabs: Record<string, HomeCardWithItemsIdsInfo[]>,
+  homeItemEntities: Dictionary<HomeItemInfo>
+): DashboardDataInfo {
   const tabsWithCards = tabs.map((tab) => ({
     ...tab,
-    cards: cardsByTabs[tab.id] || [],
+    cards:
+      cardsByTabs[tab.id].map((card) => ({
+        ...card,
+        items: card.items.map((id) => homeItemEntities[id]).filter((item): item is HomeItemInfo => item !== undefined),
+      })) || [],
   }));
   return { tabs: tabsWithCards };
 }

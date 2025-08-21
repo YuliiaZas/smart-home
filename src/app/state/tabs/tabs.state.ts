@@ -5,10 +5,10 @@ import { tabsActions } from './tabs.actions';
 
 interface TabsState extends EntityState<TabInfo> {
   currentTabdId: string | null;
-  tabsOrdered: string[];
+  tabsIdsOrdered: string[];
 
   originalTabs: TabInfo[];
-  originalTabsOrdered: string[];
+  originalTabsIdsOrdered: string[];
 
   isChanged: boolean;
 }
@@ -19,18 +19,17 @@ const tabsAdapter = createEntityAdapter<TabInfo>({
 
 const initialState: TabsState = tabsAdapter.getInitialState({
   currentTabdId: null,
-  tabsOrdered: [],
+  tabsIdsOrdered: [],
 
   originalTabs: [],
-  originalTabsOrdered: [],
+  originalTabsIdsOrdered: [],
 
   isChanged: false,
 });
 
-// const getNewTab = (title: string, tabIds: string[]): DashboardTabInfo => ({
+// const getNewTabInfo = (title: string, tabIds: string[]): TabInfo => ({
 //   id: getUniqueId(getKebabCase(title), tabIds),
 //   title,
-//   cards: [],
 // });
 
 const reducer = createReducer<TabsState>(
@@ -38,76 +37,82 @@ const reducer = createReducer<TabsState>(
 
   on(tabsActions.setCurrentTabId, (state, { tabId }) => ({ ...state, currentTabdId: tabId })),
 
-  on(
-    tabsActions.setTabsData,
-    (state, { tabs }): TabsState =>
-      tabsAdapter.setAll(
-        tabs.map(({ id, title }) => ({ id, title })),
-        {
-          ...state,
-          tabsOrdered: tabs.map((tab) => tab.id),
-        }
-      )
-  ),
+  on(tabsActions.setTabsData, (_, { tabs }): TabsState => {
+    const newState: TabsState = {
+      ...initialState,
+      tabsIdsOrdered: tabs.map((tab) => tab.id),
+    };
+    return tabsAdapter.setAll(
+      tabs.map(({ id, title }) => ({ id, title })),
+      newState
+    );
+  }),
 
   on(
     tabsActions.enterEditMode,
     (state): TabsState => ({
       ...state,
       originalTabs: Object.values(state.entities).filter((entity): entity is TabInfo => !!entity),
-      originalTabsOrdered: [...state.tabsOrdered],
+      originalTabsIdsOrdered: [...state.tabsIdsOrdered],
     })
   ),
+  on(tabsActions.discardChanges, (state): TabsState => {
+    if (!state.originalTabs) return state;
+    const newState: TabsState = {
+      ...state,
+      tabsIdsOrdered: [...state.originalTabsIdsOrdered],
+    };
+    return tabsAdapter.setAll(state.originalTabs, newState);
+  }),
   on(
     tabsActions.exitEditMode,
     (state): TabsState => ({
       ...state,
       originalTabs: [],
-      originalTabsOrdered: [],
+      originalTabsIdsOrdered: [],
       isChanged: false,
     })
   ),
-  on(tabsActions.discardChanges, (state): TabsState => {
-    if (!state.originalTabs) return state;
-    return tabsAdapter.setAll(state.originalTabs, {
-      ...state,
-      tabsOrdered: [...state.originalTabsOrdered],
-    });
-  }),
 
   on(tabsActions.renameCurrentTab, (state, { title }): TabsState => {
     const currentTabId = state.currentTabdId;
     if (!currentTabId) return state;
-    return tabsAdapter.updateOne({ id: currentTabId, changes: { title } }, { ...state, isChanged: true });
+    const newState: TabsState = { ...state, isChanged: true };
+    return tabsAdapter.updateOne({ id: currentTabId, changes: { title } }, newState);
   }),
 
-  on(tabsActions.reorderTabs, (state, { tabsOrdered }): TabsState => ({ ...state, tabsOrdered, isChanged: true })),
+  on(
+    tabsActions.reorderTabs,
+    (state, { tabsIdsOrdered }): TabsState => ({ ...state, tabsIdsOrdered, isChanged: true })
+  ),
 
   on(tabsActions.addTab, (state, { tabInfo }): TabsState => {
-    return tabsAdapter.addOne(tabInfo, {
+    const newState: TabsState = {
       ...state,
-      tabsOrdered: [...state.tabsOrdered, tabInfo.id],
+      tabsIdsOrdered: [...state.tabsIdsOrdered, tabInfo.id],
       isChanged: true,
-    });
+    };
+    return tabsAdapter.addOne(tabInfo, newState);
   }),
 
   on(tabsActions.deleteCurrentTab, (state): TabsState => {
     const currentTabId = state.currentTabdId;
     if (!currentTabId) return state;
-    return tabsAdapter.removeOne(currentTabId, {
+    const newState: TabsState = {
       ...state,
-      tabsOrdered: state.tabsOrdered.filter((id) => id !== currentTabId),
+      tabsIdsOrdered: state.tabsIdsOrdered.filter((id) => id !== currentTabId),
       isChanged: true,
-    });
+    };
+    return tabsAdapter.removeOne(currentTabId, newState);
   })
 );
 
 export const tabsFeature = createFeature({
   name: 'tabs',
   reducer,
-  extraSelectors: ({ selectEntities, selectTabsOrdered }) => ({
-    selectOrderedTabs: createSelector(selectTabsOrdered, selectEntities, (tabsOrdered, entities) =>
-      tabsOrdered.map((id) => entities[id]).filter((tab): tab is TabInfo => !!tab)
+  extraSelectors: ({ selectEntities, selectTabsIdsOrdered }) => ({
+    selectOrderedTabs: createSelector(selectTabsIdsOrdered, selectEntities, (tabsIdsOrdered, entities) =>
+      tabsIdsOrdered.map((id) => entities[id]).filter((tab): tab is TabInfo => !!tab)
     ),
   }),
 });

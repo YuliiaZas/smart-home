@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { Dictionary } from '@ngrx/entity';
-import { CardInfo, HomeCardInfo, HomeItemInfo } from '@shared/models';
+import { CardInfo, HomeCardWithItemsIdsInfo } from '@shared/models';
 import { cardsFeature } from './cards.state';
 import { cardsActions } from './cards.actions';
 
@@ -16,11 +16,11 @@ export class CardsFacade {
     return this.#store.select(cardsFeature.selectCardsOrderedByTab);
   }
 
-  get cardsEntities$(): Observable<Dictionary<HomeCardInfo>> {
+  get cardsEntities$(): Observable<Dictionary<HomeCardWithItemsIdsInfo>> {
     return this.#store.select(cardsFeature.selectEntities);
   }
 
-  get currentCardId$(): Observable<string | null> {
+  get currentEditCardId$(): Observable<string | null> {
     return this.#store.select(cardsFeature.selectCurrentCardId);
   }
 
@@ -32,8 +32,8 @@ export class CardsFacade {
     this.#store.dispatch(cardsActions.renameCurrentCard({ title }));
   }
 
-  addItemToCurrentCard(item: HomeItemInfo): void {
-    this.#store.dispatch(cardsActions.addItemToCurrentCard({ item }));
+  addItemToCurrentCard(itemId: string): void {
+    this.#store.dispatch(cardsActions.addItemToCurrentCard({ itemId }));
   }
 
   removeItemFromCurrentCard(orderIndex: number): void {

@@ -1,22 +1,23 @@
-import { DashboardTabInfo, HomeCardInfo, HomeItemInfo } from '@shared/models';
 import { createEntityAdapter, EntityState } from '@ngrx/entity';
 import { createFeature, createReducer, createSelector, on } from '@ngrx/store';
+import { map } from 'lodash';
+import { DashboardTabInfo, HomeCardWithItemsIdsInfo } from '@shared/models';
 import { cardsActions } from './cards.actions';
 
-interface CardsState extends EntityState<HomeCardInfo> {
+interface CardsState extends EntityState<HomeCardWithItemsIdsInfo> {
   cardsOrderedByTab: Record<string, string[]>;
 
-  originalCards: HomeCardInfo[] | null;
+  originalCards: HomeCardWithItemsIdsInfo[] | null;
   originalCardsOrderedByTab: Record<string, string[]>;
 
   currentCardId: string | null;
-  originalCurrentCardData: HomeCardInfo | null;
+  originalCurrentCardData: HomeCardWithItemsIdsInfo | null;
 
   isChanged: boolean;
 }
 
-const cardsAdapter = createEntityAdapter<HomeCardInfo>({
-  selectId: (card: HomeCardInfo) => card.id,
+const cardsAdapter = createEntityAdapter<HomeCardWithItemsIdsInfo>({
+  selectId: (card: HomeCardWithItemsIdsInfo) => card.id,
 });
 
 const initialState: CardsState = cardsAdapter.getInitialState({
@@ -33,20 +34,19 @@ const initialState: CardsState = cardsAdapter.getInitialState({
 
 const reducer = createReducer<CardsState>(
   initialState,
-  on(
-    cardsActions.setCardsData,
-    (_, { tabs }): CardsState =>
-      cardsAdapter.setAll(
-        tabs.flatMap(({ cards }) => cards),
-        { ...initialState, cardsOrderedByTab: getCardsOrderedByTab(tabs) }
-      )
-  ),
+  on(cardsActions.setCardsData, (_, { tabs }): CardsState => {
+    const newState: CardsState = { ...initialState, cardsOrderedByTab: getCardsOrderedByTab(tabs) };
+    return cardsAdapter.setAll(
+      tabs.flatMap(({ cards }) => cards.map((card) => ({ ...card, items: map(card.items, 'id') }))),
+      newState
+    );
+  }),
 
   on(
     cardsActions.enterEditMode,
     (state): CardsState => ({
       ...state,
-      originalCards: Object.values(state.entities).filter((entity): entity is HomeCardInfo => !!entity),
+      originalCards: Object.values(state.entities).filter((entity): entity is HomeCardWithItemsIdsInfo => !!entity),
       originalCardsOrderedByTab: structuredClone(state.cardsOrderedByTab),
     })
   ),
@@ -61,10 +61,11 @@ const reducer = createReducer<CardsState>(
   ),
   on(cardsActions.discardChanges, (state): CardsState => {
     if (!state.originalCards) return state;
-    return cardsAdapter.setAll(state.originalCards, {
+    const newState: CardsState = {
       ...state,
       cardsOrderedByTab: structuredClone(state.originalCardsOrderedByTab),
-    });
+    };
+    return cardsAdapter.setAll(state.originalCards, newState);
   }),
 
   on(
@@ -85,26 +86,32 @@ const reducer = createReducer<CardsState>(
   ),
   on(cardsActions.discardCurrentCardChanges, (state): CardsState => {
     if (!state.originalCurrentCardData) return state;
-    return cardsAdapter.upsertOne(state.originalCurrentCardData, {
+    const newState: CardsState = {
       ...state,
       currentCardId: null,
       originalCurrentCardData: null,
-    });
+    };
+    return cardsAdapter.upsertOne(state.originalCurrentCardData, newState);
   }),
 
   on(cardsActions.renameCurrentCard, (state, { title }): CardsState => {
     const currentCardId = state.currentCardId;
     if (!currentCardId) return state;
-    return cardsAdapter.updateOne({ id: currentCardId, changes: { title } }, { ...state, isChanged: true });
+    const newState: CardsState = { ...state, isChanged: true };
+    return cardsAdapter.updateOne({ id: currentCardId, changes: { title } }, newState);
   }),
 
-  on(cardsActions.addItemToCurrentCard, (state, { item }): CardsState => {
-    const updatedCard = addItemToCurrentCard(state, item);
-    return updatedCard ? cardsAdapter.upsertOne(updatedCard, { ...state, isChanged: true }) : state;
+  on(cardsActions.addItemToCurrentCard, (state, { itemId }): CardsState => {
+    const updatedCard = addItemToCurrentCard(state, itemId);
+    if (!updatedCard) return state;
+    const newState: CardsState = { ...state, isChanged: true };
+    return cardsAdapter.upsertOne(updatedCard, newState);
   }),
   on(cardsActions.removeItemFromCurrentCard, (state, { orderIndex }): CardsState => {
     const updatedCard = removeItemByIndexFromCurrentCard(state, orderIndex);
-    return updatedCard ? cardsAdapter.upsertOne(updatedCard, { ...state, isChanged: true }) : state;
+    if (!updatedCard) return state;
+    const newState: CardsState = { ...state, isChanged: true };
+    return cardsAdapter.upsertOne(updatedCard, newState);
   }),
 
   on(
@@ -120,26 +127,28 @@ const reducer = createReducer<CardsState>(
   ),
 
   on(cardsActions.addCard, (state, { tabId, cardInfo }): CardsState => {
-    const card: HomeCardInfo = { ...cardInfo, items: [] };
-    return cardsAdapter.addOne(card, {
+    const card: HomeCardWithItemsIdsInfo = { ...cardInfo, items: [] };
+    const newState: CardsState = {
       ...state,
       cardsOrderedByTab: {
         ...state.cardsOrderedByTab,
         [tabId]: [...(state.cardsOrderedByTab[tabId] || []), card.id],
       },
       isChanged: true,
-    });
+    };
+    return cardsAdapter.addOne(card, newState);
   }),
 
   on(cardsActions.deleteCard, (state, { tabId, cardId }): CardsState => {
-    return cardsAdapter.removeOne(cardId, {
+    const newState: CardsState = {
       ...state,
       cardsOrderedByTab: {
         ...state.cardsOrderedByTab,
         [tabId]: state.cardsOrderedByTab[tabId].filter((id) => id !== cardId),
       },
       isChanged: true,
-    });
+    };
+    return cardsAdapter.removeOne(cardId, newState);
   })
 );
 
@@ -151,30 +160,32 @@ export const cardsFeature = createFeature({
       currentCardId ? entities[currentCardId] : null
     ),
     selectCardsByTabs: createSelector(selectCardsOrderedByTab, selectEntities, (cardIdssOrderedByTab, entities) => {
-      const cardsByTab: Record<string, HomeCardInfo[]> = {};
+      const cardsByTab: Record<string, HomeCardWithItemsIdsInfo[]> = {};
       for (const [tabId, cardIds] of Object.entries(cardIdssOrderedByTab)) {
-        cardsByTab[tabId] = cardIds.map((cardId) => entities[cardId]).filter((card): card is HomeCardInfo => !!card);
+        cardsByTab[tabId] = cardIds
+          .map((cardId) => entities[cardId])
+          .filter((card): card is HomeCardWithItemsIdsInfo => !!card);
       }
       return cardsByTab;
     }),
   }),
 });
 
-function getCurrentCard(state: CardsState): HomeCardInfo | null {
+function getCurrentCard(state: CardsState): HomeCardWithItemsIdsInfo | null {
   const currentCardId = state.currentCardId;
   return currentCardId ? state.entities[currentCardId] || null : null;
 }
 
-function addItemToCurrentCard(state: CardsState, item: HomeItemInfo): HomeCardInfo | null {
+function addItemToCurrentCard(state: CardsState, itemId: string): HomeCardWithItemsIdsInfo | null {
   const currentCard = getCurrentCard(state);
   if (!currentCard) return null;
   return {
     ...currentCard,
-    items: [...(currentCard.items || []), item],
+    items: [...(currentCard.items || []), itemId],
   };
 }
 
-function removeItemByIndexFromCurrentCard(state: CardsState, orderIndex: number): HomeCardInfo | null {
+function removeItemByIndexFromCurrentCard(state: CardsState, orderIndex: number): HomeCardWithItemsIdsInfo | null {
   const currentCard = getCurrentCard(state);
   if (!currentCard) return null;
   return {

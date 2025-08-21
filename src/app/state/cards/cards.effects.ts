@@ -7,7 +7,7 @@ import { cardsActions } from './cards.actions';
 export class CardsEffects {
   private actions$ = inject(Actions);
 
-  setOriginalTabsData$ = createEffect(() =>
+  addCard$ = createEffect(() =>
     this.actions$.pipe(
       ofType(cardsActions.addCard),
       map(({ cardInfo }) => cardsActions.enterCardEditMode({ cardId: cardInfo.id }))

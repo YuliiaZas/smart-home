@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
+import { Dictionary } from '@ngrx/entity';
 import { HomeItemInfo } from '@shared/models';
 import { homeItemsFeature } from './home-items.state';
 import { homeItemsActions, homeItemsApiActions } from './home-items.actions';
@@ -8,8 +9,12 @@ import { homeItemsActions, homeItemsApiActions } from './home-items.actions';
 @Injectable({
   providedIn: 'root',
 })
-export class DevicesFacade {
+export class HomeItemsFacade {
   #store = inject(Store);
+
+  get itemsEntities$(): Observable<Dictionary<HomeItemInfo>> {
+    return this.#store.select(homeItemsFeature.selectEntities);
+  }
 
   get allItems$(): Observable<HomeItemInfo[]> {
     return this.#store.select(homeItemsFeature.selectAll);
@@ -17,12 +22,6 @@ export class DevicesFacade {
 
   get areAllItemsLoading$(): Observable<boolean> {
     return this.#store.select(homeItemsFeature.selectAreAllItemsLoading);
-  }
-
-  getItemsByIds$(itemsIds: string[]): Observable<HomeItemInfo[]> {
-    return this.#store
-      .select(homeItemsFeature.selectEntities)
-      .pipe(map((entities) => itemsIds.map((id) => entities[id]).filter((item): item is HomeItemInfo => !!item)));
   }
 
   setDeviceState(deviceId: string, newState: boolean): void {

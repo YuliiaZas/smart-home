@@ -8,11 +8,11 @@ interface HomeItemsState extends EntityState<HomeItemInfo> {
   error: { action: FailureAction; error: Error } | null;
 }
 
-const cardsAdapter = createEntityAdapter<HomeItemInfo>({
+const homeItemsAdapter = createEntityAdapter<HomeItemInfo>({
   selectId: (homeItem: HomeItemInfo) => homeItem.id,
 });
 
-const initialState: HomeItemsState = cardsAdapter.getInitialState({
+const initialState: HomeItemsState = homeItemsAdapter.getInitialState({
   allItemsLoadingStatus: LoadingStatus.NotStarted,
   error: null,
 });
@@ -24,21 +24,21 @@ const reducer = createReducer<HomeItemsState>(
       return state;
     }
     const homeItems = tabs.flatMap((tab) => tab.cards.flatMap((card) => card.items));
-    return cardsAdapter.setAll(homeItems, state);
+    return homeItemsAdapter.setAll(homeItems, initialState);
   }),
 
   on(
     homeItemsApiActions.loadAllHomeItems,
     (state): HomeItemsState => ({ ...state, allItemsLoadingStatus: LoadingStatus.Loading })
   ),
-  on(
-    homeItemsApiActions.loadAllHomeItemsSuccess,
-    (state, { homeItems }): HomeItemsState => ({
-      ...cardsAdapter.setAll(homeItems, state),
+  on(homeItemsApiActions.loadAllHomeItemsSuccess, (state, { homeItems }): HomeItemsState => {
+    const newState: HomeItemsState = {
+      ...state,
       allItemsLoadingStatus: LoadingStatus.Success,
       error: null,
-    })
-  ),
+    };
+    return homeItemsAdapter.setAll(homeItems, newState);
+  }),
   on(
     homeItemsApiActions.loadAllHomeItemsFailure,
     (state, { action, error }): HomeItemsState => ({
@@ -49,31 +49,30 @@ const reducer = createReducer<HomeItemsState>(
   ),
 
   on(homeItemsApiActions.setDeviceState, (state, { deviceId, newState }): HomeItemsState => {
-    return cardsAdapter.updateOne({ id: deviceId, changes: { state: newState } }, state);
+    return homeItemsAdapter.updateOne({ id: deviceId, changes: { state: newState } }, state);
   }),
   on(homeItemsApiActions.setDeviceStateFailure, (state, { deviceId, oldState, action, error }): HomeItemsState => {
-    return cardsAdapter.updateOne(
-      { id: deviceId, changes: { state: oldState } },
-      { ...state, error: { action, error } }
-    );
+    const newState: HomeItemsState = { ...state, error: { action, error } };
+    return homeItemsAdapter.updateOne({ id: deviceId, changes: { state: oldState } }, newState);
   }),
 
   on(homeItemsApiActions.setStateForDevices, (state, { devicesIds, newState }): HomeItemsState => {
     const updates = devicesIds.map((deviceId) => ({ id: deviceId, changes: { state: newState } }));
-    return cardsAdapter.updateMany(updates, state);
+    return homeItemsAdapter.updateMany(updates, state);
   }),
   on(
     homeItemsApiActions.setStateForDevicesFailure,
     (state, { devicesIds, oldState, action, error }): HomeItemsState => {
       const updates = devicesIds.map((deviceId) => ({ id: deviceId, changes: { state: oldState } }));
-      return cardsAdapter.updateMany(updates, { ...state, error: { action, error } });
+      const newState: HomeItemsState = { ...state, error: { action, error } };
+      return homeItemsAdapter.updateMany(updates, newState);
     }
   ),
 
   on(homeItemsActions.resetHomeItems, (): HomeItemsState => initialState)
 );
 
-const { selectAll } = cardsAdapter.getSelectors();
+const { selectAll } = homeItemsAdapter.getSelectors();
 
 export const homeItemsFeature = createFeature({
   name: 'homeItems',

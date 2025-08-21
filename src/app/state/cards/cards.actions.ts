@@ -1,5 +1,5 @@
 import { createActionGroup, emptyProps, props } from '@ngrx/store';
-import { CardInfo, DashboardTabInfo, HomeItemInfo } from '@shared/models';
+import { CardInfo, DashboardTabInfo } from '@shared/models';
 
 export const cardsActions = createActionGroup({
   source: 'Cards',
@@ -16,7 +16,7 @@ export const cardsActions = createActionGroup({
 
     'Rename Current Card': props<{ title: string }>(),
 
-    'Add Item To Current Card': props<{ item: HomeItemInfo }>(),
+    'Add Item To Current Card': props<{ itemId: string }>(),
     'Remove Item From Current Card': props<{ orderIndex: number }>(), // itemId can be non-unique in a card
 
     'Reorder Cards': props<{ tabId: string; cardsIdsOrdered: string[] }>(),

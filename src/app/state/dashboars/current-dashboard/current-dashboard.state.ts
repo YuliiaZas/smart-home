@@ -3,55 +3,82 @@ import { FailureAction, LoadingStatus } from '@shared/models';
 import { currentDashboardActions, dashboardApiActions } from './current-dashboard.actions';
 
 interface CurrentDashboardState {
-  dashboardDataLoadingStatus: LoadingStatus;
+  isDashboardDataApplied: boolean;
+  loadingStatus: LoadingStatus;
   dashboardId: string | null;
   error: { action: FailureAction; error: Error } | null;
 }
 
 const initialState: CurrentDashboardState = {
-  dashboardDataLoadingStatus: LoadingStatus.NotStarted,
+  isDashboardDataApplied: false,
+  loadingStatus: LoadingStatus.NotStarted,
   dashboardId: null,
   error: null,
 };
 
 const reducer = createReducer<CurrentDashboardState>(
   initialState,
+  on(currentDashboardActions.resetCurrentDashboard, (): CurrentDashboardState => initialState),
+
   on(
     currentDashboardActions.setCurrentDashboardId,
     (state, { dashboardId }): CurrentDashboardState => ({ ...state, dashboardId })
   ),
-  on(currentDashboardActions.resetCurrentDashboard, (): CurrentDashboardState => initialState),
+
   on(
     dashboardApiActions.loadDashboardData,
-    dashboardApiActions.updateDashboardData,
     (state): CurrentDashboardState => ({
       ...state,
-      dashboardDataLoadingStatus: LoadingStatus.Loading,
-    })
-  ),
-  on(
-    currentDashboardActions.saveCurrentDashboard,
-    (state): CurrentDashboardState => ({
-      ...state,
-      dashboardDataLoadingStatus: LoadingStatus.Loading,
+      loadingStatus: LoadingStatus.Loading,
+      isDashboardDataApplied: false,
     })
   ),
   on(
     dashboardApiActions.loadDashboardDataSuccess,
-    dashboardApiActions.updateDashboardDataSuccess,
     (state): CurrentDashboardState => ({
       ...state,
+      loadingStatus: LoadingStatus.Success,
       error: null,
-      dashboardDataLoadingStatus: LoadingStatus.Success,
     })
   ),
   on(
     dashboardApiActions.loadDashboardDataFailure,
+    (state, errorInfo): CurrentDashboardState => ({
+      ...state,
+      loadingStatus: LoadingStatus.Failure,
+      error: errorInfo,
+    })
+  ),
+  on(
+    currentDashboardActions.setCurrentDashboardDataSuccess,
+    (state): CurrentDashboardState => ({
+      ...state,
+      isDashboardDataApplied: true,
+    })
+  ),
+
+  on(
+    currentDashboardActions.saveCurrentDashboard,
+    dashboardApiActions.updateDashboardData,
+    (state): CurrentDashboardState => ({
+      ...state,
+      loadingStatus: LoadingStatus.Loading,
+    })
+  ),
+  on(
+    dashboardApiActions.updateDashboardDataSuccess,
+    (state): CurrentDashboardState => ({
+      ...state,
+      loadingStatus: LoadingStatus.Success,
+      error: null,
+    })
+  ),
+  on(
     dashboardApiActions.updateDashboardDataFailure,
     (state, errorInfo): CurrentDashboardState => ({
       ...state,
+      loadingStatus: LoadingStatus.Failure,
       error: errorInfo,
-      dashboardDataLoadingStatus: LoadingStatus.Failure,
     })
   )
 );
@@ -59,10 +86,7 @@ const reducer = createReducer<CurrentDashboardState>(
 export const currentDashboardFeature = createFeature({
   name: 'currentDashboard',
   reducer,
-  extraSelectors: ({ selectDashboardDataLoadingStatus }) => ({
-    isLoading: createSelector(
-      selectDashboardDataLoadingStatus,
-      (loadingStatus) => loadingStatus === LoadingStatus.Loading
-    ),
+  extraSelectors: ({ selectLoadingStatus }) => ({
+    selectIsLoading: createSelector(selectLoadingStatus, (loadingStatus) => loadingStatus === LoadingStatus.Loading),
   }),
 });

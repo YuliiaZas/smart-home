@@ -11,14 +11,7 @@ export class CurrentDashboardEffects {
   private actions$ = inject(Actions);
   private dashboardsService = inject(UserDashboards);
 
-  setCurrentDashboard$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(currentDashboardActions.setCurrentDashboardId),
-      map(({ dashboardId }) => dashboardApiActions.loadDashboardData({ dashboardId }))
-    )
-  );
-
-  loadCurrentDashboard$ = createEffect(() =>
+  loadDashboardData$ = createEffect(() =>
     this.actions$.pipe(
       ofType(dashboardApiActions.loadDashboardData),
       switchMap(({ dashboardId }) =>
@@ -37,7 +30,7 @@ export class CurrentDashboardEffects {
     )
   );
 
-  loadCurrentDashboardDataSuccess$ = createEffect(() =>
+  loadDashboardDataSuccess$ = createEffect(() =>
     this.actions$.pipe(
       ofType(dashboardApiActions.loadDashboardDataSuccess),
       map(({ dashboardData }) => currentDashboardActions.setCurrentDashboardData({ dashboardData }))
@@ -63,7 +56,7 @@ export class CurrentDashboardEffects {
     )
   );
 
-  updateCurrentDashboardDataSuccess$ = createEffect(() =>
+  updateDashboardDataSuccess$ = createEffect(() =>
     this.actions$.pipe(
       ofType(dashboardApiActions.updateDashboardDataSuccess),
       switchMap(({ dashboardData }) =>
