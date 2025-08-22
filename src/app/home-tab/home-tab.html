@@ -3,6 +3,6 @@
 <ng-template #cardTemplateRef let-cardId="cardId">
   @let cardData = cardsEntities()[cardId];
   @if (cardData) {
-    <app-home-card [cardData]="cardData"></app-home-card>
+    <app-home-card [cardData]="cardData" [sortedIds]="cardIds()"></app-home-card>
   }
 </ng-template>

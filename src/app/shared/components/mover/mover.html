@@ -1,0 +1,29 @@
+<div class="mover-container">
+  <button
+    matIconButton
+    [title]="leftButton().label"
+    [disabled]="isLeftButtonDisabled()"
+    (click)="buttonClick(leftButton().id)"
+  >
+    <mat-icon>{{ leftButton().icon }}</mat-icon>
+  </button>
+
+  @if (showNumberSelector()) {
+    <mat-form-field>
+      <select matNativeControl (change)="selectValue($event)">
+        @for (option of selectOptions(); track option.value) {
+          <option [value]="option.value" [selected]="currentIndex() === option.value">{{ option.viewValue }}</option>
+        }
+      </select>
+    </mat-form-field>
+  }
+
+  <button
+    matIconButton
+    [title]="rightButton().label"
+    [disabled]="isRightButtonDisabled()"
+    (click)="buttonClick(rightButton().id)"
+  >
+    <mat-icon>{{ rightButton().icon }}</mat-icon>
+  </button>
+</div>
