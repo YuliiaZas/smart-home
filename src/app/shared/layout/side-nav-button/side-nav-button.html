@@ -1,6 +1,12 @@
 <button matButton (click)="buttonClick.emit()" class="nav-button" [attr.aria-label]="label()">
-  <mat-icon class="nav-button-icon" matListItemIcon aria-hidden="true" [fontIcon]="icon()"></mat-icon>
+  <mat-icon
+    matListItemIcon
+    class="nav-button-icon"
+    [ngClass]="iconClass()"
+    aria-hidden="true"
+    [fontIcon]="icon()"
+  ></mat-icon>
   @if (showLabel()) {
-    <span>{{ label() }}</span>
+    <span [ngClass]="labelClass()">{{ label() }}</span>
   }
 </button>

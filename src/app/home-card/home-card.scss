@@ -1,4 +1,12 @@
 .mover {
   display: inline-block;
   width: min-content;
+  margin-right: auto;
+}
+
+.card-edit-container {
+  display: flex;
+  padding-top: 1rem;
+  border-top: 1px solid;
+  background: linear-gradient(#1c343d, transparent 50%, transparent 85%, #1c343d);
 }

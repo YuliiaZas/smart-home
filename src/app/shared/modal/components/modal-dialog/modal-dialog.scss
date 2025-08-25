@@ -1,0 +1,30 @@
+@use '@angular/material' as mat;
+
+:host {
+  @include mat.dialog-overrides(
+    (
+      supporting-text-line-height: 1.7,
+    )
+  );
+
+  @include mat.button-overrides(
+    (
+      text-label-text-color: #ebecf0,
+      text-state-layer-color: #2c6e93,
+      text-focus-state-layer-opacity: 0.8,
+      text-hover-state-layer-opacity: 0.8,
+      text-pressed-state-layer-opacity: 1,
+    )
+  );
+}
+
+::ng-deep {
+  .mat-mdc-dialog-surface {
+    background-color: #12374d;
+    color: #ebecf0;
+  }
+}
+
+.message {
+  white-space: pre-line;
+}

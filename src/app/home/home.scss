@@ -3,11 +3,41 @@
 
 $gap: 1rem;
 $tab-bg: #111f24;
+$tab-bg-edit: #1c343d;
 
 :host {
   display: flex;
   flex-direction: column;
   height: 100%;
+}
+
+.dashboard-edit-box {
+  display: flex;
+  gap: $gap;
+  padding: $gap $gap 0;
+  background-color: $tab-bg-edit;
+}
+
+.dashboard-info {
+  display: flex;
+  align-items: center;
+  gap: $gap;
+}
+
+.dashboard-actions {
+  align-self: center;
+  margin-left: auto;
+  gap: $gap;
+
+  &.dashboard-actions--save {
+    button:not(:last-child) {
+      margin-right: $gap;
+    }
+  }
+}
+
+.tabs-actions {
+  align-self: center;
 }
 
 .tab-content {
@@ -27,9 +57,21 @@ $tab-bg: #111f24;
     padding: 0 $gap;
     background-color: $tab-bg;
     height: vars.$header-height;
-  }
 
-  .mat-mdc-tab-list {
-    flex-grow: initial;
+    .mat-mdc-tab-list .mat-mdc-tab-link {
+      flex-grow: initial;
+    }
+  }
+}
+
+:host(.edit-mode)::ng-deep {
+  @include mat.tabs-overrides(
+    (
+      divider-color: $tab-bg-edit,
+    )
+  );
+
+  .mat-mdc-tab-link-container {
+    background-color: $tab-bg-edit;
   }
 }

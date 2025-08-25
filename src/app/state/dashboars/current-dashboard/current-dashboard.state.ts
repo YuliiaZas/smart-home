@@ -6,6 +6,7 @@ interface CurrentDashboardState {
   isDashboardDataApplied: boolean;
   loadingStatus: LoadingStatus;
   dashboardId: string | null;
+  isEditMode: boolean;
   error: { action: FailureAction; error: Error } | null;
 }
 
@@ -13,6 +14,7 @@ const initialState: CurrentDashboardState = {
   isDashboardDataApplied: false,
   loadingStatus: LoadingStatus.NotStarted,
   dashboardId: null,
+  isEditMode: false,
   error: null,
 };
 
@@ -56,6 +58,9 @@ const reducer = createReducer<CurrentDashboardState>(
       isDashboardDataApplied: true,
     })
   ),
+
+  on(currentDashboardActions.enterEditMode, (state): CurrentDashboardState => ({ ...state, isEditMode: true })),
+  on(currentDashboardActions.exitEditMode, (state): CurrentDashboardState => ({ ...state, isEditMode: false })),
 
   on(
     currentDashboardActions.saveCurrentDashboard,

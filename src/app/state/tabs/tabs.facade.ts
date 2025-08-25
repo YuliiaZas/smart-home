@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
+import { Dictionary } from '@ngrx/entity';
 import { TabInfo } from '@shared/models';
 import { tabsFeature } from './tabs.state';
 import { tabsActions } from './tabs.actions';
@@ -15,12 +16,16 @@ export class TabsFacade {
     return this.#store.select(tabsFeature.selectTabsIdsOrdered);
   }
 
-  get tabsInfo$(): Observable<TabInfo[]> {
-    return this.#store.select(tabsFeature.selectOrderedTabs);
+  get tabsEntities$(): Observable<Dictionary<TabInfo>> {
+    return this.#store.select(tabsFeature.selectEntities);
   }
 
   get currentTabId$(): Observable<string | null> {
-    return this.#store.select(tabsFeature.selectCurrentTabdId);
+    return this.#store.select(tabsFeature.selectCurrentTabId);
+  }
+
+  get currentTabInfo$(): Observable<TabInfo | null> {
+    return this.#store.select(tabsFeature.selectCurrentTab);
   }
 
   setCurrentTab(tabId: string): void {

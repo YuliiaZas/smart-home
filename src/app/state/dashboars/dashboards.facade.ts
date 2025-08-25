@@ -45,6 +45,10 @@ export class DashboardsFacade {
     );
   }
 
+  get isEditMode$(): Observable<boolean> {
+    return this.#store.select(currentDashboardFeature.selectIsEditMode);
+  }
+
   get isChangedState$(): Observable<boolean> {
     return combineLatest([
       this.#store.select(tabsFeature.selectIsChanged),

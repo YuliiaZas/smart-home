@@ -8,3 +8,4 @@ export * from './nav-item-info';
 export * from './tab-item-info';
 export * from './failure-action.enum';
 export * from './loading-status.enum';
+export * from './entity.enum';

@@ -1,0 +1,31 @@
+@use '@angular/material' as mat;
+
+$icon-size: 24px;
+$layer-size: 40px;
+$gap: 4px;
+$icon-position: calc($layer-size + $gap);
+$host-padding: calc($layer-size + $gap * 2);
+
+.mover-surround-host {
+  position: relative;
+  padding-left: $host-padding !important;
+  padding-right: $host-padding !important;
+
+  .mover-button {
+    position: absolute;
+
+    &--left {
+      left: -$icon-position;
+    }
+
+    &--right {
+      right: -$icon-position;
+    }
+    @include mat.icon-button-overrides(
+      (
+        icon-size: $icon-size,
+        state-layer-size: $layer-size,
+      )
+    );
+  }
+}

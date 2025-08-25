@@ -4,7 +4,7 @@ import { TabInfo } from '@shared/models';
 import { tabsActions } from './tabs.actions';
 
 interface TabsState extends EntityState<TabInfo> {
-  currentTabdId: string | null;
+  currentTabId: string | null;
   tabsIdsOrdered: string[];
 
   originalTabs: TabInfo[];
@@ -18,7 +18,7 @@ const tabsAdapter = createEntityAdapter<TabInfo>({
 });
 
 const initialState: TabsState = tabsAdapter.getInitialState({
-  currentTabdId: null,
+  currentTabId: null,
   tabsIdsOrdered: [],
 
   originalTabs: [],
@@ -35,7 +35,7 @@ const initialState: TabsState = tabsAdapter.getInitialState({
 const reducer = createReducer<TabsState>(
   initialState,
 
-  on(tabsActions.setCurrentTabId, (state, { tabId }) => ({ ...state, currentTabdId: tabId })),
+  on(tabsActions.setCurrentTabId, (state, { tabId }): TabsState => ({ ...state, currentTabId: tabId })),
 
   on(tabsActions.setTabsData, (_, { tabs }): TabsState => {
     const newState: TabsState = {
@@ -75,7 +75,7 @@ const reducer = createReducer<TabsState>(
   ),
 
   on(tabsActions.renameCurrentTab, (state, { title }): TabsState => {
-    const currentTabId = state.currentTabdId;
+    const currentTabId = state.currentTabId;
     if (!currentTabId) return state;
     const newState: TabsState = { ...state, isChanged: true };
     return tabsAdapter.updateOne({ id: currentTabId, changes: { title } }, newState);
@@ -96,11 +96,12 @@ const reducer = createReducer<TabsState>(
   }),
 
   on(tabsActions.deleteCurrentTab, (state): TabsState => {
-    const currentTabId = state.currentTabdId;
+    const currentTabId = state.currentTabId;
     if (!currentTabId) return state;
     const newState: TabsState = {
       ...state,
       tabsIdsOrdered: state.tabsIdsOrdered.filter((id) => id !== currentTabId),
+      currentTabId: null,
       isChanged: true,
     };
     return tabsAdapter.removeOne(currentTabId, newState);
@@ -110,9 +111,12 @@ const reducer = createReducer<TabsState>(
 export const tabsFeature = createFeature({
   name: 'tabs',
   reducer,
-  extraSelectors: ({ selectEntities, selectTabsIdsOrdered }) => ({
+  extraSelectors: ({ selectEntities, selectTabsIdsOrdered, selectCurrentTabId }) => ({
     selectOrderedTabs: createSelector(selectTabsIdsOrdered, selectEntities, (tabsIdsOrdered, entities) =>
       tabsIdsOrdered.map((id) => entities[id]).filter((tab): tab is TabInfo => !!tab)
+    ),
+    selectCurrentTab: createSelector(selectEntities, selectCurrentTabId, (entities, currentTabId) =>
+      currentTabId ? entities[currentTabId] || null : null
     ),
   }),
 });

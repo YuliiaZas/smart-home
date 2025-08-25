@@ -16,8 +16,24 @@
       }
     </ng-container>
 
-    <ng-container cardFooter>
-      <app-mover class="mover" [sortedIds]="sortedIds()" [currentId]="cardData().id"></app-mover>
-    </ng-container>
+    @if (isEditMode()) {
+      <ng-container cardFooter>
+        <div class="card-edit-container">
+          <app-mover
+            class="mover"
+            [sortedIds]="sortedIds()"
+            [currentId]="cardData().id"
+            (setSorting)="setCardsSorting($event)"
+          ></app-mover>
+          <app-edit-action-buttons
+            [entity]="entity"
+            [entityName]="cardData().title"
+            [deleteClass]="''"
+            (editEvent)="enterCardEditMode()"
+            (deleteEvent)="deleteCurrentCard()"
+          ></app-edit-action-buttons>
+        </div>
+      </ng-container>
+    }
   </app-card>
 </article>

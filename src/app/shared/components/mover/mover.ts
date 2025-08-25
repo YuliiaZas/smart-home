@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, ElementRef, inject, input, output } from '@angular/core';
+import { NgClass } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
@@ -8,16 +9,19 @@ import { MoverButtonStyle, MoverDirection, moverIcons, moverLabels } from './mov
 
 @Component({
   selector: 'app-mover',
-  imports: [MatButtonModule, MatIconModule, MatFormFieldModule, MatSelectModule, MatInputModule],
+  imports: [NgClass, MatButtonModule, MatIconModule, MatFormFieldModule, MatSelectModule, MatInputModule],
   templateUrl: './mover.html',
   styleUrl: './mover.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Mover {
+  element = inject(ElementRef).nativeElement as HTMLElement;
+
   sortedIds = input.required<string[]>();
   currentId = input.required<string>();
   buttonsStyle = input<MoverButtonStyle>(MoverButtonStyle.DEFAULT);
   showNumberSelector = input<boolean>(true);
+  iconClass = input<string>('');
 
   setSorting = output<string[]>();
 

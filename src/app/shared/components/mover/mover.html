@@ -1,5 +1,7 @@
 <div class="mover-container">
   <button
+    class="mover-button mover-button--left"
+    [ngClass]="iconClass()"
     matIconButton
     [title]="leftButton().label"
     [disabled]="isLeftButtonDisabled()"
@@ -19,6 +21,8 @@
   }
 
   <button
+    class="mover-button mover-button--right"
+    [ngClass]="iconClass()"
     matIconButton
     [title]="rightButton().label"
     [disabled]="isRightButtonDisabled()"

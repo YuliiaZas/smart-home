@@ -5,7 +5,6 @@ $item-radius: 0.25rem;
 $item-margin: 0.25rem;
 $menu-font-size: 1.15rem;
 $default-color: var(--mat-sys-on-surface-variant);
-$logout-color: #e23535;
 $active-color: #07a9f4;
 $active-bg-color: #182e37;
 
@@ -71,14 +70,6 @@ $active-bg-color: #182e37;
     @include mat.button-overrides(
       (
         text-label-text-size: $menu-font-size,
-      )
-    );
-  }
-
-  .nav-item__logout {
-    @include mat.button-overrides(
-      (
-        text-label-text-color: $logout-color,
       )
     );
   }
