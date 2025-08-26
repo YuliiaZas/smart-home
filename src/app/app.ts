@@ -45,9 +45,9 @@ export class App {
   constructor() {
     this.currentUser$
       .pipe(
-        takeUntilDestroyed(),
         filter((user) => !!user),
-        switchMap(() => this.dashboardsService.getUserDashboards())
+        switchMap(() => this.dashboardsService.getUserDashboards()),
+        takeUntilDestroyed()
       )
       .subscribe();
 

@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { combineLatest, filter, map, Observable, switchMap, take, tap } from 'rxjs';
+import { combineLatest, filter, map, Observable, switchMap, tap } from 'rxjs';
 import { LoginRequestInfo, LoginResponseInfo, UserProfileInfo } from './auth-info';
 import { AuthUser } from '../auth-user/auth-user';
 import { environment } from 'src/environments/environments';
@@ -26,13 +26,8 @@ export class Auth {
   login(loginRequest: LoginRequestInfo): Observable<UserProfileInfo | null> {
     return this.http.post<LoginResponseInfo>(`${environment.apiUrl}${this.loginPath}`, loginRequest).pipe(
       tap(({ token }) => this.authTokenService.setToken(token)),
-      switchMap(() =>
-        this.currentToken$.pipe(
-          filter((token) => !!token),
-          take(1),
-          switchMap(() => this.updateCurrentUser())
-        )
-      )
+      filter(({ token }) => !!token),
+      switchMap(() => this.updateCurrentUser())
     );
   }
 

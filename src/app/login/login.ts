@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AsyncPipe } from '@angular/common';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { BehaviorSubject, catchError, finalize, of } from 'rxjs';
+import { BehaviorSubject, finalize } from 'rxjs';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -11,6 +11,7 @@ import { Auth, LoginRequestInfo } from '@shared/auth';
 import { ERROR_MESSAGES, ROUTING_PATHS } from '@shared/constants';
 import { MatButton } from '@angular/material/button';
 import { Spinner } from '@shared/components';
+import { InvalidCredentialsError } from '@shared/errors';
 
 @Component({
   selector: 'app-login',
@@ -57,17 +58,18 @@ export class Login {
     this.authService
       .login(loginRequest)
       .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        catchError((error) => {
-          if (error.status === 401) {
+        finalize(() => this.isLoading$.next(false)),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: () => this.router.navigate([ROUTING_PATHS.DASHBOARD]),
+        error: (error) => {
+          if (error instanceof InvalidCredentialsError) {
             this.markIsDataInvalid(true);
-            return of();
           }
           throw error;
-        }),
-        finalize(() => this.isLoading$.next(false))
-      )
-      .subscribe(() => this.router.navigate([ROUTING_PATHS.DASHBOARD]));
+        },
+      });
   }
 
   togglePasswordVisibility(event: MouseEvent) {

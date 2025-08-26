@@ -6,7 +6,6 @@ import { Card } from '@shared/components';
 import { Sensor } from '../../home-sensor/home-sensor';
 import { Device } from '../../home-device/home-device';
 import { HomeCardBase } from '../home-card-base/home-card-base';
-import { isDeviceInfo } from '@shared/utils';
 
 @Component({
   selector: 'app-home-card-multiple',
@@ -21,22 +20,17 @@ export class HomeCardMultiple extends HomeCardBase {
   isContentVertical = computed(() => this.cardData().layout === CardLayout.VERTICAL);
   iconPosition = computed(() => (this.isContentVertical() ? 'bottom' : 'left'));
 
-  private devices = computed(() => {
-    const items = this.cardData().items;
-    return items.filter((item) => isDeviceInfo(item));
-  });
+  private devices = computed(() => this.cardService.getDevicesFromCardData(this.cardData()));
   showAllDevicesState = computed(() => this.devices().length > 1);
-  allDevicesState = computed(() => this.devices().some((device) => device.state));
+  allDevicesState = computed(() => this.cardService.getAllDevicesState(this.devices()));
 
   changeAllDevicesState() {
-    const newState = !this.allDevicesState();
+    const updatedCardState = this.cardService.getUpdatedCardDataOnAllDevicesStateChange(
+      this.cardData(),
+      !this.allDevicesState()
+    );
 
-    this.cardData.update((currentCardData) => {
-      const updatedItems = currentCardData.items.map((item) => ('state' in item ? { ...item, state: newState } : item));
-
-      return { ...currentCardData, items: updatedItems };
-    });
-
-    this.updateCardData.emit(this.cardData());
+    this.cardData.update(() => updatedCardState);
+    this.updateCardData.emit(updatedCardState);
   }
 }
