@@ -5,6 +5,5 @@ import { DashboardsFacade } from '@state';
 
 export const userDashboardsGuard: CanActivateFn = () => {
   const dashboardsFacade = inject(DashboardsFacade);
-
-  return dashboardsFacade.userDashboards$.pipe(map(() => true));
+  return dashboardsFacade.userDashboardsWithRequest$.pipe(map(() => true));
 };

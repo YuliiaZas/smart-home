@@ -15,6 +15,10 @@ export class DashboardsFacade {
   #store = inject(Store);
 
   get userDashboards$(): Observable<DashboardInfo[]> {
+    return this.#store.select(dashboardsListFeature.selectAll);
+  }
+
+  get userDashboardsWithRequest$(): Observable<DashboardInfo[]> {
     return this.#store.select(dashboardsListFeature.selectLoadingStatus).pipe(
       switchMap((loadingStatus) => {
         if (loadingStatus === LoadingStatus.Success || loadingStatus === LoadingStatus.Failure) {

@@ -2,7 +2,7 @@
 @let dashboard = currentDashboard();
 
 <div class="tabs-container" [class.tabs-container--edit-mode]="editMode">
-  @if (editMode) {
+  @if (editMode && dashboard) {
     <div class="dashboard-edit-box">
       <div class="dashboard-info">
         <mat-icon>{{ dashboard.icon }}</mat-icon>
@@ -70,7 +70,7 @@
         </div>
       }
 
-      @if (!editMode) {
+      @if (!editMode && dashboard) {
         <div mat-tab-link class="dashboard-actions dashboard-actions--edit">
           <app-edit-action-buttons
             [entity]="dashboardEntity"

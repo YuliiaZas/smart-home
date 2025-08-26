@@ -47,8 +47,7 @@ export class Home {
   tabsEntities = toSignal<Dictionary<TabInfo>>(this.#tabsFacade.tabsEntities$, { requireSync: true });
 
   currentDashboard = toSignal<DashboardInfo>(
-    this.#dashboardsFacade.currentDashboardInfo$.pipe(filter((database) => !!database)),
-    { requireSync: true }
+    this.#dashboardsFacade.currentDashboardInfo$.pipe(filter((database) => !!database))
   );
 
   isEditMode = toSignal(this.#dashboardsFacade.isEditMode$);
@@ -58,7 +57,7 @@ export class Home {
   }
 
   deleteCurrentDashboard() {
-    console.log('Deleting current dashboard:', this.currentDashboard().id);
+    console.log('Deleting current dashboard:', this.currentDashboard()?.id);
     // this.#dashboardsFacade.deleteDashboard(this.currentDashboard().id);
   }
 
