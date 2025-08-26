@@ -5,7 +5,7 @@ import {
   provideBrowserGlobalErrorListeners,
   provideZoneChangeDetection,
 } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { Auth, authInterceptor } from '@shared/auth';
 import { provideState, provideStore } from '@ngrx/store';
@@ -19,7 +19,7 @@ import {
   DashboardsListEffects,
   dashboardsListFeature,
   DashboardsOrchestratorEffects,
-} from '@state/dashboars';
+} from '@state/dashboards';
 import { HomeItemsEffects, homeItemsFeature } from '@state/home-items';
 
 import { routes } from './app.routes';
@@ -28,7 +28,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes),
+    provideRouter(routes, withComponentInputBinding()),
     provideHttpClient(withInterceptors([authInterceptor]), withFetch()),
     provideAppInitializer(() => {
       const authService = inject(Auth);

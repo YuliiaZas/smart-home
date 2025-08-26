@@ -1,7 +1,10 @@
+import { Entity } from '@shared/models';
+
 export const ERROR_MESSAGES = {
   emptyHomeData: {
-    dashboards: 'You don’t have any dashboards yet.',
-    tabs: 'You don’t have any tabs in this dashboard.',
+    [Entity.DASHBOARD]: 'You don’t have any dashboards yet.',
+    [Entity.TAB]: 'You don’t have any tabs in this dashboard.',
+    [Entity.CARD]: 'You don’t have any cards in this tab.',
     create: 'They’ll appear here as soon as you create them.',
   },
   login: {

@@ -1,5 +1,6 @@
 @use '@angular/material' as mat;
 @use '/styles/variables' as vars;
+@use '/styles/breakpoints';
 
 $gap: 1rem;
 $tab-bg: #111f24;
@@ -16,6 +17,10 @@ $tab-bg-edit: #1c343d;
   gap: $gap;
   padding: $gap $gap 0;
   background-color: $tab-bg-edit;
+
+  @media (max-width: breakpoints.$grid-breakpoint-sm) {
+    flex-direction: column-reverse;
+  }
 }
 
 .dashboard-info {
@@ -28,6 +33,10 @@ $tab-bg-edit: #1c343d;
   align-self: center;
   margin-left: auto;
   gap: $gap;
+
+  &.dashboard-actions--edit {
+    padding-inline: 0;
+  }
 
   &.dashboard-actions--save {
     button:not(:last-child) {
@@ -53,8 +62,11 @@ $tab-bg-edit: #1c343d;
     )
   );
 
+  .mat-mdc-tab-header-pagination {
+    background-color: $tab-bg;
+  }
+
   .mat-mdc-tab-link-container {
-    padding: 0 $gap;
     background-color: $tab-bg;
     height: vars.$header-height;
 
@@ -64,12 +76,27 @@ $tab-bg-edit: #1c343d;
   }
 }
 
-:host(.edit-mode)::ng-deep {
+.nav-container {
+  padding: 0 $gap;
+  background-color: $tab-bg;
+}
+
+:host(.edit-mode) {
   @include mat.tabs-overrides(
     (
       divider-color: $tab-bg-edit,
     )
   );
+
+  .nav-container {
+    background-color: $tab-bg-edit;
+  }
+}
+
+:host(.edit-mode)::ng-deep {
+  .mat-mdc-tab-header-pagination {
+    background-color: $tab-bg-edit;
+  }
 
   .mat-mdc-tab-link-container {
     background-color: $tab-bg-edit;

@@ -1,31 +1,32 @@
 @use '/styles/breakpoints';
 
 $gap: 0.5rem;
+$min-card-width-sm: 260px;
+$min-card-width-lg: 315px;
+$min-card-width: 350px;
+
+// .cdk-drag-placeholder {
+//   opacity: 0.5;
+// }
 
 .card-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: $gap;
-  justify-content: center;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-
-  @media (max-width: breakpoints.$grid-breakpoint-md) {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  column-width: $min-card-width;
+  column-gap: $gap;
 
   @media (max-width: breakpoints.$grid-breakpoint-sm) {
-    grid-template-columns: 1fr;
+    column-width: $min-card-width-sm;
+  }
+
+  @media (max-width: breakpoints.$grid-breakpoint-lg) {
+    column-width: $min-card-width-lg;
   }
 }
 
-.card-list-group {
-  min-width: 225px;
-  display: flex;
-  flex-direction: column;
-  gap: $gap;
-}
+.card-box {
+  min-width: $min-card-width-sm;
+  break-inside: avoid;
 
-.cdk-drag-placeholder {
-  opacity: 0.5;
+  &:not(:last-child) {
+    margin-bottom: $gap;
+  }
 }

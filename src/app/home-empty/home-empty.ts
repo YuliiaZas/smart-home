@@ -1,7 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { ActivatedRoute } from '@angular/router';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { ERROR_MESSAGES } from '@shared/constants';
+import { Entity } from '@shared/models';
 
 @Component({
   selector: 'app-home-empty',
@@ -11,13 +10,8 @@ import { ERROR_MESSAGES } from '@shared/constants';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeEmpty {
-  private activatedRoute = inject(ActivatedRoute);
+  entity = input.required<Entity>();
 
   createMessage = ERROR_MESSAGES.emptyHomeData.create;
-
-  parameters = toSignal(this.activatedRoute.paramMap);
-  isDashboardsEmpty = computed(() => !this.parameters()?.get('dashboardId'));
-  emptyMessage = computed(() =>
-    this.isDashboardsEmpty() ? ERROR_MESSAGES.emptyHomeData.dashboards : ERROR_MESSAGES.emptyHomeData.tabs
-  );
+  emptyMessage = computed(() => ERROR_MESSAGES.emptyHomeData[this.entity()]);
 }

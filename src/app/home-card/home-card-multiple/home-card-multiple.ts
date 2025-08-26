@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
-import { CardLayout } from '@shared/models';
 import { UnitsPipe } from '@shared/pipes';
+import { DevicesService } from '@shared/services';
 import { Sensor } from '../../home-sensor/home-sensor';
 import { Device } from '../../home-device/home-device';
 import { HomeCardBase } from '../home-card-base/home-card-base';
@@ -16,14 +16,15 @@ import { HomeCardService } from '../home-card.service';
 })
 export class HomeCardMultiple extends HomeCardBase {
   #cardService = inject(HomeCardService);
+  #devicesService = inject(DevicesService);
 
-  isContentVertical = computed(() => this.cardData().layout === CardLayout.VERTICAL);
-  iconPosition = computed(() => (this.isContentVertical() ? 'bottom' : 'left'));
+  isContentVertical = computed(() => this.#cardService.getIsContentVertical(this.cardData()));
+  iconPosition = computed(() => this.#cardService.getIconPosition(this.isContentVertical()));
 
-  #devices = computed(() => this.#cardService.selectDevices(this.cardData().items, this.homeItemsEntities()));
+  #devices = computed(() => this.#devicesService.selectDevices(this.cardData().items, this.homeItemsEntities()));
   #devicesIds = computed(() => this.#devices().map((device) => device.id));
   showAllDevicesState = computed(() => this.#devices().length > 1);
-  allDevicesState = computed(() => this.#cardService.getAllDevicesState(this.#devices()));
+  allDevicesState = computed(() => this.#devicesService.getAllDevicesState(this.#devices()));
 
   changeAllDevicesState() {
     this.homeItemsFacade.setStateForDevices(this.#devicesIds(), !this.allDevicesState());
