@@ -1,11 +1,12 @@
 import { NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, input, viewChild } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { CardLayout, Entity, HomeCardWithItemsIdsInfo } from '@shared/models';
+import { Entity, HomeCardWithItemsIdsInfo } from '@shared/models';
 import { Card, EditActionButtons, Mover } from '@shared/components';
 import { CardsFacade, DashboardsFacade, TabsFacade } from '@state';
 import { HomeCardSingle } from './home-card-single/home-card-single';
 import { HomeCardMultiple } from './home-card-multiple/home-card-multiple';
+import { HomeCardService } from './home-card.service';
 
 @Component({
   selector: 'app-home-card',
@@ -15,6 +16,7 @@ import { HomeCardMultiple } from './home-card-multiple/home-card-multiple';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeCard {
+  #cardService = inject(HomeCardService);
   #dashboardsFacade = inject(DashboardsFacade);
   #tabsFacade = inject(TabsFacade);
   #cardsFacade = inject(CardsFacade);
@@ -37,9 +39,7 @@ export class HomeCard {
     () => this.singleCardContent()?.cardActionTemplate() ?? this.multipleCardContent()?.cardActionTemplate()
   );
 
-  isSingleItem = computed<boolean>(
-    () => this.cardData().layout === CardLayout.SINGLE && this.cardData().items.length === 1
-  );
+  isSingleItem = computed<boolean>(() => this.#cardService.getIsSingleItem(this.cardData()));
 
   enterCardEditMode() {
     this.#cardsFacade.enterCardEditMode(this.cardData().id);

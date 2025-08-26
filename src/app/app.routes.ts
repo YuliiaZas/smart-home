@@ -24,7 +24,7 @@ export const routes: Routes = [
       },
       {
         path: ':dashboardId',
-        canActivate: [currentDashboardGuard, isDashboardValidGuard],
+        canActivate: [isDashboardValidGuard, currentDashboardGuard],
         loadComponent: () => import('./home/home').then((m) => m.Home),
         children: [
           {

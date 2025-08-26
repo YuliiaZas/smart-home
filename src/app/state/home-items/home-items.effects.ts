@@ -1,24 +1,25 @@
 import { inject, Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { Dictionary } from '@ngrx/entity';
 import { map } from 'rxjs';
 import { filter, withLatestFrom } from 'rxjs/operators';
-import { isDeviceInfo } from '@shared/utils';
-import { HomeItemInfo } from '@shared/models';
 import { homeItemsApiActions } from './home-items.actions';
 import { homeItemsFeature } from './home-items.state';
+import { HomeCardService } from 'src/app/home-card/home-card.service';
 
 @Injectable()
 export class HomeItemsEffects {
   private actions$ = inject(Actions);
   private store = inject(Store);
+  private cardService = inject(HomeCardService);
 
   setDeviceState$ = createEffect(() =>
     this.actions$.pipe(
       ofType(homeItemsApiActions.setDeviceState),
       withLatestFrom(this.store.select(homeItemsFeature.selectEntities)),
-      filter(([{ deviceId, newState }, entities]) => getDoesDeviceNeedChange(deviceId, entities, newState)),
+      filter(([{ deviceId, newState }, entities]) =>
+        this.cardService.getDoesDeviceNeedChange(deviceId, entities, newState)
+      ),
       map(([{ deviceId, newState }]) => homeItemsApiActions.setDeviceState({ deviceId, newState }))
     )
   );
@@ -28,15 +29,12 @@ export class HomeItemsEffects {
       ofType(homeItemsApiActions.setStateForDevices),
       withLatestFrom(this.store.select(homeItemsFeature.selectEntities)),
       map(([{ devicesIds, newState }, entities]) => ({
-        devicesIds: devicesIds.filter((deviceId) => getDoesDeviceNeedChange(deviceId, entities, newState)),
+        devicesIds: devicesIds.filter((deviceId) =>
+          this.cardService.getDoesDeviceNeedChange(deviceId, entities, newState)
+        ),
         newState,
       })),
       map(({ devicesIds, newState }) => homeItemsApiActions.setStateForDevices({ devicesIds, newState }))
     )
   );
 }
-
-const getDoesDeviceNeedChange = (deviceId: string, entities: Dictionary<HomeItemInfo>, newState: boolean): boolean => {
-  const device = entities[deviceId];
-  return isDeviceInfo(device) && device.state !== newState;
-};
