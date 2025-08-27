@@ -18,9 +18,8 @@ export class Auth {
   isAuthenticated$ = combineLatest([this.authUserService.currentUser$, this.authTokenService.currentToken$]).pipe(
     map(([user, token]) => !!(user && token))
   );
-  areCredentialsInvalid$ = this.authTokenService.tokenLoadingStatus$.pipe(
-    map((status) => status === LoadingStatus.Failure)
-  );
+  tokenLoadingStatus$ = this.authTokenService.tokenLoadingStatus$;
+  invalidCredentials$ = this.authTokenService.invalidCredentials$;
   isTokenLoading$ = this.authTokenService.tokenLoadingStatus$.pipe(map((status) => status === LoadingStatus.Loading));
 
   login(loginRequest: LoginRequestInfo): Observable<LoginResponseInfo> {
@@ -38,5 +37,13 @@ export class Auth {
 
   setTokenLoadingStatus(loadingStatus: LoadingStatus): void {
     this.authTokenService.setTokenLoadingStatus(loadingStatus);
+  }
+
+  setInvalidCredentials(isInvalidCredentials: boolean): void {
+    this.authTokenService.setInvalidCredentials(isInvalidCredentials);
+  }
+
+  getIsUrlForToken(ulr: string): boolean {
+    return this.authTokenService.getIsUrlForToken(ulr);
   }
 }

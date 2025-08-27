@@ -17,4 +17,5 @@ export const ERROR_MESSAGES = {
     description: 'Sorry, the page you are looking for does not exist.',
     homeLink: 'Return to Home Page',
   },
+  defaultError: 'Something went wrong. Please try again later.',
 };

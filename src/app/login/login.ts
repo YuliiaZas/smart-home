@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, OnInit 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AsyncPipe } from '@angular/common';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { combineLatest, map } from 'rxjs';
 import { Router } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
@@ -11,6 +12,7 @@ import { ERROR_MESSAGES, ROUTING_PATHS } from '@shared/constants';
 import { MatButton } from '@angular/material/button';
 import { Spinner } from '@shared/components';
 import { getValidationErrorMessage } from '@shared/validation';
+import { LoadingStatus } from '@shared/models';
 
 @Component({
   selector: 'app-login',
@@ -26,8 +28,11 @@ export class Login implements OnInit {
   private destroyRef = inject(DestroyRef);
 
   invalidErrorMessage = ERROR_MESSAGES.formValidation.invalidCredentials;
+  defaultErrorMessage = ERROR_MESSAGES.defaultError;
 
-  readonly isLoading$ = this.authService.isTokenLoading$;
+  errorMessage = signal('');
+
+  isLoading$ = this.authService.isTokenLoading$;
 
   loginForm = this.formBuilder.nonNullable.group({
     username: ['', [Validators.required, Validators.minLength(2)]],
@@ -41,12 +46,23 @@ export class Login implements OnInit {
   password = this.loginForm.controls.password;
 
   ngOnInit() {
-    this.authService.areCredentialsInvalid$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((areInvalid) => {
-      this.markIsDataInvalid(areInvalid);
-    });
+    combineLatest([
+      this.authService.tokenLoadingStatus$.pipe(map((status) => status === LoadingStatus.Failure)),
+      this.authService.invalidCredentials$,
+    ])
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(([isFailure, invalidCredentials]) => {
+        if (isFailure && invalidCredentials) {
+          this.errorMessage.set(this.invalidErrorMessage);
+          this.markIsDataInvalid(true);
+          return;
+        }
+        this.errorMessage.set(isFailure ? this.defaultErrorMessage : '');
+      });
   }
 
   formFocus() {
+    this.errorMessage.set('');
     if (this.isDataInvalid()) {
       this.markIsDataInvalid(false);
     }

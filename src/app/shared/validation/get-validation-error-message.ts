@@ -1,4 +1,4 @@
-import { FormControl } from '@angular/forms';
+import { AbstractControl } from '@angular/forms';
 import { ERROR_MESSAGES } from '@shared/constants';
 
 function isErrorKey(key: string): key is keyof typeof ERROR_MESSAGES.formValidation {
@@ -11,7 +11,7 @@ export interface ValidationErrorOptions {
 }
 
 export function getValidationErrorMessage(
-  formControl: FormControl,
+  formControl: AbstractControl,
   validationErrorOptions?: ValidationErrorOptions
 ): string {
   if (!formControl.errors) return '';
