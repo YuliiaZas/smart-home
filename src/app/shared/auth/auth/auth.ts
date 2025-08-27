@@ -1,46 +1,42 @@
-import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { combineLatest, filter, map, Observable, switchMap, tap } from 'rxjs';
-import { LoginRequestInfo, LoginResponseInfo, UserProfileInfo } from './auth-info';
+import { combineLatest, map, Observable } from 'rxjs';
+import { LoginRequestInfo, LoginResponseInfo } from './auth-info';
 import { AuthUser } from '../auth-user/auth-user';
-import { environment } from 'src/environments/environments';
 import { AuthToken } from '../auth-token/auth-token';
+import { LoadingStatus } from '@shared/models';
 
 @Injectable({
   providedIn: 'root',
 })
 export class Auth {
-  readonly loginPath = '/api/user/login';
-
-  private http = inject(HttpClient);
   private authUserService = inject(AuthUser);
   private authTokenService = inject(AuthToken);
 
   currentToken$ = this.authTokenService.currentToken$;
   currentUser$ = this.authUserService.currentUser$;
-  isCurrentUserFetching$ = this.authUserService.isCurrentUserFetching$;
+  currentUserWithRequest$ = this.authUserService.currentUserWithRequest$;
   isAuthenticated$ = combineLatest([this.authUserService.currentUser$, this.authTokenService.currentToken$]).pipe(
     map(([user, token]) => !!(user && token))
   );
+  areCredentialsInvalid$ = this.authTokenService.tokenLoadingStatus$.pipe(
+    map((status) => status === LoadingStatus.Failure)
+  );
+  isTokenLoading$ = this.authTokenService.tokenLoadingStatus$.pipe(map((status) => status === LoadingStatus.Loading));
 
-  login(loginRequest: LoginRequestInfo): Observable<UserProfileInfo | null> {
-    return this.http.post<LoginResponseInfo>(`${environment.apiUrl}${this.loginPath}`, loginRequest).pipe(
-      tap(({ token }) => this.authTokenService.setToken(token)),
-      filter(({ token }) => !!token),
-      switchMap(() => this.updateCurrentUser())
-    );
+  login(loginRequest: LoginRequestInfo): Observable<LoginResponseInfo> {
+    return this.authTokenService.loginUser(loginRequest);
   }
 
   logout(): void {
-    this.authTokenService.setToken(null);
+    this.authTokenService.logoutUser();
     this.authUserService.logoutUser();
-  }
-
-  updateCurrentUser(): Observable<UserProfileInfo | null> {
-    return this.authUserService.updateCurrentUser();
   }
 
   checkAuthentication(): void {
     this.authTokenService.updateCurrentToken();
+  }
+
+  setTokenLoadingStatus(loadingStatus: LoadingStatus): void {
+    this.authTokenService.setTokenLoadingStatus(loadingStatus);
   }
 }

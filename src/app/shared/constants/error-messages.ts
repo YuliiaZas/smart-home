@@ -4,10 +4,13 @@ export const ERROR_MESSAGES = {
     tabs: 'You don’t have any tabs in this dashboard.',
     create: 'They’ll appear here as soon as you create them.',
   },
-  login: {
+  formValidation: {
     required: 'This field is required',
     minlength: (minLength: number) => `Minimum length is ${minLength}`,
-    invalid: 'Invalid username or password',
+    maxlength: (maxLength: number) => `Maximum length is ${maxLength}`,
+    notUnique: (uniqueArea?: string) => 'This value must be unique' + (uniqueArea ? ` within ${uniqueArea}` : ''),
+    invalidCredentials: 'Invalid username or password',
+    defaultError: 'Invalid value',
   },
   notFound: {
     title: '404 - Page Not Found',
