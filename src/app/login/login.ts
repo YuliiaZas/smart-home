@@ -1,36 +1,27 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, OnInit } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { AsyncPipe } from '@angular/common';
-import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { ReactiveFormsModule } from '@angular/forms';
 import { combineLatest, map } from 'rxjs';
 import { Router } from '@angular/router';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
+import { MatError } from '@angular/material/form-field';
+import { MatButtonModule } from '@angular/material/button';
 import { Auth, LoginRequestInfo } from '@shared/auth';
 import { ERROR_MESSAGES, ROUTING_PATHS } from '@shared/constants';
-import { MatButtonModule } from '@angular/material/button';
 import { Spinner } from '@shared/components';
-import { getValidationErrorMessage } from '@shared/validation';
 import { LoadingStatus } from '@shared/models';
+import { FormControlsService, FormInput } from '@shared/form-input';
+import { LoginFormService } from './login-form.service';
 
 @Component({
   selector: 'app-login',
-  imports: [
-    ReactiveFormsModule,
-    AsyncPipe,
-    MatFormFieldModule,
-    MatInputModule,
-    MatIconModule,
-    MatButtonModule,
-    Spinner,
-  ],
+  imports: [ReactiveFormsModule, MatError, MatButtonModule, Spinner, FormInput],
   templateUrl: './login.html',
   styleUrl: './login.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Login implements OnInit {
-  private formBuilder = inject(FormBuilder);
+  private loginFormService = inject(LoginFormService);
+  private formControlsService = inject(FormControlsService);
   private authService = inject(Auth);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
@@ -38,20 +29,13 @@ export class Login implements OnInit {
   invalidErrorMessage = ERROR_MESSAGES.formValidation.invalidCredentials;
   defaultErrorMessage = ERROR_MESSAGES.defaultError;
 
+  isLoading = toSignal(this.authService.isTokenLoading$);
+
+  loginFormInfo = this.loginFormService.getInputsData();
+  loginForm = this.formControlsService.toFormGroup(this.loginFormInfo);
+
   errorMessage = signal('');
-
-  isLoading$ = this.authService.isTokenLoading$;
-
-  loginForm = this.formBuilder.nonNullable.group({
-    username: ['', [Validators.required, Validators.minLength(2)]],
-    password: ['', [Validators.required, Validators.minLength(2)]],
-  });
-
-  hidePassword = signal(true);
   isDataInvalid = signal(false);
-
-  username = this.loginForm.controls.username;
-  password = this.loginForm.controls.password;
 
   ngOnInit() {
     combineLatest([
@@ -77,34 +61,27 @@ export class Login implements OnInit {
   }
 
   login() {
-    const loginRequest: LoginRequestInfo = {
-      userName: this.username.value,
-      password: this.password.value,
-    };
-
     this.authService
-      .login(loginRequest)
+      .login(this.loginForm.getRawValue() as LoginRequestInfo)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.router.navigate([ROUTING_PATHS.DASHBOARD]));
-  }
-
-  togglePasswordVisibility(event: MouseEvent) {
-    this.hidePassword.set(!this.hidePassword());
-    event.stopPropagation();
-  }
-
-  getErrorMessage(formControl: FormControl): string {
-    return getValidationErrorMessage(formControl, { skipDefaultError: true });
   }
 
   private markIsDataInvalid(isInvalid: boolean) {
     this.isDataInvalid.set(isInvalid);
     if (isInvalid) {
-      this.username.setErrors({ invalidCredentials: true });
-      this.password.setErrors({ invalidCredentials: true });
+      this.setFormGroupErrors({ defaultError: true });
     } else {
-      this.username.setErrors(null);
-      this.password.setErrors(null);
+      this.setFormGroupErrors(null);
+    }
+  }
+
+  private setFormGroupErrors(errors: Record<string, boolean> | null) {
+    for (const controlName of Object.keys(this.loginForm.controls)) {
+      const control = this.loginForm.get(controlName);
+      if (control) {
+        control.setErrors(errors);
+      }
     }
   }
 }
