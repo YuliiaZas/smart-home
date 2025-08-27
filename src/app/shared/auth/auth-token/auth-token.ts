@@ -16,9 +16,11 @@ export class AuthToken {
 
   #currentToken$ = new BehaviorSubject<string | null>(null);
   #tokenLoadingStatus$ = new BehaviorSubject<LoadingStatus>(LoadingStatus.NotStarted);
+  #invalidCredentials$ = new BehaviorSubject<boolean>(false);
 
   currentToken$ = this.#currentToken$.asObservable().pipe(distinctUntilChanged());
   tokenLoadingStatus$ = this.#tokenLoadingStatus$.asObservable();
+  invalidCredentials$ = this.#invalidCredentials$.asObservable().pipe(distinctUntilChanged());
 
   constructor() {
     this.updateCurrentToken();
@@ -30,6 +32,7 @@ export class AuthToken {
 
   loginUser(loginRequest: LoginRequestInfo): Observable<LoginResponseInfo> {
     this.setTokenLoadingStatus(LoadingStatus.Loading);
+    this.setInvalidCredentials(false);
 
     return this.#fetchToken(loginRequest).pipe(
       tap(({ token }) => {
@@ -47,6 +50,14 @@ export class AuthToken {
   updateCurrentToken() {
     const currentToken = localStorage.getItem(this.#tokenKey);
     this.#currentToken$.next(currentToken);
+  }
+
+  getIsUrlForToken(ulr: string): boolean {
+    return ulr.includes(this.#loginPath);
+  }
+
+  setInvalidCredentials(isInvalidCredentials: boolean): void {
+    this.#invalidCredentials$.next(isInvalidCredentials);
   }
 
   #setToken(token: string | null) {

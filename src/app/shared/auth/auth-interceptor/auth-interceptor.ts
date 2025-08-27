@@ -10,11 +10,12 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
   const authService = inject(Auth);
   const router = inject(Router);
 
-  if (request.url.includes(ROUTING_PATHS.LOGIN))
+  if (authService.getIsUrlForToken(request.url))
     return next(request).pipe(
       catchError((error) => {
+        authService.setTokenLoadingStatus(LoadingStatus.Failure);
         if (error.status === 401) {
-          authService.setTokenLoadingStatus(LoadingStatus.Failure);
+          authService.setInvalidCredentials(true);
           return EMPTY;
         }
         return throwError(() => error);

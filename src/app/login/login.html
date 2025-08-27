@@ -36,7 +36,7 @@
       }
     </mat-form-field>
 
-    <mat-error>{{ isDataInvalid() ? invalidErrorMessage : '' }}</mat-error>
+    <mat-error>{{ errorMessage() }}</mat-error>
 
     <button class="button" matButton="filled" [disabled]="loginForm.invalid" (click)="login()">Log in</button>
   </form>
