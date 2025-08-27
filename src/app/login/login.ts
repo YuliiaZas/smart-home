@@ -98,6 +98,7 @@ export class Login implements OnInit {
   }
 
   private markIsDataInvalid(isInvalid: boolean) {
+    this.isDataInvalid.set(isInvalid);
     if (isInvalid) {
       this.username.setErrors({ invalidCredentials: true });
       this.password.setErrors({ invalidCredentials: true });
