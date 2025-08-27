@@ -6,6 +6,6 @@ export * from './home-card-info';
 export * from './home-item-info';
 export * from './nav-item-info';
 export * from './tab-item-info';
-export * from './failure-action.enum';
 export * from './loading-status.enum';
+export * from './failure-action.enum';
 export * from './entity.enum';
