@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { filter } from 'rxjs';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { filter } from 'rxjs';
 import { Dictionary } from '@ngrx/entity';
 import { MatTabLink, MatTabNav, MatTabNavPanel } from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
@@ -9,6 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { DashboardInfo, Entity, TabInfo } from '@shared/models';
 import { EDIT_MESSAGES } from '@shared/constants';
 import { EditActionButtons, Mover, MoverButtonStyle, MoverSurroundDirective } from '@shared/components';
+import { TabInfoFormService, DashboardInfoFormService } from '@shared/edit';
 import { DashboardsFacade, TabsFacade } from '@state';
 
 @Component({
@@ -36,6 +37,9 @@ import { DashboardsFacade, TabsFacade } from '@state';
 export class Home {
   #dashboardsFacade = inject(DashboardsFacade);
   #tabsFacade = inject(TabsFacade);
+  #dashboardInfoFormService = inject(DashboardInfoFormService);
+  #tabInfoFormService = inject(TabInfoFormService);
+  #destroyRef = inject(DestroyRef);
   editMessages = EDIT_MESSAGES;
 
   dashboardEntity = Entity.DASHBOARD;
@@ -46,9 +50,8 @@ export class Home {
   tabsIds = toSignal<string[]>(this.#tabsFacade.tabsIds$, { requireSync: true });
   tabsEntities = toSignal<Dictionary<TabInfo>>(this.#tabsFacade.tabsEntities$, { requireSync: true });
 
-  currentDashboard = toSignal<DashboardInfo>(
-    this.#dashboardsFacade.currentDashboardInfo$.pipe(filter((database) => !!database))
-  );
+  currentDashboardInfo = toSignal<DashboardInfo | null>(this.#dashboardsFacade.currentDashboardInfo$);
+  currentTabInfo = toSignal<TabInfo | null>(this.#tabsFacade.currentTabInfo$);
 
   isEditMode = toSignal(this.#dashboardsFacade.isEditMode$);
 
@@ -56,37 +59,65 @@ export class Home {
     this.#dashboardsFacade.enterEditMode();
   }
 
-  deleteCurrentDashboard() {
-    console.log('Deleting current dashboard:', this.currentDashboard()?.id);
-    // this.#dashboardsFacade.deleteDashboard(this.currentDashboard().id);
-  }
-
   discardChanges() {
     this.#dashboardsFacade.discardChanges();
   }
 
   saveChanges() {
-    console.log('Saving changes');
-    // this.#dashboardsFacade.saveCurrentDashboard();
+    this.#dashboardsFacade.saveCurrentDashboard();
   }
 
   renameCurrentDashboard() {
-    console.log('Renaming current dashboard to:');
-    // this.#dashboardsFacade.renameCurrentDashboard(title);
+    const currentDashboardInfo = this.currentDashboardInfo();
+    if (!currentDashboardInfo) return;
+
+    this.#dashboardInfoFormService
+      .edit(currentDashboardInfo)
+      .pipe(
+        filter((dashboardInfo) => dashboardInfo !== null),
+        takeUntilDestroyed(this.#destroyRef)
+      )
+      .subscribe((dashboardInfo: DashboardInfo) => {
+        this.#dashboardsFacade.editDashboardInfo(dashboardInfo);
+      });
   }
 
-  renameCurrentTab() {
-    console.log('Edit current tab');
-  }
+  deleteCurrentDashboard() {
+    const currentDashboardInfo = this.currentDashboardInfo();
+    if (!currentDashboardInfo) return;
 
-  deleteCurrentTab() {
-    console.log('Deleting current tab');
-    this.#tabsFacade.deleteCurrentTab();
+    this.#dashboardsFacade.deleteDashboard(currentDashboardInfo.id);
   }
 
   addTab() {
-    console.log('Adding new tab');
-    // this.#tabsFacade.addTab();
+    this.#tabInfoFormService
+      .addNew()
+      .pipe(
+        filter((tabInfo) => tabInfo !== null),
+        takeUntilDestroyed(this.#destroyRef)
+      )
+      .subscribe((tabInfo: TabInfo) => {
+        this.#tabsFacade.addTab(tabInfo);
+      });
+  }
+
+  renameCurrentTab() {
+    const currentTabInfo = this.currentTabInfo();
+    if (!currentTabInfo) return;
+
+    this.#tabInfoFormService
+      .edit(currentTabInfo)
+      .pipe(
+        filter((tabInfo) => tabInfo !== null),
+        takeUntilDestroyed(this.#destroyRef)
+      )
+      .subscribe((tabInfo: TabInfo) => {
+        this.#tabsFacade.renameTab(tabInfo);
+      });
+  }
+
+  deleteCurrentTab() {
+    this.#tabsFacade.deleteCurrentTab();
   }
 
   setTabSorting(sortedIds: string[]) {

@@ -1,9 +1,10 @@
 import { AbstractControl } from '@angular/forms';
-import { ERROR_MESSAGES } from '@shared/constants';
+import { ERROR_MESSAGES, UNIQUE_AREA } from '@shared/constants';
+import { Entity } from '@shared/models';
 import { isObjectKey } from '@shared/utils';
 
 export interface ValidationErrorOptions {
-  uniqueArea?: string;
+  uniqueArea?: Entity;
   skipDefaultError?: boolean;
 }
 
@@ -22,7 +23,8 @@ export function getValidationErrorMessage(
         return ERROR_MESSAGES.formValidation[errorKey](requiredLength);
       }
       if (errorKey === 'notUnique') {
-        return ERROR_MESSAGES.formValidation[errorKey](validationErrorOptions?.uniqueArea);
+        const uniqueArea = validationErrorOptions?.uniqueArea ? UNIQUE_AREA[validationErrorOptions.uniqueArea] : '';
+        return ERROR_MESSAGES.formValidation[errorKey](uniqueArea);
       }
       return ERROR_MESSAGES.formValidation[errorKey];
     }

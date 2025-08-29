@@ -5,23 +5,23 @@ import { InputType } from '../models/input-type';
 export class InputBase<T> {
   controlType: InputType;
   controlKey: string;
-  value?: T | undefined;
+  value: T | undefined;
   label: string;
   required: boolean;
   validators: ValidatorFn[];
-  validationErrorOptions?: ValidationErrorOptions;
+  validationErrorOptions: ValidationErrorOptions;
 
   constructor(options: {
     controlType?: InputType;
-    controlKey?: string;
+    controlKey: string;
     value?: T | undefined;
     label?: string;
     required?: boolean;
-    validators: ValidatorFn[];
+    validators?: ValidatorFn[];
     validationErrorOptions?: ValidationErrorOptions;
   }) {
     this.controlType = options.controlType || InputType.TEXT;
-    this.controlKey = options.controlKey || '';
+    this.controlKey = options.controlKey;
     this.value = options.value;
     this.label = options.label || '';
     this.required = !!options.required;

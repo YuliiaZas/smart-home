@@ -1,0 +1,9 @@
+<form [formGroup]="form()" class="form">
+  @for (controlInfo of controlsInfo(); track $index) {
+    <app-form-input class="form-input" [inputData]="controlInfo"></app-form-input>
+  }
+
+  @if (errorMessage()) {
+    <mat-error>{{ errorMessage() }}</mat-error>
+  }
+</form>

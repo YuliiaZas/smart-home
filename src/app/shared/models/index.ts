@@ -9,3 +9,4 @@ export * from './tab-item-info';
 export * from './loading-status.enum';
 export * from './failure-action.enum';
 export * from './entity.enum';
+export * from './state-error';

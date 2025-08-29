@@ -33,7 +33,7 @@ export class CurrentDashboardEffects {
   loadDashboardDataSuccess$ = createEffect(() =>
     this.actions$.pipe(
       ofType(dashboardApiActions.loadDashboardDataSuccess),
-      map(({ dashboardData }) => currentDashboardActions.setCurrentDashboardData({ dashboardData }))
+      map(({ dashboardData }) => currentDashboardActions.propagateCurrentDashboardData({ dashboardData }))
     )
   );
 
@@ -61,7 +61,7 @@ export class CurrentDashboardEffects {
       ofType(dashboardApiActions.updateDashboardDataSuccess),
       switchMap(({ dashboardData }) =>
         from([
-          currentDashboardActions.setCurrentDashboardData({ dashboardData }),
+          currentDashboardActions.propagateCurrentDashboardData({ dashboardData }),
           currentDashboardActions.exitEditMode(),
         ])
       )

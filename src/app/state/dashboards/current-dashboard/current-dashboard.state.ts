@@ -52,7 +52,7 @@ const reducer = createReducer<CurrentDashboardState>(
     })
   ),
   on(
-    currentDashboardActions.setCurrentDashboardDataSuccess,
+    currentDashboardActions.propagateCurrentDashboardDataSuccess,
     (state): CurrentDashboardState => ({
       ...state,
       isDashboardDataApplied: true,

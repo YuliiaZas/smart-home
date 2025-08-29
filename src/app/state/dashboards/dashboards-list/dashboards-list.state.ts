@@ -1,13 +1,15 @@
 import { createFeature, createReducer, createSelector, on } from '@ngrx/store';
 import { createEntityAdapter, EntityState } from '@ngrx/entity';
 import { isEqual } from 'lodash';
-import { DashboardInfo, FailureAction, LoadingStatus } from '@shared/models';
-import { dashboardsListActions } from './dashboards-list.actions';
+import { DashboardInfo, LoadingStatus, StateError } from '@shared/models';
+import { dashboardsListActions, dashboardsListApiActions } from './dashboards-list.actions';
 
 interface DashboardsListState extends EntityState<DashboardInfo> {
   loadingStatus: LoadingStatus;
-  error: { action: FailureAction; error: Error } | null;
-  changedCurrentDashboardInfo: DashboardInfo | null;
+  error: StateError | null;
+
+  originalCurrentDashboardInfo: DashboardInfo | null;
+  isChanged: boolean;
 }
 
 const dashboardsListAdapter = createEntityAdapter<DashboardInfo>({
@@ -17,7 +19,8 @@ const dashboardsListAdapter = createEntityAdapter<DashboardInfo>({
 const initialState: DashboardsListState = dashboardsListAdapter.getInitialState({
   loadingStatus: LoadingStatus.NotStarted,
   error: null,
-  changedCurrentDashboardInfo: null,
+  originalCurrentDashboardInfo: null,
+  isChanged: false,
 });
 
 const reducer = createReducer<DashboardsListState>(
@@ -25,11 +28,11 @@ const reducer = createReducer<DashboardsListState>(
   on(dashboardsListActions.resetUserDashboards, (): DashboardsListState => initialState),
 
   on(
-    dashboardsListActions.loadUserDashboards,
+    dashboardsListApiActions.loadUserDashboards,
     (): DashboardsListState => ({ ...initialState, loadingStatus: LoadingStatus.Loading })
   ),
   on(
-    dashboardsListActions.loadUserDashboardsSuccess,
+    dashboardsListApiActions.loadUserDashboardsSuccess,
     (state, { dashboardsList }): DashboardsListState =>
       dashboardsListAdapter.setAll(dashboardsList, {
         ...state,
@@ -38,7 +41,7 @@ const reducer = createReducer<DashboardsListState>(
       })
   ),
   on(
-    dashboardsListActions.loadUserDashboardsFailure,
+    dashboardsListApiActions.loadUserDashboardsFailure,
     (state, errorInfo): DashboardsListState => ({
       ...state,
       loadingStatus: LoadingStatus.Failure,
@@ -46,42 +49,71 @@ const reducer = createReducer<DashboardsListState>(
     })
   ),
 
-  on(dashboardsListActions.changeCurrentDashboardInfo, (state, { dashboardInfo }): DashboardsListState => {
-    const currentDashboardInfo = state.entities[dashboardInfo?.id || ''];
-    const isUnchanged = isEqual(currentDashboardInfo, dashboardInfo);
-    return { ...state, changedCurrentDashboardInfo: isUnchanged ? null : dashboardInfo };
+  on(dashboardsListActions.enterEditMode, (state, { dashboardId }): DashboardsListState => {
+    return {
+      ...state,
+      originalCurrentDashboardInfo: state.entities[dashboardId] || null,
+    };
+  }),
+  on(
+    dashboardsListActions.exitEditMode,
+    (state): DashboardsListState => ({
+      ...state,
+      originalCurrentDashboardInfo: null,
+      isChanged: false,
+    })
+  ),
+
+  on(dashboardsListActions.changeDashboardInfo, (state, { dashboardInfo }): DashboardsListState => {
+    const isUnchanged = isEqual(state.originalCurrentDashboardInfo, dashboardInfo);
+    if (isUnchanged) return state;
+    const newState: DashboardsListState = {
+      ...state,
+      isChanged: true,
+    };
+    return dashboardsListAdapter.upsertOne(dashboardInfo, newState);
+  }),
+  on(dashboardsListActions.discardChangesForCurrentDashboardInfo, (state): DashboardsListState => {
+    if (!state.originalCurrentDashboardInfo || !state.isChanged) return state;
+    return dashboardsListAdapter.upsertOne(state.originalCurrentDashboardInfo, state);
   }),
 
   on(
-    dashboardsListActions.addDashboard,
-    dashboardsListActions.updateCurrentDashboardInfo,
-    dashboardsListActions.deleteDashboard,
+    dashboardsListApiActions.addDashboard,
+    dashboardsListApiActions.updateDashboardInfo,
+    dashboardsListApiActions.deleteDashboard,
     (state): DashboardsListState => ({ ...state, loadingStatus: LoadingStatus.Loading })
   ),
   on(
-    dashboardsListActions.updateCurrentDashboardInfoSuccess,
-    (state): DashboardsListState => ({
-      ...state,
-      changedCurrentDashboardInfo: null,
-      loadingStatus: LoadingStatus.Success,
-    })
-  ),
-  on(
-    dashboardsListActions.addDashboardSuccess,
-    dashboardsListActions.deleteDashboardSuccess,
+    dashboardsListApiActions.updateDashboardInfoSuccess,
     (state): DashboardsListState => ({
       ...state,
       loadingStatus: LoadingStatus.Success,
     })
   ),
   on(
-    dashboardsListActions.addDashboardFailure,
-    dashboardsListActions.updateCurrentDashboardInfoFailure,
-    dashboardsListActions.deleteDashboardFailure,
+    dashboardsListApiActions.addDashboardSuccess,
+    dashboardsListApiActions.deleteDashboardSuccess,
+    (state): DashboardsListState => ({
+      ...state,
+      loadingStatus: LoadingStatus.NotUpdated,
+    })
+  ),
+  on(
+    dashboardsListApiActions.addDashboardFailure,
+    dashboardsListApiActions.updateDashboardInfoFailure,
+    dashboardsListApiActions.deleteDashboardFailure,
     (state, errorInfo): DashboardsListState => ({
       ...state,
       loadingStatus: LoadingStatus.Failure,
       error: errorInfo,
+    })
+  ),
+  on(
+    dashboardsListActions.clearError,
+    (state): DashboardsListState => ({
+      ...state,
+      error: null,
     })
   )
 );

@@ -1,6 +1,6 @@
-import { Component, inject } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import {
   NavigationEnd,
   NavigationError,
@@ -14,7 +14,8 @@ import { SideNav } from '@shared/layout/side-nav/side-nav';
 import { Spinner } from '@shared/components';
 import { Auth } from '@shared/auth';
 import { ROUTING_PATHS } from '@shared/constants';
-import { NavInfo } from '@shared/models';
+import { DashboardInfo, FailureAction, NavInfo } from '@shared/models';
+import { DashboardInfoFormService } from '@shared/edit';
 import { DashboardsFacade } from '@state';
 
 @Component({
@@ -28,6 +29,8 @@ export class App {
   private router = inject(Router);
   private authService = inject(Auth);
   private dashboardsFacade = inject(DashboardsFacade);
+  private dashboardInfoFormService = inject(DashboardInfoFormService);
+  private destroyRef = inject(DestroyRef);
 
   readonly isLoading$ = new BehaviorSubject<boolean>(false);
   readonly currentUser$ = this.authService.currentUser$;
@@ -39,13 +42,21 @@ export class App {
     map(([isAuthenticated, isLogin]) => isAuthenticated && !isLogin)
   );
 
-  dashboards$: Observable<NavInfo[]> = this.dashboardsFacade.userDashboards$.pipe(
+  dashboards$: Observable<NavInfo[]> = this.dashboardsFacade.userDashboardsWithRequest$.pipe(
     map((dashboards) =>
       (dashboards || []).map((dashboard) => ({
         ...dashboard,
         link: `/${ROUTING_PATHS.DASHBOARD}/${dashboard.id}`,
       }))
     )
+  );
+
+  addDashboardFailureAction = toSignal<FailureAction | null>(this.dashboardsFacade.addDashboardError$, {
+    initialValue: null,
+  });
+  updateDashboardsListSuccess$: Observable<void> = this.dashboardsFacade.userDashboardsShouldBeRefetched$.pipe(
+    filter((isSuccess) => isSuccess),
+    map(() => void 0)
   );
 
   constructor() {
@@ -61,6 +72,18 @@ export class App {
         this.isLoading$.next(false);
       }
     });
+  }
+
+  addDashboard() {
+    this.dashboardInfoFormService
+      .addNew(this.addDashboardFailureAction, this.updateDashboardsListSuccess$)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((dashboardInfo: DashboardInfo | null) => {
+        if (dashboardInfo) {
+          this.dashboardsFacade.addDashboard(dashboardInfo);
+        }
+        this.dashboardsFacade.clearDashboardListError();
+      });
   }
 
   logout() {

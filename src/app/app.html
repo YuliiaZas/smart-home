@@ -3,7 +3,12 @@
 }
 
 @if (showSideNav$ | async) {
-  <app-side-nav [navItems]="(dashboards$ | async) || []" [user]="currentUser$ | async" (logout)="logout()">
+  <app-side-nav
+    [navItems]="(dashboards$ | async) || []"
+    [user]="currentUser$ | async"
+    (addDashboard)="addDashboard()"
+    (logout)="logout()"
+  >
     <main class="main">
       <router-outlet />
     </main>

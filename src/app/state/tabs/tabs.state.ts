@@ -27,11 +27,6 @@ const initialState: TabsState = tabsAdapter.getInitialState({
   isChanged: false,
 });
 
-// const getNewTabInfo = (title: string, tabIds: string[]): TabInfo => ({
-//   id: getUniqueId(getKebabCase(title), tabIds),
-//   title,
-// });
-
 const reducer = createReducer<TabsState>(
   initialState,
 
@@ -74,11 +69,11 @@ const reducer = createReducer<TabsState>(
     })
   ),
 
-  on(tabsActions.renameCurrentTab, (state, { title }): TabsState => {
+  on(tabsActions.renameTab, (state, { tabInfo }): TabsState => {
     const currentTabId = state.currentTabId;
-    if (!currentTabId) return state;
+    if (currentTabId !== tabInfo.id) return state;
     const newState: TabsState = { ...state, isChanged: true };
-    return tabsAdapter.updateOne({ id: currentTabId, changes: { title } }, newState);
+    return tabsAdapter.upsertOne(tabInfo, newState);
   }),
 
   on(
@@ -117,6 +112,9 @@ export const tabsFeature = createFeature({
     ),
     selectCurrentTab: createSelector(selectEntities, selectCurrentTabId, (entities, currentTabId) =>
       currentTabId ? entities[currentTabId] || null : null
+    ),
+    selectTabsTitles: createSelector(selectTabsIdsOrdered, selectEntities, (ids, entities) =>
+      ids.map((id) => entities[id]?.title).filter((title): title is string => !!title)
     ),
   }),
 });

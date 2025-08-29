@@ -12,7 +12,7 @@ export const tabsActions = createActionGroup({
 
     'Set Current Tab Id': props<{ tabId: string | null }>(),
 
-    'Rename Current Tab': props<{ title: string }>(),
+    'Rename Tab': props<{ tabInfo: TabInfo }>(),
 
     'Reorder Tabs': props<{ tabsIdsOrdered: string[] }>(),
 

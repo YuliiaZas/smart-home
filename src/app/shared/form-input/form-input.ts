@@ -1,5 +1,5 @@
 import { AbstractControl, FormGroup } from '@angular/forms';
-import { Component, computed, inject, input, linkedSignal, OnInit } from '@angular/core';
+import { AfterViewInit, Component, computed, inject, input, linkedSignal } from '@angular/core';
 import { ControlContainer, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -24,7 +24,7 @@ import { passwordDataMap } from './constants/password-data-map';
     },
   ],
 })
-export class FormInput implements OnInit {
+export class FormInput implements AfterViewInit {
   #parentContainer = inject(ControlContainer);
   inputType = InputType;
 
@@ -43,7 +43,7 @@ export class FormInput implements OnInit {
     return this.#parentContainer.control as FormGroup;
   }
 
-  ngOnInit() {
+  ngAfterViewInit() {
     this.formControl = this.#parentContainerForm?.get(this.inputData().controlKey);
   }
 

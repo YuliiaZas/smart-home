@@ -19,8 +19,8 @@ export const currentDashboardActions = createActionGroup({
   events: {
     'Set Current Dashboard Id': props<{ dashboardId: string | null }>(),
 
-    'Set Current Dashboard Data': props<{ dashboardData: DashboardDataInfo | null }>(),
-    'Set Current Dashboard Data Success': emptyProps(),
+    'Propagate Current Dashboard Data': props<{ dashboardData: DashboardDataInfo | null }>(),
+    'Propagate Current Dashboard Data Success': emptyProps(),
 
     'Enter Edit Mode': emptyProps(),
     'Exit Edit Mode': emptyProps(),

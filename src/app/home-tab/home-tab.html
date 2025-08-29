@@ -1,6 +1,6 @@
 @let cardIdsArray = cardIds();
 
-@if (cardIdsArray.length) {
+@if (cardIdsArray?.length) {
   <app-card-list [cardIds]="cardIdsArray" [cardTemplateRef]="cardTemplateRef"></app-card-list>
 
   <ng-template #cardTemplateRef let-cardId="cardId">

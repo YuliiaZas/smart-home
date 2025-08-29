@@ -1,11 +1,11 @@
 import { inject, Injectable } from '@angular/core';
-import { combineLatest, EMPTY, map, Observable, switchMap, take } from 'rxjs';
-import { DashboardInfo, LoadingStatus } from '@shared/models';
+import { combineLatest, distinctUntilChanged, EMPTY, map, Observable, switchMap, take } from 'rxjs';
+import { DashboardInfo, FailureAction, LoadingStatus, StateError } from '@shared/models';
 import { Store } from '@ngrx/store';
 import { homeItemsActions } from '@state/home-items';
 import { cardsFeature } from '@state/cards';
 import { tabsFeature } from '@state/tabs';
-import { dashboardsListActions, dashboardsListFeature } from './dashboards-list';
+import { dashboardsListActions, dashboardsListApiActions, dashboardsListFeature } from './dashboards-list';
 import { currentDashboardActions, currentDashboardFeature, dashboardApiActions } from './current-dashboard';
 
 @Injectable({
@@ -18,17 +18,35 @@ export class DashboardsFacade {
     return this.#store.select(dashboardsListFeature.selectAll);
   }
 
+  get userDashboardIds$(): Observable<string[]> {
+    return this.#store.select(dashboardsListFeature.selectIds).pipe(map((ids) => ids as string[]));
+  }
+
   get userDashboardsWithRequest$(): Observable<DashboardInfo[]> {
     return this.#store.select(dashboardsListFeature.selectLoadingStatus).pipe(
       switchMap((loadingStatus) => {
         if (loadingStatus === LoadingStatus.Success || loadingStatus === LoadingStatus.Failure) {
           return this.#store.select(dashboardsListFeature.selectAll);
         }
-        if (loadingStatus === LoadingStatus.NotStarted) {
-          this.#store.dispatch(dashboardsListActions.loadUserDashboards());
+        if (loadingStatus === LoadingStatus.NotStarted || loadingStatus === LoadingStatus.NotUpdated) {
+          this.#store.dispatch(dashboardsListApiActions.loadUserDashboards());
         }
         return EMPTY;
       })
+    );
+  }
+
+  get userDashboardsShouldBeRefetched$(): Observable<boolean> {
+    return this.#store.select(dashboardsListFeature.selectLoadingStatus).pipe(
+      map((loadingStatus) => loadingStatus === LoadingStatus.NotUpdated),
+      distinctUntilChanged()
+    );
+  }
+
+  get addDashboardError$(): Observable<FailureAction | null> {
+    return this.#store.select(dashboardsListFeature.selectError).pipe(
+      map((error: StateError | null) => (error?.action === FailureAction.AddDashboard ? error.action : null)),
+      distinctUntilChanged()
     );
   }
 
@@ -77,11 +95,15 @@ export class DashboardsFacade {
   }
 
   addDashboard(dashboardInfo: DashboardInfo): void {
-    this.#store.dispatch(dashboardsListActions.addDashboard({ dashboardInfo }));
+    this.#store.dispatch(dashboardsListApiActions.addDashboard({ dashboardInfo }));
+  }
+
+  editDashboardInfo(dashboardInfo: DashboardInfo): void {
+    this.#store.dispatch(dashboardsListActions.changeDashboardInfo({ dashboardInfo }));
   }
 
   deleteDashboard(dashboardId: string): void {
-    this.#store.dispatch(dashboardsListActions.deleteDashboard({ dashboardId }));
+    this.#store.dispatch(dashboardsListApiActions.deleteDashboard({ dashboardId }));
   }
 
   enterEditMode(): void {
@@ -100,5 +122,9 @@ export class DashboardsFacade {
     this.#store.dispatch(dashboardsListActions.resetUserDashboards());
     this.#store.dispatch(currentDashboardActions.resetCurrentDashboard());
     this.#store.dispatch(homeItemsActions.resetHomeItems());
+  }
+
+  clearDashboardListError(): void {
+    this.#store.dispatch(dashboardsListActions.clearError());
   }
 }

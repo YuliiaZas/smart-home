@@ -31,6 +31,6 @@ export class HomeTab {
   cardIds = computed(() => {
     const tabId = this.#tabId();
     if (!tabId) return [];
-    return this.#cardsOrderedByTab()[tabId];
+    return this.#cardsOrderedByTab()[tabId] || [];
   });
 }

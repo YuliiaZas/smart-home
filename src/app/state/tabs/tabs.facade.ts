@@ -20,6 +20,10 @@ export class TabsFacade {
     return this.#store.select(tabsFeature.selectEntities);
   }
 
+  get tabsTitles$(): Observable<string[]> {
+    return this.#store.select(tabsFeature.selectTabsTitles);
+  }
+
   get currentTabId$(): Observable<string | null> {
     return this.#store.select(tabsFeature.selectCurrentTabId);
   }
@@ -32,8 +36,8 @@ export class TabsFacade {
     this.#store.dispatch(tabsActions.setCurrentTabId({ tabId }));
   }
 
-  renameCurrentTab(title: string): void {
-    this.#store.dispatch(tabsActions.renameCurrentTab({ title }));
+  renameTab(tabInfo: TabInfo): void {
+    this.#store.dispatch(tabsActions.renameTab({ tabInfo }));
   }
 
   reorderTabs(tabsIdsOrdered: string[]): void {

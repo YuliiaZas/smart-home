@@ -22,3 +22,8 @@ export const ERROR_MESSAGES = {
   },
   defaultError: 'Something went wrong. Please try again later.',
 };
+
+export const UNIQUE_AREA: Partial<Record<Entity, string>> = {
+  [Entity.DASHBOARD]: 'your dashboards IDs',
+  [Entity.TAB]: 'dashboard tabs',
+};

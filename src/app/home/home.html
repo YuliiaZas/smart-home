@@ -1,5 +1,5 @@
 @let editMode = isEditMode();
-@let dashboard = currentDashboard();
+@let dashboard = currentDashboardInfo();
 
 <div class="tabs-container" [class.tabs-container--edit-mode]="editMode">
   @if (editMode && dashboard) {

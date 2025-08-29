@@ -29,7 +29,7 @@ export class UserDashboards {
   }
 
   updateDashboardInfo({ id, title, icon }: DashboardInfo): Observable<DashboardInfo> {
-    return this.http.put<DashboardInfo>(`${this.dashboardsPath}/${id}`, { title, icon });
+    return this.http.put<DashboardInfo>(`${this.dashboardsPath}/${id}/info`, { title, icon });
   }
 
   updateDashboardData(dashboardId: string, dashboardData: DashboardDataInfo): Observable<DashboardDataInfo> {

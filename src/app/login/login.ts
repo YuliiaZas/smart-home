@@ -31,8 +31,8 @@ export class Login implements OnInit {
 
   isLoading = toSignal(this.authService.isTokenLoading$);
 
-  loginFormInfo = this.loginFormService.getInputsData();
-  loginForm = this.formControlsService.toFormGroup(this.loginFormInfo);
+  loginControlsInfo = this.loginFormService.getInputsData();
+  loginForm = this.formControlsService.toFormGroup(this.loginControlsInfo);
 
   errorMessage = signal('');
   isDataInvalid = signal(false);

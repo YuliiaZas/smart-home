@@ -1,0 +1,12 @@
+<h2 mat-dialog-title>{{ data.title }}</h2>
+
+<mat-dialog-content class="content">
+  <ng-template #dynamicContent></ng-template>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  @if (data.cancelButtonText) {
+    <button matButton id="cancel" [mat-dialog-close]="false">{{ data.cancelButtonText }}</button>
+  }
+  <button matButton id="confirm" type="submit" (click)="handleSubmitForm()">{{ data.confirmButtonText }}</button>
+</mat-dialog-actions>

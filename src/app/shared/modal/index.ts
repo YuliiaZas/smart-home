@@ -1,1 +1,2 @@
-export * from './services/modal';
+export * from './services';
+export * from './models';

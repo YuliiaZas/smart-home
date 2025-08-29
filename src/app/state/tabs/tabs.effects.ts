@@ -12,11 +12,19 @@ export class TabsEffects {
   #store = inject(Store);
   #router = inject(Router);
 
-  addTab$ = createEffect(() =>
-    this.#actions$.pipe(
-      ofType(tabsActions.addTab),
-      map(({ tabInfo }) => tabsActions.setCurrentTabId({ tabId: tabInfo.id }))
-    )
+  addTab$ = createEffect(
+    () =>
+      this.#actions$.pipe(
+        ofType(tabsActions.addTab),
+        map(({ tabInfo }) => tabInfo.id),
+        withLatestFrom(this.#store.select(tabsFeature.selectCurrentTabId)),
+        map(([tabId, currentTabId]) => {
+          const currentBaseUrl = currentTabId ? getParentUrl(this.#router.url) : this.#router.url;
+          return `${currentBaseUrl}/${tabId}`;
+        }),
+        tap((url) => this.#router.navigateByUrl(url))
+      ),
+    { dispatch: false }
   );
 
   deleteCurrentTab$ = createEffect(
@@ -26,8 +34,7 @@ export class TabsEffects {
         withLatestFrom(this.#store.select(tabsFeature.selectTabsIdsOrdered)),
         map(([, tabsOrdered]) => {
           const defaultTabId = tabsOrdered[0] || null;
-          const url = this.#router.url;
-          const parentUrl = url.split('/').slice(0, -1).join('/');
+          const parentUrl = getParentUrl(this.#router.url);
           return defaultTabId ? `${parentUrl}/${defaultTabId}` : parentUrl;
         }),
         tap((url) => this.#router.navigateByUrl(url))
@@ -50,4 +57,8 @@ export class TabsEffects {
       ),
     { dispatch: false }
   );
+}
+
+function getParentUrl(url: string): string {
+  return url.split('/').slice(0, -1).join('/');
 }

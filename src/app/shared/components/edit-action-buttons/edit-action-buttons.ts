@@ -1,12 +1,12 @@
 import { NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, output, DestroyRef, input, computed } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { filter } from 'rxjs/operators';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { EDIT_MESSAGES } from '@shared/constants';
 import { DialogData, ModalService } from '@shared/modal';
 import { Entity } from '@shared/models';
-import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-edit-action-buttons',
@@ -30,7 +30,14 @@ export class EditActionButtons {
   editEvent = output<void>();
   deleteEvent = output<void>();
 
-  editButtonLabel = computed(() => this.#editMessages.editEntity(this.entity(), this.entityName(), this.renameMode()));
+  editButtonLabel = computed(() => {
+    const entity = this.entity();
+    const entityName = this.entityName();
+    if (this.renameMode()) {
+      return this.#editMessages.renameEntity(entity, entityName);
+    }
+    return this.#editMessages.editEntity(entity, entityName);
+  });
   deleteButtonLabel = computed(() => this.#editMessages.deleteEntity(this.entity(), this.entityName()));
 
   #getDeleteConfirmationModalText = computed<DialogData>(() => {

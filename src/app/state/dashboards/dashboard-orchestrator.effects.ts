@@ -4,10 +4,17 @@ import { Store } from '@ngrx/store';
 import { from } from 'rxjs';
 import { filter, map, switchMap, withLatestFrom } from 'rxjs/operators';
 import { isString } from '@shared/utils';
-import { DashboardDataInfo, HomeCardWithItemsIdsInfo, HomeItemInfo, TabInfo } from '@shared/models';
+import {
+  DashboardDataInfo,
+  DashboardTabInfo,
+  HomeCardInfo,
+  HomeCardWithItemsIdsInfo,
+  HomeItemInfo,
+  TabInfo,
+} from '@shared/models';
 import { tabsActions, tabsFeature } from '@state/tabs';
 import { cardsActions, cardsFeature } from '@state/cards';
-import { dashboardsListActions } from './dashboards-list';
+import { dashboardsListActions, dashboardsListApiActions, dashboardsListFeature } from './dashboards-list';
 import { currentDashboardActions, currentDashboardFeature, dashboardApiActions } from './current-dashboard';
 import { homeItemsActions, homeItemsFeature } from '@state/home-items';
 import { Dictionary } from '@ngrx/entity';
@@ -20,53 +27,61 @@ export class DashboardsOrchestratorEffects {
   resetCurrentDashboard$ = createEffect(() =>
     this.actions$.pipe(
       ofType(currentDashboardActions.resetCurrentDashboard),
-      map(() => currentDashboardActions.setCurrentDashboardData({ dashboardData: null }))
+      map(() => currentDashboardActions.propagateCurrentDashboardData({ dashboardData: null }))
     )
   );
 
   setCurrentDashboardData$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(currentDashboardActions.setCurrentDashboardData),
-      switchMap(({ dashboardData }) => {
-        const tabs = dashboardData?.tabs || [];
-        return from([
+      ofType(currentDashboardActions.propagateCurrentDashboardData),
+      map(({ dashboardData }) => dashboardData?.tabs || ([] as DashboardTabInfo[])),
+      switchMap((tabs) =>
+        from([
           tabsActions.setTabsData({ tabs }),
           cardsActions.setCardsData({ tabs }),
           homeItemsActions.setCurrentDashboardHomeItems({ tabs }),
-          currentDashboardActions.setCurrentDashboardDataSuccess(),
-        ]);
-      })
+          currentDashboardActions.propagateCurrentDashboardDataSuccess(),
+        ])
+      )
     )
   );
 
   enterEditMode$ = createEffect(() =>
     this.actions$.pipe(
       ofType(currentDashboardActions.enterEditMode),
-      switchMap(() => {
-        return from([tabsActions.enterEditMode(), cardsActions.enterEditMode()]);
-      })
+      withLatestFrom(this.store.select(currentDashboardFeature.selectDashboardId)),
+      map(([, currentDashboardId]) => currentDashboardId),
+      filter((dashboardId) => dashboardId !== null),
+      switchMap((dashboardId) =>
+        from([
+          dashboardsListActions.enterEditMode({ dashboardId }),
+          tabsActions.enterEditMode(),
+          cardsActions.enterEditMode(),
+        ])
+      )
     )
   );
 
   exitEditMode$ = createEffect(() =>
     this.actions$.pipe(
       ofType(currentDashboardActions.exitEditMode),
-      switchMap(() => {
-        return from([tabsActions.exitEditMode(), cardsActions.exitEditMode()]);
-      })
+      switchMap(() =>
+        from([dashboardsListActions.exitEditMode(), tabsActions.exitEditMode(), cardsActions.exitEditMode()])
+      )
     )
   );
 
   discardChanges$ = createEffect(() =>
     this.actions$.pipe(
       ofType(currentDashboardActions.discardChanges),
-      switchMap(() => {
-        return from([
+      switchMap(() =>
+        from([
+          dashboardsListActions.discardChangesForCurrentDashboardInfo(),
           tabsActions.discardChanges(),
           cardsActions.discardChanges(),
           currentDashboardActions.exitEditMode(),
-        ]);
-      })
+        ])
+      )
     )
   );
 
@@ -77,20 +92,22 @@ export class DashboardsOrchestratorEffects {
       map(([, currentDashboardId]) => currentDashboardId),
       filter((currentDashboardId) => isString(currentDashboardId)),
       withLatestFrom(
+        this.store.select(dashboardsListFeature.selectEntities),
         this.store.select(tabsFeature.selectOrderedTabs),
         this.store.select(cardsFeature.selectCardsByTabs),
         this.store.select(homeItemsFeature.selectEntities)
       ),
-      map(([dashboardId, tabs, cardsByTabs, homeItemEntities]) => ({
+      map(([dashboardId, dashboardInfoEntities, tabs, cardsByTabs, homeItemEntities]) => ({
         dashboardId,
+        dashboardInfo: dashboardInfoEntities[dashboardId] || null,
         dashboardData: getherDashboardData(tabs, cardsByTabs, homeItemEntities),
       })),
-      switchMap(({ dashboardId, dashboardData }) => {
-        return from([
+      switchMap(({ dashboardId, dashboardInfo, dashboardData }) =>
+        from([
           dashboardApiActions.updateDashboardData({ dashboardId, dashboardData }),
-          dashboardsListActions.updateCurrentDashboardInfo(),
-        ]);
-      })
+          dashboardsListApiActions.updateDashboardInfo({ dashboardInfo }),
+        ])
+      )
     )
   );
 }
@@ -102,11 +119,27 @@ function getherDashboardData(
 ): DashboardDataInfo {
   const tabsWithCards = tabs.map((tab) => ({
     ...tab,
-    cards:
-      cardsByTabs[tab.id].map((card) => ({
-        ...card,
-        items: card.items.map((id) => homeItemEntities[id]).filter((item): item is HomeItemInfo => item !== undefined),
-      })) || [],
+    cards: getCardsForTab(tab.id, cardsByTabs, homeItemEntities),
   }));
   return { tabs: tabsWithCards };
+}
+
+function getCardsForTab(
+  tabId: string,
+  cardsByTabs: Record<string, HomeCardWithItemsIdsInfo[]>,
+  homeItemEntities: Dictionary<HomeItemInfo>
+): HomeCardInfo[] {
+  const cardsIdsForTab = cardsByTabs[tabId];
+  if (!cardsIdsForTab) return [];
+
+  return cardsIdsForTab.map((card) => ({
+    ...card,
+    items: getHomeItemsByIds(homeItemEntities, card.items),
+  }));
+}
+
+function getHomeItemsByIds(homeItemEntities: Dictionary<HomeItemInfo>, itemsIds: string[]): HomeItemInfo[] {
+  if (!itemsIds) return [];
+
+  return itemsIds.map((itemId) => homeItemEntities[itemId]).filter((item): item is HomeItemInfo => item !== undefined);
 }

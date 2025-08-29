@@ -2,10 +2,11 @@ import { Entity } from '@shared/models';
 import { ENTITY_MESSAGES } from './entity-messages';
 
 export const EDIT_MESSAGES = {
-  editEntity: (entity: Entity, name?: string, renameMode?: boolean) =>
-    `${renameMode ? 'Rename' : 'Edit'} ${ENTITY_MESSAGES[entity]}${name ? ` "${name}"` : ''}`,
+  editEntity: (entity: Entity, name?: string) => `Edit ${ENTITY_MESSAGES[entity]}${name ? ` "${name}"` : ''}`,
+  renameEntity: (entity: Entity, name?: string) => `Rename ${ENTITY_MESSAGES[entity]}${name ? ` "${name}"` : ''}`,
   deleteEntity: (entity: Entity, name?: string) => `Delete ${ENTITY_MESSAGES[entity]}${name ? ` "${name}"` : ''}`,
   createEntity: (entity: Entity) => `Create New ${ENTITY_MESSAGES[entity]}`,
+  applyButton: 'Apply',
   saveButton: 'Save',
   deleteButton: 'Delete',
   cancelButton: 'Cancel',
@@ -14,6 +15,11 @@ export const EDIT_MESSAGES = {
     title: `${ENTITY_MESSAGES[entity]} Delete Confirmation`,
     message: `Are you sure you want to delete ${ENTITY_MESSAGES[entity].toLowerCase()}${name ? ` "${name}"` : ''}? \n${DELETE_WARNING[entity]}`,
   }),
+  label: {
+    id: (entity: Entity) => `${ENTITY_MESSAGES[entity]} ID`,
+    title: (entity: Entity) => `${ENTITY_MESSAGES[entity]} Title`,
+    icon: (entity: Entity) => `${ENTITY_MESSAGES[entity]} Icon`,
+  },
 };
 
 const DELETE_WARNING = {
