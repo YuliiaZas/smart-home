@@ -2,17 +2,17 @@ import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivateFn, RedirectCommand, Router } from '@angular/router';
 import { map } from 'rxjs';
 import { createUrlTreeRelatedToCurrentRoute } from '@shared/utils';
-import { UserDashboards } from '../services';
+import { TabsFacade } from '@state';
 
 export const areTabsEmptyGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
-  const dashboardsService = inject(UserDashboards);
+  const tabsFacade = inject(TabsFacade);
   const router = inject(Router);
 
-  return dashboardsService.currentDashboardTabs$.pipe(
-    map((tabs) => {
-      if (!tabs?.length) return true;
+  return tabsFacade.tabsIds$.pipe(
+    map((tabsIds) => {
+      if (tabsIds.length === 0) return true;
 
-      const urlTree = createUrlTreeRelatedToCurrentRoute(tabs[0].id, route, router);
+      const urlTree = createUrlTreeRelatedToCurrentRoute(tabsIds[0], route, router);
       return new RedirectCommand(urlTree, { replaceUrl: true });
     })
   );

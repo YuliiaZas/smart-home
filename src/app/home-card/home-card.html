@@ -1,10 +1,39 @@
 <article>
-  @if (isSingleItem()) {
-    <app-home-card-single [cardData]="cardData()" (updateCardData)="updateCardData.emit($event)"></app-home-card-single>
-  } @else {
-    <app-home-card-multiple
-      [cardData]="cardData()"
-      (updateCardData)="updateCardData.emit($event)"
-    ></app-home-card-multiple>
-  }
+  <app-card [headerClass]="isSingleItem() ? 'body-1' : 'heading-2'">
+    <ng-container cardTitle>
+      <ng-container *ngTemplateOutlet="titleTemplate()"></ng-container>
+    </ng-container>
+
+    <ng-container cardAction>
+      <ng-container *ngTemplateOutlet="actionTemplate()"></ng-container>
+    </ng-container>
+
+    <ng-container cardContent>
+      @if (isSingleItem()) {
+        <app-home-card-single [cardData]="cardData()"></app-home-card-single>
+      } @else {
+        <app-home-card-multiple [cardData]="cardData()"></app-home-card-multiple>
+      }
+    </ng-container>
+
+    @if (isEditMode()) {
+      <ng-container cardFooter>
+        <div class="card-edit-container">
+          <app-mover
+            class="mover"
+            [sortedIds]="sortedIds()"
+            [currentId]="cardData().id"
+            (setSorting)="setCardsSorting($event)"
+          ></app-mover>
+          <app-edit-action-buttons
+            [entity]="entity"
+            [entityName]="cardData().title"
+            [deleteClass]="''"
+            (editEvent)="enterCardEditMode()"
+            (deleteEvent)="deleteCurrentCard()"
+          ></app-edit-action-buttons>
+        </div>
+      </ng-container>
+    }
+  </app-card>
 </article>

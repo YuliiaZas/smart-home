@@ -1,24 +1,126 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { filter } from 'rxjs';
+import { Dictionary } from '@ngrx/entity';
 import { MatTabLink, MatTabNav, MatTabNavPanel } from '@angular/material/tabs';
-import { TabInfo, TabItemInfo } from '@shared/models';
-import { UserDashboards } from '@shared/dashboards/services';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { DashboardInfo, Entity, TabInfo } from '@shared/models';
+import { EDIT_MESSAGES } from '@shared/constants';
+import { EditActionButtons, Mover, MoverButtonStyle, MoverSurroundDirective } from '@shared/components';
+import { TabInfoFormService, DashboardInfoFormService } from '@shared/edit';
+import { DashboardsFacade, TabsFacade } from '@state';
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, RouterLinkActive, RouterOutlet, MatTabNav, MatTabLink, MatTabNavPanel],
+  imports: [
+    RouterLink,
+    RouterLinkActive,
+    RouterOutlet,
+    MatTabNav,
+    MatTabLink,
+    MatTabNavPanel,
+    MatButtonModule,
+    MatIconModule,
+    EditActionButtons,
+    Mover,
+    MoverSurroundDirective,
+  ],
   templateUrl: './home.html',
   styleUrl: './home.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '[class.edit-mode]': 'isEditMode()',
+  },
 })
 export class Home {
-  private dashboardsService = inject(UserDashboards);
+  #dashboardsFacade = inject(DashboardsFacade);
+  #tabsFacade = inject(TabsFacade);
+  #dashboardInfoFormService = inject(DashboardInfoFormService);
+  #tabInfoFormService = inject(TabInfoFormService);
+  #destroyRef = inject(DestroyRef);
+  editMessages = EDIT_MESSAGES;
 
-  dashboardTabs = toSignal<TabInfo[]>(this.dashboardsService.currentDashboardTabs$);
+  dashboardEntity = Entity.DASHBOARD;
+  tabEntity = Entity.TAB;
+  moverButtonStyles = MoverButtonStyle.ARROWS;
+  addTabButtonLabel = this.editMessages.createEntity(this.tabEntity);
 
-  tabs = computed<TabItemInfo[]>(() => {
-    const tabs = this.dashboardTabs();
-    return (tabs || []).map((tab) => ({ ...tab, link: tab.id }));
-  });
+  tabsIds = toSignal<string[]>(this.#tabsFacade.tabsIds$, { requireSync: true });
+  tabsEntities = toSignal<Dictionary<TabInfo>>(this.#tabsFacade.tabsEntities$, { requireSync: true });
+
+  currentDashboardInfo = toSignal<DashboardInfo | null>(this.#dashboardsFacade.currentDashboardInfo$);
+  currentTabInfo = toSignal<TabInfo | null>(this.#tabsFacade.currentTabInfo$);
+
+  isEditMode = toSignal(this.#dashboardsFacade.isEditMode$);
+
+  enterEditMode() {
+    this.#dashboardsFacade.enterEditMode();
+  }
+
+  discardChanges() {
+    this.#dashboardsFacade.discardChanges();
+  }
+
+  saveChanges() {
+    this.#dashboardsFacade.saveCurrentDashboard();
+  }
+
+  renameCurrentDashboard() {
+    const currentDashboardInfo = this.currentDashboardInfo();
+    if (!currentDashboardInfo) return;
+
+    this.#dashboardInfoFormService
+      .edit(currentDashboardInfo)
+      .pipe(
+        filter((dashboardInfo) => dashboardInfo !== null),
+        takeUntilDestroyed(this.#destroyRef)
+      )
+      .subscribe((dashboardInfo: DashboardInfo) => {
+        this.#dashboardsFacade.editDashboardInfo(dashboardInfo);
+      });
+  }
+
+  deleteCurrentDashboard() {
+    const currentDashboardInfo = this.currentDashboardInfo();
+    if (!currentDashboardInfo) return;
+
+    this.#dashboardsFacade.deleteDashboard(currentDashboardInfo.id);
+  }
+
+  addTab() {
+    this.#tabInfoFormService
+      .addNew()
+      .pipe(
+        filter((tabInfo) => tabInfo !== null),
+        takeUntilDestroyed(this.#destroyRef)
+      )
+      .subscribe((tabInfo: TabInfo) => {
+        this.#tabsFacade.addTab(tabInfo);
+      });
+  }
+
+  renameCurrentTab() {
+    const currentTabInfo = this.currentTabInfo();
+    if (!currentTabInfo) return;
+
+    this.#tabInfoFormService
+      .edit(currentTabInfo)
+      .pipe(
+        filter((tabInfo) => tabInfo !== null),
+        takeUntilDestroyed(this.#destroyRef)
+      )
+      .subscribe((tabInfo: TabInfo) => {
+        this.#tabsFacade.renameTab(tabInfo);
+      });
+  }
+
+  deleteCurrentTab() {
+    this.#tabsFacade.deleteCurrentTab();
+  }
+
+  setTabSorting(sortedIds: string[]) {
+    this.#tabsFacade.reorderTabs(sortedIds);
+  }
 }

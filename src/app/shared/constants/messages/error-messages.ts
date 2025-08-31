@@ -1,7 +1,10 @@
+import { Entity } from '@shared/models';
+
 export const ERROR_MESSAGES = {
   emptyHomeData: {
-    dashboards: 'You don’t have any dashboards yet.',
-    tabs: 'You don’t have any tabs in this dashboard.',
+    [Entity.DASHBOARD]: 'You don’t have any dashboards yet.',
+    [Entity.TAB]: 'You don’t have any tabs in this dashboard.',
+    [Entity.CARD]: 'You don’t have any cards in this tab.',
     create: 'They’ll appear here as soon as you create them.',
   },
   formValidation: {
@@ -18,4 +21,9 @@ export const ERROR_MESSAGES = {
     homeLink: 'Return to Home Page',
   },
   defaultError: 'Something went wrong. Please try again later.',
+};
+
+export const UNIQUE_AREA: Partial<Record<Entity, string>> = {
+  [Entity.DASHBOARD]: 'your dashboards IDs',
+  [Entity.TAB]: 'dashboard tabs',
 };

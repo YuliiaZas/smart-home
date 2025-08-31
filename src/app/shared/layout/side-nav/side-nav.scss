@@ -3,7 +3,8 @@
 
 $item-radius: 0.25rem;
 $item-margin: 0.25rem;
-$logout-color: #e23535;
+$menu-font-size: 1.15rem;
+$default-color: var(--mat-sys-on-surface-variant);
 $active-color: #07a9f4;
 $active-bg-color: #182e37;
 
@@ -15,9 +16,13 @@ $active-bg-color: #182e37;
 
 .nav-header {
   height: vars.$header-height;
-  display: flex;
-  align-items: center;
   padding: 0;
+
+  .nav-tem {
+    font-size: 1.5rem;
+    position: relative;
+    top: 1px;
+  }
 }
 
 .nav-content {
@@ -30,27 +35,22 @@ $active-bg-color: #182e37;
   margin-top: auto;
 }
 
-.nav-link {
+.nav-item {
   margin: $item-margin;
   border-radius: $item-radius;
 
-  .nav-link-label {
+  .nav-item-label {
     text-transform: capitalize;
   }
 
   &__active {
     background-color: $active-bg-color;
 
-    .nav-link-label,
-    .nav-link-icon {
+    .nav-item-label,
+    .nav-item-icon {
       color: $active-color;
     }
   }
-}
-
-.nav-button {
-  width: 100%;
-  margin-inline: $item-margin;
 }
 
 :host {
@@ -66,10 +66,10 @@ $active-bg-color: #182e37;
     )
   );
 
-  .nav-button__logout {
+  .nav-item__menu {
     @include mat.button-overrides(
       (
-        text-label-text-color: $logout-color,
+        text-label-text-size: $menu-font-size,
       )
     );
   }

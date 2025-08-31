@@ -1,13 +1,15 @@
 <mat-sidenav-container fullscreen [hasBackdrop]="false">
   <mat-sidenav opened [style.width.px]="sideNavWidth()" aria-label="Side navigation">
-    <mat-list class="nav-header" aria-label="Actions">
-      <app-side-nav-button
-        class="nav-button"
-        icon="menu"
-        label="Smart Home UI"
-        [showLabel]="expanded()"
-        (buttonClick)="toggleExpanded()"
-      ></app-side-nav-button>
+    <mat-list class="nav-header" aria-label="Menu Actions">
+      <div mat-list-item class="nav-item">
+        <app-side-nav-button
+          class="nav-item__menu"
+          icon="menu"
+          label="Smart Home UI"
+          [showLabel]="expanded()"
+          (buttonClick)="toggleExpanded()"
+        ></app-side-nav-button>
+      </div>
     </mat-list>
 
     <mat-divider></mat-divider>
@@ -15,11 +17,11 @@
     <mat-nav-list class="nav-content" aria-label="Dashboards">
       <ul>
         @for (nav of navItems(); track nav) {
-          <li class="nav-link" routerLinkActive="nav-link__active" [routerLinkActiveOptions]="{ exact: false }">
+          <li class="nav-item" routerLinkActive="nav-item__active" [routerLinkActiveOptions]="{ exact: false }">
             <a mat-list-item [routerLink]="nav.link" [attr.aria-label]="nav.title">
-              <mat-icon class="nav-link-icon" matListItemIcon aria-hidden="true" [fontIcon]="nav.icon"></mat-icon>
+              <mat-icon class="nav-item-icon" matListItemIcon aria-hidden="true" [fontIcon]="nav.icon"></mat-icon>
               @if (expanded()) {
-                <span class="nav-link-label">{{ nav.title }}</span>
+                <span class="nav-item-label">{{ nav.title }}</span>
               }
             </a>
           </li>
@@ -27,24 +29,35 @@
       </ul>
     </mat-nav-list>
 
-    <div class="nav-footer">
-      <mat-divider></mat-divider>
-      <mat-list aria-label="Profile actions">
+    <mat-divider></mat-divider>
+
+    <mat-list aria-label="Actions">
+      <div mat-list-item class="nav-item">
         <app-side-nav-button
-          class="nav-button nav-button__logout"
+          icon="add"
+          label="Add Dashboard"
+          [showLabel]="expanded()"
+          (buttonClick)="addDashboard.emit()"
+        ></app-side-nav-button>
+      </div>
+      <div mat-list-item class="nav-item">
+        <app-side-nav-button
+          class="nav-item__logout"
           icon="logout"
           label="Logout"
+          iconClass="danger"
+          labelClass="danger"
           [showLabel]="expanded()"
           (buttonClick)="logout.emit()"
         ></app-side-nav-button>
+      </div>
 
-        @if (user()) {
-          <div mat-list-item>
-            <app-side-nav-user [user]="user()!" [showLabel]="expanded()"></app-side-nav-user>
-          </div>
-        }
-      </mat-list>
-    </div>
+      @if (user()) {
+        <div mat-list-item class="nav-item">
+          <app-side-nav-user [user]="user()!" [showLabel]="expanded()"></app-side-nav-user>
+        </div>
+      }
+    </mat-list>
   </mat-sidenav>
 
   <mat-sidenav-content [style.marginLeft.px]="contentMargin()" (click)="contentClick()">

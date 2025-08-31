@@ -9,6 +9,7 @@ import {
   isDashboardValidGuard,
   isTabValidGuard,
 } from '@shared/dashboards/guards';
+import { Entity } from '@shared/models';
 
 export const routes: Routes = [
   { path: ROUTING_PATHS.HOME, redirectTo: ROUTING_PATHS.DASHBOARD, pathMatch: 'full' },
@@ -20,6 +21,7 @@ export const routes: Routes = [
       {
         path: '',
         canActivate: [areDashboardsEmptyGuard],
+        data: { entity: Entity.DASHBOARD },
         loadComponent: () => import('./home-empty/home-empty').then((m) => m.HomeEmpty),
       },
       {
@@ -30,6 +32,7 @@ export const routes: Routes = [
           {
             path: '',
             canActivate: [areTabsEmptyGuard],
+            data: { entity: Entity.TAB },
             loadComponent: () => import('./home-empty/home-empty').then((m) => m.HomeEmpty),
           },
           {

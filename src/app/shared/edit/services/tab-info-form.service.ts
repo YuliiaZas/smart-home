@@ -1,0 +1,55 @@
+import { inject, Injectable } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { Validators } from '@angular/forms';
+import { EMPTY, Observable } from 'rxjs';
+import { CustomValidators } from '@shared/validation';
+import { InputBase, InputText } from '@shared/form-input';
+import { Entity, TabInfo } from '@shared/models';
+import { EDIT_MESSAGES } from '@shared/constants';
+import { getKebabCase, getUniqueId } from '@shared/utils';
+import { TabsFacade } from '@state';
+import { BaseEditFormService } from './base-edit-form.service';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class TabInfoFormService extends BaseEditFormService<TabInfo> {
+  private tabsFacade = inject(TabsFacade);
+  #entity = Entity.TAB;
+
+  userTabsTitles = toSignal(this.tabsFacade.tabsTitles$, { initialValue: [] });
+  userTabsIds = toSignal(this.tabsFacade.tabsIds$, { initialValue: [] });
+
+  protected createInputsData(dashboardInfo?: TabInfo): InputBase<string>[] {
+    return [
+      new InputText({
+        controlKey: 'title',
+        label: EDIT_MESSAGES.label.title(this.#entity),
+        required: true,
+        validators: [Validators.maxLength(50), CustomValidators.uniqueWithinArray(this.userTabsTitles())],
+        validationErrorOptions: { uniqueArea: this.#entity },
+        value: dashboardInfo?.title,
+      }),
+    ];
+  }
+
+  addNew(): Observable<TabInfo | null> {
+    const controlsInfo: InputBase<string>[] = this.createInputsData();
+    const title = EDIT_MESSAGES.createEntity(this.#entity);
+
+    return this.getValidValueFromCreatedForm({
+      title,
+      controlsInfo,
+      initDataId: (tabInfo) => getUniqueId(getKebabCase(tabInfo.title), this.userTabsIds()),
+    });
+  }
+
+  edit(entityInfo: TabInfo): Observable<TabInfo | null> {
+    if (!entityInfo) return EMPTY;
+
+    const controlsInfo: InputBase<string>[] = this.createInputsData(entityInfo);
+    const title = EDIT_MESSAGES.renameEntity(this.#entity);
+
+    return this.getValidValueFromCreatedForm({ title, controlsInfo, initDataId: entityInfo.id });
+  }
+}

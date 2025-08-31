@@ -1,0 +1,34 @@
+<mat-form-field class="input">
+  <mat-label>{{ inputData().label }}</mat-label>
+
+  <input
+    matInput
+    [formControlName]="inputData().controlKey"
+    [required]="inputData().required"
+    [type]="currentElementType()"
+    autocomplete="on"
+  />
+
+  @switch (inputData().controlType) {
+    @case (inputType.PASSWORD) {
+      <ng-container matSuffix>
+        @let passwordState = currentPasswordState();
+        @if (passwordState) {
+          <button matIconButton [title]="passwordState.title" (click)="togglePasswordVisibility($event)">
+            <mat-icon>{{ passwordState.icon }}</mat-icon>
+          </button>
+        }
+      </ng-container>
+    }
+
+    @case (inputType.ICON) {
+      <ng-container matSuffix>
+        <mat-icon>{{ formControl?.valueChanges | async }}</mat-icon>
+      </ng-container>
+    }
+  }
+
+  @if (formControl?.touched && formControl?.invalid) {
+    <mat-error>{{ getErrorMessage() }}</mat-error>
+  }
+</mat-form-field>

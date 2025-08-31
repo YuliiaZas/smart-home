@@ -1,23 +1,23 @@
-import { Directive, inject, model, output } from '@angular/core';
+import { Directive, inject, input, TemplateRef, viewChild } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { Dictionary } from '@ngrx/entity';
 import { SENSOR_TYPES_WITH_HIDDEN_AMOUNT } from '@shared/constants';
-import { HomeItemInfo, HomeCardInfo } from '@shared/models';
-import { HomeCardService } from '../home-card.service';
+import { DeviceInfo, HomeCardWithItemsIdsInfo, HomeItemInfo } from '@shared/models';
+import { HomeItemsFacade } from '@state';
 
 @Directive({})
 export abstract class HomeCardBase {
-  cardData = model.required<HomeCardInfo>();
-  updateCardData = output<HomeCardInfo>();
-
-  cardService = inject(HomeCardService);
-
+  protected homeItemsFacade = inject(HomeItemsFacade);
   protected readonly sensorTypesWithHiddenAmount = SENSOR_TYPES_WITH_HIDDEN_AMOUNT;
 
-  changeDeviceState(device?: HomeItemInfo) {
-    const updatedCardState = this.cardService.getUpdatedCardDataOnDeviceStateChange(this.cardData(), device);
+  cardData = input.required<HomeCardWithItemsIdsInfo>();
 
-    if (updatedCardState) {
-      this.cardData.update(() => updatedCardState);
-      this.updateCardData.emit(updatedCardState);
-    }
+  cardTitleTemplate = viewChild.required('cardTitleTemplate', { read: TemplateRef });
+  cardActionTemplate = viewChild.required('cardActionTemplate', { read: TemplateRef });
+
+  homeItemsEntities = toSignal(this.homeItemsFacade.itemsEntities$, { initialValue: {} as Dictionary<HomeItemInfo> });
+
+  changeDeviceState(device: DeviceInfo) {
+    this.homeItemsFacade.setDeviceState(device.id, !device.state);
   }
 }

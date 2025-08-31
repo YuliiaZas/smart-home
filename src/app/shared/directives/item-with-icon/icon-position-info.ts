@@ -1,1 +1,1 @@
-export type IconPositionInfo = 'left' | 'right' | 'bottom';
+export type IconPositionInfo = 'left' | 'bottom';

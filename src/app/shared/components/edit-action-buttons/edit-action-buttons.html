@@ -1,0 +1,10 @@
+@if (showEditButton()) {
+  <button matIconButton [ngClass]="editClass()" (click)="editEvent.emit()" [title]="editButtonLabel()">
+    <mat-icon>edit</mat-icon>
+  </button>
+}
+@if (showDeleteButton()) {
+  <button matIconButton [ngClass]="deleteClass()" (click)="handleDelete()" [title]="deleteButtonLabel()">
+    <mat-icon>delete</mat-icon>
+  </button>
+}

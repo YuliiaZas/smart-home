@@ -10,3 +10,7 @@ export interface CardInfo {
 export interface HomeCardInfo extends CardInfo {
   items: HomeItemInfo[];
 }
+
+export interface HomeCardWithItemsIdsInfo extends CardInfo {
+  items: string[];
+}
