@@ -18,4 +18,5 @@ export const ERROR_MESSAGES = {
     homeLink: 'Return to Home Page',
   },
   defaultError: 'Something went wrong. Please try again later.',
+  unauthorized: 'You are not logged in or your session has expired. Please log in to continue',
 };
