@@ -11,7 +11,10 @@ export const ERROR_MESSAGES = {
     required: 'This field is required',
     minlength: (minLength: number) => `Minimum length is ${minLength}`,
     maxlength: (maxLength: number) => `Maximum length is ${maxLength}`,
-    notUnique: (uniqueArea?: string) => 'This value must be unique' + (uniqueArea ? ` within ${uniqueArea}` : ''),
+    notUnique: (entity?: Entity) => {
+      const uniqueArea = entity ? UNIQUE_AREA[entity] || '' : '';
+      return 'This value must be unique' + (uniqueArea ? ` within ${uniqueArea}` : '');
+    },
     invalidCredentials: 'Invalid username or password',
     defaultError: 'Invalid value',
   },
@@ -21,9 +24,10 @@ export const ERROR_MESSAGES = {
     homeLink: 'Return to Home Page',
   },
   defaultError: 'Something went wrong. Please try again later.',
+  unauthorized: 'You are not logged in or your session has expired. Please log in to continue',
 };
 
-export const UNIQUE_AREA: Partial<Record<Entity, string>> = {
+const UNIQUE_AREA: Partial<Record<Entity, string>> = {
   [Entity.DASHBOARD]: 'your dashboards IDs',
   [Entity.TAB]: 'dashboard tabs',
 };
