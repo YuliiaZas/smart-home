@@ -1,0 +1,6 @@
+<div class="nav-user" aria-label="User">
+  <div class="nav-user-logo" [attr.aria-label]="showLabel() ? '' : user().fullName">{{ user().initials }}</div>
+  @if (showLabel()) {
+    <span class="nav-user-label">{{ user().fullName }}</span>
+  }
+</div>

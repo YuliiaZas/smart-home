@@ -1,18 +1,32 @@
-import { Component, inject, signal, input, OnInit, DestroyRef, computed } from '@angular/core';
+import {
+  Component,
+  inject,
+  signal,
+  input,
+  OnInit,
+  DestroyRef,
+  computed,
+  output,
+  ChangeDetectionStrategy,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import { MatDivider, MatList, MatListItemIcon, MatNavList } from '@angular/material/list';
 import { MatSidenav, MatSidenavContainer, MatSidenavContent } from '@angular/material/sidenav';
 import { MatListItem } from '@angular/material/list';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { MatIcon } from '@angular/material/icon';
-import { NavInfo } from '../../models/nav-item-info';
-import { MenuButton } from '../menu-button/menu-button';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { BREAKPOINT_MAX_WIDTH } from '../../constants/breakpoint';
-import { SIDE_NAV_WIDTH } from '@shared/constants';
+import { UserProfileInfo } from '@shared/auth';
+import { NavInfo } from '@shared/models/nav-item-info';
+import { SIDE_NAV_WIDTH, BREAKPOINT_MAX_WIDTH } from '@shared/constants';
+import { SideNavButton } from '../side-nav-button/side-nav-button';
+import { SideNavUser } from '../side-nav-user/side-nav-user';
 
 @Component({
   selector: 'app-side-nav',
   imports: [
+    RouterLink,
+    RouterLinkActive,
     MatSidenavContainer,
     MatSidenav,
     MatSidenavContent,
@@ -22,13 +36,17 @@ import { SIDE_NAV_WIDTH } from '@shared/constants';
     MatListItemIcon,
     MatIcon,
     MatDivider,
-    MenuButton,
+    SideNavButton,
+    SideNavUser,
   ],
   templateUrl: './side-nav.html',
   styleUrls: ['./side-nav.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SideNav implements OnInit {
   navItems = input.required<NavInfo[]>();
+  user = input.required<UserProfileInfo | null>();
+  logout = output<void>();
 
   expanded = signal(true);
 

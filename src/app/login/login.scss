@@ -1,0 +1,54 @@
+@use '@angular/material' as mat;
+
+$form-radius: 0.5rem;
+$form-border: 0.5px solid #616161;
+$form-padding: 1.5rem 2.5rem;
+$title-margin-bottom: 2rem;
+$input-width: 280px;
+$button-radius: 0.25rem;
+$button-margin: 0.5rem auto;
+$background: linear-gradient(90deg, rgb(3 28 39) 0%, rgb(0, 0, 0) 25%, rgb(0, 0, 0) 75%, rgb(3 28 39) 100%);
+
+:host {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $background;
+}
+
+.container {
+  border: $form-border;
+  padding: $form-padding;
+  text-align: center;
+  border-radius: $form-radius;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  width: $input-width;
+}
+
+.title {
+  margin-bottom: $title-margin-bottom;
+}
+
+.input {
+  min-width: $input-width;
+}
+
+.button {
+  width: fit-content;
+  margin: $button-margin;
+  text-transform: uppercase;
+}
+
+:host {
+  @include mat.button-overrides(
+    (
+      filled-container-shape: $button-radius,
+    )
+  );
+}

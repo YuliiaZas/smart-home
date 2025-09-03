@@ -1,0 +1,6 @@
+<button matButton (click)="buttonClick.emit()" class="nav-button" [attr.aria-label]="label()">
+  <mat-icon class="nav-button-icon" matListItemIcon aria-hidden="true" [fontIcon]="icon()"></mat-icon>
+  @if (showLabel()) {
+    <span>{{ label() }}</span>
+  }
+</button>

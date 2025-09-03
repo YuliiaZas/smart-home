@@ -36,6 +36,8 @@ export default tseslint.config(
       ],
       '@typescript-eslint/no-explicit-any': 'error',
       'unicorn/prefer-top-level-await': 'off',
+      'unicorn/no-useless-undefined': 'off',
+      'unicorn/no-null': 'off',
       'unicorn/consistent-function-scoping': ['error', { checkArrowFunctions: false }],
     },
   },

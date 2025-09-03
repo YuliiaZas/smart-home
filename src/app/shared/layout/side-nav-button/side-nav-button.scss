@@ -3,13 +3,13 @@
 $icon-size: 24px;
 $icon-margin: 16px;
 
-.menu-button {
+.nav-button {
   font-size: medium;
   justify-content: flex-start;
   width: 100%;
 }
 
-.menu-icon.mat-icon {
+.nav-button-icon.mat-icon {
   font-size: $icon-size;
   width: $icon-size;
   height: $icon-size;
@@ -21,6 +21,7 @@ $icon-margin: 16px;
       text-with-icon-horizontal-padding: 0,
       text-icon-offset: $icon-margin,
       text-icon-spacing: $icon-margin,
+      // text-label-text-color: #e23535,
     )
   );
 }

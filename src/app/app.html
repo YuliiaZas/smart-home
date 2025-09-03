@@ -1,6 +1,15 @@
-<main class="main">
-  <app-side-nav [navItems]="navItems">
-    <router-outlet />
-    <app-home />
+@if (isLoading$ | async) {
+  <app-spinner></app-spinner>
+}
+
+@if (showSideNav$ | async) {
+  <app-side-nav [navItems]="(dashboards$ | async) || []" [user]="currentUser$ | async" (logout)="logout()">
+    <main class="main">
+      <router-outlet />
+    </main>
   </app-side-nav>
-</main>
+} @else {
+  <main>
+    <router-outlet />
+  </main>
+}

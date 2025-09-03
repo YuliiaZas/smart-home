@@ -1,6 +1,6 @@
 <app-card-list
   [sorting]="sorting()"
-  [sortingId]="tabData().id"
+  [sortingId]="sortingId()"
   [cardTemplateRef]="cardTemplateRef"
   (sortUpdated)="sortUpdated($event)"
 ></app-card-list>
