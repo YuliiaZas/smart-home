@@ -72,7 +72,10 @@ export class DashboardInfoFormService extends BaseEditFormService<DashboardInfo>
             controlKey: 'id',
             label: EDIT_MESSAGES.label.id(this.#entity),
             required: true,
-            validators: [Validators.maxLength(30), CustomValidators.uniqueWithinArray(this.userDashboardIds())],
+            validators: [
+              Validators.maxLength(30),
+              CustomValidators.uniqueWithinArray(this.userDashboardIds(), dashboardInfo?.id),
+            ],
             validationErrorOptions: { uniqueArea: this.#entity },
             value: dashboardInfo?.id,
           }),

@@ -4,10 +4,10 @@ type ConditionalObject = Record<string, number>;
 
 export const CustomValidators = {
   uniqueWithinArray:
-    (array: string[]) =>
+    (array: string[], initialValue?: string) =>
     (formControl: AbstractControl): ValidationErrors | null => {
       const value = formControl.value as string;
-      if (array.includes(value)) {
+      if (array.includes(value) && (!initialValue || value !== initialValue)) {
         return { notUnique: true };
       }
       return null;
