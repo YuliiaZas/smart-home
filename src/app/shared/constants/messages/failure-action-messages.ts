@@ -9,4 +9,5 @@ export const failureActionMessages: Record<FailureAction, string> = {
   [FailureAction.DeleteCurrentDashboard]: 'Failed to delete current dashboard',
   [FailureAction.LoadAllHomeItems]: 'Failed to load all available devices and sensors',
   [FailureAction.ChangeDeviceState]: 'Failed to change status of the device',
+  [FailureAction.ChangeDevicesState]: 'Failed to change status of some devices',
 };

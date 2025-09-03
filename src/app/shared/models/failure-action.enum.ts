@@ -7,4 +7,5 @@ export enum FailureAction {
   DeleteCurrentDashboard = 'deleteCurrentDashboardFailure',
   LoadAllHomeItems = 'loadAllHomeItemsFailure',
   ChangeDeviceState = 'changeDeviceStateFailure',
+  ChangeDevicesState = 'changeDevicesStateFailure',
 }
