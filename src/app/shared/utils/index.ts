@@ -6,3 +6,4 @@ export * from './create-url-tree-related-to-parent';
 export * from './type-guards/is-string';
 export * from './get-unique-id';
 export * from './get-kebab-case';
+export * from './collect-dashboard-data';

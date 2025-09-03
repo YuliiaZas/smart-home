@@ -1,6 +1,6 @@
 import { createEntityAdapter, EntityState } from '@ngrx/entity';
 import { createFeature, createReducer, createSelector, on } from '@ngrx/store';
-import { map } from 'lodash';
+import { isEqual, map } from 'lodash';
 import { DashboardTabInfo, HomeCardWithItemsIdsInfo } from '@shared/models';
 import { cardsActions } from './cards.actions';
 
@@ -77,11 +77,18 @@ const reducer = createReducer<CardsState>(
     })
   ),
   on(cardsActions.changeCurrentCard, (state, { cardData }): CardsState => {
+    if (state.originalCurrentCardData) return state;
+    const isChanged = !isEqual(state.originalCurrentCardData, {
+      ...cardData,
+      layout: state.originalCurrentCardData!.layout,
+    });
     const newState: CardsState = {
       ...state,
+      isChanged,
       currentCardId: null,
       originalCurrentCardData: null,
     };
+    if (!isChanged) return newState;
     return cardsAdapter.updateOne({ id: cardData.id, changes: cardData }, newState);
   }),
 

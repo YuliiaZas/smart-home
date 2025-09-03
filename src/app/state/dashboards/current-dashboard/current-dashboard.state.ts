@@ -1,6 +1,6 @@
 import { createFeature, createReducer, createSelector, on } from '@ngrx/store';
 import { FailureAction, LoadingStatus } from '@shared/models';
-import { currentDashboardActions, dashboardApiActions } from './current-dashboard.actions';
+import { currentDashboardActions, currentDashboardApiActions } from './current-dashboard.actions';
 
 interface CurrentDashboardState {
   isDashboardDataApplied: boolean;
@@ -28,7 +28,7 @@ const reducer = createReducer<CurrentDashboardState>(
   ),
 
   on(
-    dashboardApiActions.loadDashboardData,
+    currentDashboardApiActions.loadDashboardData,
     (state): CurrentDashboardState => ({
       ...state,
       loadingStatus: LoadingStatus.Loading,
@@ -36,7 +36,7 @@ const reducer = createReducer<CurrentDashboardState>(
     })
   ),
   on(
-    dashboardApiActions.loadDashboardDataSuccess,
+    currentDashboardApiActions.loadDashboardDataSuccess,
     (state): CurrentDashboardState => ({
       ...state,
       loadingStatus: LoadingStatus.Success,
@@ -44,7 +44,7 @@ const reducer = createReducer<CurrentDashboardState>(
     })
   ),
   on(
-    dashboardApiActions.loadDashboardDataFailure,
+    currentDashboardApiActions.loadDashboardDataFailure,
     (state, errorInfo): CurrentDashboardState => ({
       ...state,
       loadingStatus: LoadingStatus.Failure,
@@ -63,15 +63,14 @@ const reducer = createReducer<CurrentDashboardState>(
   on(currentDashboardActions.exitEditMode, (state): CurrentDashboardState => ({ ...state, isEditMode: false })),
 
   on(
-    currentDashboardActions.saveCurrentDashboard,
-    dashboardApiActions.updateDashboardData,
+    currentDashboardActions.startUpdatingDashboardData,
     (state): CurrentDashboardState => ({
       ...state,
       loadingStatus: LoadingStatus.Loading,
     })
   ),
   on(
-    dashboardApiActions.updateDashboardDataSuccess,
+    currentDashboardApiActions.updateDashboardDataSuccess,
     (state): CurrentDashboardState => ({
       ...state,
       loadingStatus: LoadingStatus.Success,
@@ -79,7 +78,7 @@ const reducer = createReducer<CurrentDashboardState>(
     })
   ),
   on(
-    dashboardApiActions.updateDashboardDataFailure,
+    currentDashboardApiActions.updateDashboardDataFailure,
     (state, errorInfo): CurrentDashboardState => ({
       ...state,
       loadingStatus: LoadingStatus.Failure,

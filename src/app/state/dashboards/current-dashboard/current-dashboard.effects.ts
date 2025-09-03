@@ -1,10 +1,10 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, ofType, createEffect } from '@ngrx/effects';
-import { from, of } from 'rxjs';
+import { of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { UserDashboards } from '@shared/dashboards/services';
 import { FailureAction } from '@shared/models';
-import { currentDashboardActions, dashboardApiActions } from './current-dashboard.actions';
+import { currentDashboardActions, currentDashboardApiActions } from './current-dashboard.actions';
 
 @Injectable()
 export class CurrentDashboardEffects {
@@ -13,13 +13,13 @@ export class CurrentDashboardEffects {
 
   loadDashboardData$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(dashboardApiActions.loadDashboardData),
+      ofType(currentDashboardApiActions.loadDashboardData),
       switchMap(({ dashboardId }) =>
         this.dashboardsService.fetchDashboardData(dashboardId).pipe(
-          map((dashboardData) => dashboardApiActions.loadDashboardDataSuccess({ dashboardData })),
+          map((dashboardData) => currentDashboardApiActions.loadDashboardDataSuccess({ dashboardData })),
           catchError((error) =>
             of(
-              dashboardApiActions.loadDashboardDataFailure({
+              currentDashboardApiActions.loadDashboardDataFailure({
                 error,
                 action: FailureAction.LoadCurrentDashboard,
               })
@@ -32,20 +32,20 @@ export class CurrentDashboardEffects {
 
   loadDashboardDataSuccess$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(dashboardApiActions.loadDashboardDataSuccess),
+      ofType(currentDashboardApiActions.loadDashboardDataSuccess),
       map(({ dashboardData }) => currentDashboardActions.propagateCurrentDashboardData({ dashboardData }))
     )
   );
 
   updateDashboardData$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(dashboardApiActions.updateDashboardData),
+      ofType(currentDashboardApiActions.updateDashboardData),
       switchMap(({ dashboardId, dashboardData }) =>
         this.dashboardsService.updateDashboardData(dashboardId, dashboardData).pipe(
-          map((dashboardData) => dashboardApiActions.updateDashboardDataSuccess({ dashboardData })),
+          map((dashboardData) => currentDashboardApiActions.updateDashboardDataSuccess({ dashboardData })),
           catchError((error) =>
             of(
-              dashboardApiActions.updateDashboardDataFailure({
+              currentDashboardApiActions.updateDashboardDataFailure({
                 error,
                 action: FailureAction.UpdateCurrentDashboardData,
               })
@@ -58,13 +58,8 @@ export class CurrentDashboardEffects {
 
   updateDashboardDataSuccess$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(dashboardApiActions.updateDashboardDataSuccess),
-      switchMap(({ dashboardData }) =>
-        from([
-          currentDashboardActions.propagateCurrentDashboardData({ dashboardData }),
-          currentDashboardActions.exitEditMode(),
-        ])
-      )
+      ofType(currentDashboardApiActions.updateDashboardDataSuccess),
+      map(({ dashboardData }) => currentDashboardActions.propagateCurrentDashboardData({ dashboardData }))
     )
   );
 }

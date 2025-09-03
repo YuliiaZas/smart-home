@@ -17,7 +17,7 @@ export const homeItemsActions = createActionGroup({
 });
 
 export const homeItemsApiActions = createActionGroup({
-  source: 'Home Items Api',
+  source: 'Home Items API',
   events: {
     'Load All Home Items': emptyProps(),
     'Load All Home Items Success': props<{ homeItems: HomeItemInfo[] }>(),
