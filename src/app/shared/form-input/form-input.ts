@@ -104,8 +104,11 @@ export class FormInput implements AfterViewInit, OnInit {
   }
 
   selectedChip(event: MatAutocompleteSelectedEvent): void {
-    this.selectedItemIds.update((selectedIds) => [...selectedIds, event.option.value]);
-    this.currentSearch.set('');
+    const currentValue = [...this.selectedItemIds(), event.option.value];
+
+    this.selectedItemIds.set(currentValue);
+    this.formControl?.setValue(currentValue);
+
     event.option.deselect();
   }
 
@@ -114,9 +117,12 @@ export class FormInput implements AfterViewInit, OnInit {
   }
 
   removeChip(itemIndex: number, selectedOptionItem?: OptionInfo) {
-    this.selectedItemIds.update((selectedItems) => {
-      return selectedItems.filter((_, index) => index !== itemIndex);
-    });
+    const currentValue = [...this.selectedItemIds()];
+    currentValue.splice(itemIndex, 1);
+
+    this.selectedItemIds.set(currentValue);
+    this.formControl?.setValue(currentValue);
+
     this.#announcer.announce(`Removed ${selectedOptionItem?.label || 'item'}`);
   }
 

@@ -77,7 +77,7 @@ const reducer = createReducer<CardsState>(
     })
   ),
   on(cardsActions.changeCurrentCard, (state, { cardData }): CardsState => {
-    if (state.originalCurrentCardData) return state;
+    if (!state.originalCurrentCardData) return state;
     const isChanged = !isEqual(state.originalCurrentCardData, {
       ...cardData,
       layout: state.originalCurrentCardData!.layout,
