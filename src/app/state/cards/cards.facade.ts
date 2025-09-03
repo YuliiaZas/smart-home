@@ -28,20 +28,8 @@ export class CardsFacade {
     this.#store.dispatch(cardsActions.enterCardEditMode({ cardId }));
   }
 
-  renameCurrentCard(title: string): void {
-    this.#store.dispatch(cardsActions.renameCurrentCard({ title }));
-  }
-
-  addItemToCurrentCard(itemId: string): void {
-    this.#store.dispatch(cardsActions.addItemToCurrentCard({ itemId }));
-  }
-
-  removeItemFromCurrentCard(orderIndex: number): void {
-    this.#store.dispatch(cardsActions.removeItemFromCurrentCard({ orderIndex }));
-  }
-
-  saveCurrentCardChanges(): void {
-    this.#store.dispatch(cardsActions.saveCurrentCardChanges());
+  changeCurrentCard(cardData: Omit<HomeCardWithItemsIdsInfo, 'layout'>): void {
+    this.#store.dispatch(cardsActions.changeCurrentCard({ cardData }));
   }
 
   discardCurrentCardChanges(): void {
@@ -52,7 +40,7 @@ export class CardsFacade {
     this.#store.dispatch(cardsActions.reorderCards({ tabId, cardsIdsOrdered }));
   }
 
-  addCard(tabId: string, cardInfo: CardInfo): void {
+  addCard(tabId: string, cardInfo: Pick<CardInfo, 'id' | 'layout'>): void {
     this.#store.dispatch(cardsActions.addCard({ tabId, cardInfo }));
   }
 

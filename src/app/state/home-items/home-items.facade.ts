@@ -1,8 +1,8 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, switchMap } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { Dictionary } from '@ngrx/entity';
-import { HomeItemInfo } from '@shared/models';
+import { HomeItemInfo, LoadingStatus } from '@shared/models';
 import { homeItemsFeature } from './home-items.state';
 import { homeItemsActions, homeItemsApiActions } from './home-items.actions';
 
@@ -16,8 +16,15 @@ export class HomeItemsFacade {
     return this.#store.select(homeItemsFeature.selectEntities);
   }
 
-  get allItems$(): Observable<HomeItemInfo[]> {
-    return this.#store.select(homeItemsFeature.selectAll);
+  get allHomeItems$(): Observable<HomeItemInfo[]> {
+    return this.#store.select(homeItemsFeature.selectAllItemsLoadingStatus).pipe(
+      switchMap((allItemsLoadingStatus) => {
+        if (allItemsLoadingStatus === LoadingStatus.NotUpdated) {
+          this.#store.dispatch(homeItemsApiActions.loadAllHomeItems());
+        }
+        return this.#store.select(homeItemsFeature.selectAll);
+      })
+    );
   }
 
   get areAllItemsLoading$(): Observable<boolean> {
@@ -33,6 +40,6 @@ export class HomeItemsFacade {
   }
 
   loadAllHomeItems(): void {
-    this.#store.dispatch(homeItemsApiActions.loadAllHomeItems());
+    this.#store.dispatch(homeItemsActions.loadAllHomeItems());
   }
 }

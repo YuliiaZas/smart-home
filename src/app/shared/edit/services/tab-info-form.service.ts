@@ -37,7 +37,7 @@ export class TabInfoFormService extends BaseEditFormService<TabInfo> {
     const controlsInfo: InputBase<string>[] = this.createInputsData();
     const title = EDIT_MESSAGES.createEntity(this.#entity);
 
-    return this.getValidValueFromCreatedForm({
+    return this.getSubmittedValueFromCreatedForm({
       title,
       controlsInfo,
       initDataId: (tabInfo) => getUniqueId(getKebabCase(tabInfo.title), this.userTabsIds()),
@@ -50,6 +50,6 @@ export class TabInfoFormService extends BaseEditFormService<TabInfo> {
     const controlsInfo: InputBase<string>[] = this.createInputsData(entityInfo);
     const title = EDIT_MESSAGES.renameEntity(this.#entity);
 
-    return this.getValidValueFromCreatedForm({ title, controlsInfo, initDataId: entityInfo.id });
+    return this.getSubmittedValueFromCreatedForm({ title, controlsInfo, initDataId: entityInfo.id });
   }
 }

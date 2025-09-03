@@ -76,14 +76,15 @@ const reducer = createReducer<CardsState>(
       originalCurrentCardData: state.entities[cardId] || null,
     })
   ),
-  on(
-    cardsActions.saveCurrentCardChanges,
-    (state): CardsState => ({
+  on(cardsActions.changeCurrentCard, (state, { cardData }): CardsState => {
+    const newState: CardsState = {
       ...state,
       currentCardId: null,
       originalCurrentCardData: null,
-    })
-  ),
+    };
+    return cardsAdapter.updateOne({ id: cardData.id, changes: cardData }, newState);
+  }),
+
   on(cardsActions.discardCurrentCardChanges, (state): CardsState => {
     if (!state.originalCurrentCardData) return state;
     const newState: CardsState = {
@@ -92,26 +93,6 @@ const reducer = createReducer<CardsState>(
       originalCurrentCardData: null,
     };
     return cardsAdapter.upsertOne(state.originalCurrentCardData, newState);
-  }),
-
-  on(cardsActions.renameCurrentCard, (state, { title }): CardsState => {
-    const currentCardId = state.currentCardId;
-    if (!currentCardId) return state;
-    const newState: CardsState = { ...state, isChanged: true };
-    return cardsAdapter.updateOne({ id: currentCardId, changes: { title } }, newState);
-  }),
-
-  on(cardsActions.addItemToCurrentCard, (state, { itemId }): CardsState => {
-    const updatedCard = addItemToCurrentCard(state, itemId);
-    if (!updatedCard) return state;
-    const newState: CardsState = { ...state, isChanged: true };
-    return cardsAdapter.upsertOne(updatedCard, newState);
-  }),
-  on(cardsActions.removeItemFromCurrentCard, (state, { orderIndex }): CardsState => {
-    const updatedCard = removeItemByIndexFromCurrentCard(state, orderIndex);
-    if (!updatedCard) return state;
-    const newState: CardsState = { ...state, isChanged: true };
-    return cardsAdapter.upsertOne(updatedCard, newState);
   }),
 
   on(
@@ -127,7 +108,7 @@ const reducer = createReducer<CardsState>(
   ),
 
   on(cardsActions.addCard, (state, { tabId, cardInfo }): CardsState => {
-    const card: HomeCardWithItemsIdsInfo = { ...cardInfo, items: [] };
+    const card: HomeCardWithItemsIdsInfo = { ...cardInfo, title: '', items: [] };
     const newState: CardsState = {
       ...state,
       cardsOrderedByTab: {
@@ -170,29 +151,6 @@ export const cardsFeature = createFeature({
     }),
   }),
 });
-
-function getCurrentCard(state: CardsState): HomeCardWithItemsIdsInfo | null {
-  const currentCardId = state.currentCardId;
-  return currentCardId ? state.entities[currentCardId] || null : null;
-}
-
-function addItemToCurrentCard(state: CardsState, itemId: string): HomeCardWithItemsIdsInfo | null {
-  const currentCard = getCurrentCard(state);
-  if (!currentCard) return null;
-  return {
-    ...currentCard,
-    items: [...(currentCard.items || []), itemId],
-  };
-}
-
-function removeItemByIndexFromCurrentCard(state: CardsState, orderIndex: number): HomeCardWithItemsIdsInfo | null {
-  const currentCard = getCurrentCard(state);
-  if (!currentCard) return null;
-  return {
-    ...currentCard,
-    items: (currentCard.items || []).filter((_, index) => index !== orderIndex),
-  };
-}
 
 function getCardsOrderedByTab(tabs: DashboardTabInfo[]): Record<string, string[]> {
   const accumulator: Record<string, string[]> = {};

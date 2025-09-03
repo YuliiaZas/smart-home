@@ -4,7 +4,8 @@ import { Validators } from '@angular/forms';
 import { EMPTY, Observable } from 'rxjs';
 import { CustomValidators } from '@shared/validation';
 import { InputBase, InputIcon, InputText } from '@shared/form-input';
-import { DashboardInfo, Entity, FailureAction } from '@shared/models';
+import { DashboardInfo } from '@shared/models/dashboard-info';
+import { Entity, FailureAction } from '@shared/models';
 import { EDIT_MESSAGES, failureActionMessages } from '@shared/constants';
 import { DashboardsFacade } from '@state';
 import { BaseEditFormService } from './base-edit-form.service';
@@ -28,7 +29,7 @@ export class DashboardInfoFormService extends BaseEditFormService<DashboardInfo>
       return failureActionKey ? failureActionMessages[failureActionKey] : '';
     });
 
-    return this.getValidValueFromCreatedForm({
+    return this.getSubmittedValueFromCreatedForm({
       title,
       controlsInfo,
       errorMessage,
@@ -42,7 +43,7 @@ export class DashboardInfoFormService extends BaseEditFormService<DashboardInfo>
     const controlsInfo: InputBase<string>[] = this.createInputsData(dashboardInfo);
     const title = EDIT_MESSAGES.renameEntity(this.#entity);
 
-    return this.getValidValueFromCreatedForm({
+    return this.getSubmittedValueFromCreatedForm({
       title,
       controlsInfo,
       initDataId: dashboardInfo.id,

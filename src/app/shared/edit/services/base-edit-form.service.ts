@@ -16,7 +16,7 @@ export abstract class BaseEditFormService<T extends object> {
 
   protected abstract createInputsData(entityInfo?: T): InputBase<string>[];
 
-  protected getValidValueFromCreatedForm({
+  protected getSubmittedValueFromCreatedForm({
     title,
     controlsInfo,
     initDataId,

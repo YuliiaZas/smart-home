@@ -10,6 +10,8 @@ export const homeItemsActions = createActionGroup({
 
     'Set State For Devices': props<{ devicesIds: string[]; newState: boolean }>(),
 
+    'Load All Home Items': emptyProps(),
+
     'Reset Home Items': emptyProps(),
   },
 });

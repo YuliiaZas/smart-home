@@ -7,4 +7,6 @@ export const failureActionMessages: Record<FailureAction, string> = {
   [FailureAction.AddDashboard]: 'Failed to add new dashboard. Please, try one more time',
   [FailureAction.UpdateCurrentDashboardInfo]: 'Failed to rename current dashboard',
   [FailureAction.DeleteCurrentDashboard]: 'Failed to delete current dashboard',
+  [FailureAction.LoadAllHomeItems]: 'Failed to load all available devices and sensors',
+  [FailureAction.ChangeDeviceState]: 'Failed to change status of the device',
 };
