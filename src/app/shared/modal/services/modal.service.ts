@@ -43,23 +43,3 @@ export class ModalService {
     };
   }
 }
-// openCustomModal<TComponent>(
-//   modalConfig: ModalConfig<CustomModalData<TComponent>>
-// ): MatDialogRef<ModalCustom<TComponent>, boolean> {
-//   const dialogReference = this.dialog.open<ModalCustom<TComponent>, CustomModalData<TComponent>, boolean>(
-//     ModalCustom,
-//     this.#getDialogConfig(modalConfig)
-//   );
-
-//   return dialogReference;
-// }
-
-// customDialogReference.onConfirm = () =>
-//   dialogReference.componentInstance?.onConfirm$
-//     .asObservable()
-//     .pipe(filter((formGroup): formGroup is FormGroup => formGroup !== undefined)) ?? EMPTY;
-// getDynamicComponentFromModal<TComponent>(
-//   modal: MatDialogRef<ModalCustom<TComponent>, boolean>
-// ): TComponent | undefined {
-//   return modal.componentRef?.instance.dynamicComponent?.instance;
-// }

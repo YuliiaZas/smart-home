@@ -27,10 +27,6 @@ export class HomeItemsFacade {
     );
   }
 
-  get areAllItemsLoading$(): Observable<boolean> {
-    return this.#store.select(homeItemsFeature.selectAreAllItemsLoading);
-  }
-
   setDeviceState(deviceId: string, newState: boolean): void {
     this.#store.dispatch(homeItemsActions.setDeviceState({ deviceId, newState }));
   }

@@ -11,14 +11,10 @@ export const cardsActions = createActionGroup({
     'Discard Changes': emptyProps(),
 
     'Enter Card Edit Mode': props<{ cardId: string }>(),
-    // 'Save Current Card Changes': emptyProps(),
+
     'Discard Current Card Changes': emptyProps(),
 
     'Change Current Card': props<{ cardData: Omit<HomeCardWithItemsIdsInfo, 'layout'> }>(),
-    // 'Rename Current Card': props<{ title: string }>(),
-
-    // 'Add Item To Current Card': props<{ itemId: string }>(),
-    // 'Remove Item From Current Card': props<{ orderIndex: number }>(), // itemId can be non-unique in a card
 
     'Reorder Cards': props<{ tabId: string; cardsIdsOrdered: string[] }>(),
 

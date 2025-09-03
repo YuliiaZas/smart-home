@@ -5,7 +5,6 @@ import { InputBase } from './input-base';
 
 export class InputSelect<K = OptionInfo> extends InputBase<string, K> {
   override controlType = InputType.SELECT;
-  // override options: string[];
 
   constructor(options: {
     controlKey: string;
@@ -22,7 +21,5 @@ export class InputSelect<K = OptionInfo> extends InputBase<string, K> {
     if (!this.hasSyncOptions()) {
       throw new Error('The "options" property is required for InputSelect.');
     }
-
-    // this.options = options.options;
   }
 }

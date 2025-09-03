@@ -54,10 +54,6 @@ export class DashboardsFacade {
     return this.#store.select(currentDashboardFeature.selectIsDashboardDataApplied);
   }
 
-  get currentDashboardId$(): Observable<string | null> {
-    return this.#store.select(currentDashboardFeature.selectDashboardId);
-  }
-
   get currentDashboardInfo$(): Observable<DashboardInfo | null> {
     return combineLatest([
       this.#store.select(currentDashboardFeature.selectDashboardId),
