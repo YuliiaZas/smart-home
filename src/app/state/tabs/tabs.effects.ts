@@ -1,10 +1,11 @@
 import { inject, Injectable } from '@angular/core';
-import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { filter, map, tap, withLatestFrom } from 'rxjs';
-import { tabsActions } from './tabs.actions';
-import { Store } from '@ngrx/store';
-import { tabsFeature } from './tabs.state';
 import { Router } from '@angular/router';
+import { Actions, createEffect, ofType } from '@ngrx/effects';
+import { Store } from '@ngrx/store';
+import { filter, map, tap, withLatestFrom } from 'rxjs';
+import { createUrlRelatedToCurrentUrl } from '@shared/utils';
+import { tabsActions } from './tabs.actions';
+import { tabsFeature } from './tabs.state';
 
 @Injectable()
 export class TabsEffects {
@@ -18,10 +19,7 @@ export class TabsEffects {
         ofType(tabsActions.addTab),
         map(({ tabInfo }) => tabInfo.id),
         withLatestFrom(this.#store.select(tabsFeature.selectCurrentTabId)),
-        map(([tabId, currentTabId]) => {
-          const currentBaseUrl = currentTabId ? getParentUrl(this.#router.url) : this.#router.url;
-          return `${currentBaseUrl}/${tabId}`;
-        }),
+        map(([tabId, currentTabId]) => createUrlRelatedToCurrentUrl(tabId, this.#router.url, !!currentTabId)),
         tap((url) => this.#router.navigateByUrl(url))
       ),
     { dispatch: false }
@@ -32,11 +30,7 @@ export class TabsEffects {
       this.#actions$.pipe(
         ofType(tabsActions.deleteCurrentTab),
         withLatestFrom(this.#store.select(tabsFeature.selectTabsIdsOrdered)),
-        map(([, tabsOrdered]) => {
-          const defaultTabId = tabsOrdered[0] || null;
-          const parentUrl = getParentUrl(this.#router.url);
-          return defaultTabId ? `${parentUrl}/${defaultTabId}` : parentUrl;
-        }),
+        map(([, tabsOrdered]) => createUrlRelatedToCurrentUrl(tabsOrdered[0] || '', this.#router.url, true)),
         tap((url) => this.#router.navigateByUrl(url))
       ),
     { dispatch: false }
@@ -47,18 +41,17 @@ export class TabsEffects {
       this.#actions$.pipe(
         ofType(tabsActions.discardChanges),
         withLatestFrom(
-          this.#store.select(tabsFeature.selectCurrentTabId),
-          this.#store.select(tabsFeature.selectTabsIdsOrdered)
+          this.#store.select(tabsFeature.selectTabsIdsOrdered),
+          this.#store.select(tabsFeature.selectCurrentTabId)
         ),
-        map(([, currentTabId, tabsOrdered]) => currentTabId === null && tabsOrdered[0]),
-        filter((defaultTabId) => !!defaultTabId),
-        map((defaultTabId) => `${this.#router.url}/${defaultTabId}`),
+        filter(([, tabsOrdered, currentTabId]) => currentTabId === null || !tabsOrdered.includes(currentTabId)),
+        map(([, tabsOrdered, currentTabId]) => ({ defaultTabId: tabsOrdered[0], isCurrentTabId: !!currentTabId })),
+        filter(({ defaultTabId }) => defaultTabId !== undefined),
+        map(({ defaultTabId, isCurrentTabId }) =>
+          createUrlRelatedToCurrentUrl(defaultTabId, this.#router.url, isCurrentTabId)
+        ),
         tap((url) => this.#router.navigateByUrl(url))
       ),
     { dispatch: false }
   );
-}
-
-function getParentUrl(url: string): string {
-  return url.split('/').slice(0, -1).join('/');
 }
