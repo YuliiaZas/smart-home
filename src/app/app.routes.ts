@@ -8,6 +8,7 @@ import {
   userDashboardsGuard,
   isDashboardValidGuard,
   isTabValidGuard,
+  unsavedChangesGuard,
 } from '@shared/dashboards/guards';
 import { Entity } from '@shared/models';
 
@@ -27,6 +28,7 @@ export const routes: Routes = [
       {
         path: ':dashboardId',
         canActivate: [isDashboardValidGuard, currentDashboardGuard],
+        canDeactivate: [unsavedChangesGuard],
         loadComponent: () => import('./home/home').then((m) => m.Home),
         children: [
           {
