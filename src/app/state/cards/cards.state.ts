@@ -35,7 +35,7 @@ const initialState: CardsState = cardsAdapter.getInitialState({
 const reducer = createReducer<CardsState>(
   initialState,
   on(cardsActions.setCardsData, (_, { tabs }): CardsState => {
-    const newState: CardsState = { ...initialState, cardsOrderedByTab: getCardsOrderedByTab(tabs) };
+    const newState: CardsState = { ...initialState, cardsOrderedByTab: getCardIdsOrderedByTab(tabs) };
     return cardsAdapter.setAll(
       tabs.flatMap(({ cards }) => cards.map((card) => ({ ...card, items: map(card.items, 'id') }))),
       newState
@@ -147,9 +147,9 @@ export const cardsFeature = createFeature({
     selectCurrentCard: createSelector(selectCurrentCardId, selectEntities, (currentCardId, entities) =>
       currentCardId ? entities[currentCardId] : null
     ),
-    selectCardsByTabs: createSelector(selectCardsOrderedByTab, selectEntities, (cardIdssOrderedByTab, entities) => {
+    selectCardsByTabs: createSelector(selectCardsOrderedByTab, selectEntities, (cardIdsOrderedByTab, entities) => {
       const cardsByTab: Record<string, HomeCardWithItemsIdsInfo[]> = {};
-      for (const [tabId, cardIds] of Object.entries(cardIdssOrderedByTab)) {
+      for (const [tabId, cardIds] of Object.entries(cardIdsOrderedByTab)) {
         cardsByTab[tabId] = cardIds
           .map((cardId) => entities[cardId])
           .filter((card): card is HomeCardWithItemsIdsInfo => !!card);
@@ -159,10 +159,10 @@ export const cardsFeature = createFeature({
   }),
 });
 
-function getCardsOrderedByTab(tabs: DashboardTabInfo[]): Record<string, string[]> {
-  const accumulator: Record<string, string[]> = {};
+function getCardIdsOrderedByTab(tabs: DashboardTabInfo[]): Record<string, string[]> {
+  const cardIdsOrderedByTab: Record<string, string[]> = {};
   for (const tab of tabs) {
-    accumulator[tab.id] = tab.cards.map((card) => card.id);
+    cardIdsOrderedByTab[tab.id] = tab.cards.map((card) => card.id);
   }
-  return accumulator;
+  return cardIdsOrderedByTab;
 }

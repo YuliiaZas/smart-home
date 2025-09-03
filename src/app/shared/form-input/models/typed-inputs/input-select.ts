@@ -1,6 +1,6 @@
 import { ValidatorFn } from '@angular/forms';
 import { ValidationErrorOptions } from '@shared/validation';
-import { InputType, OptionInfo } from '../models';
+import { InputType, OptionInfo } from '..';
 import { InputBase } from './input-base';
 
 export class InputSelect<K = OptionInfo> extends InputBase<string, K> {

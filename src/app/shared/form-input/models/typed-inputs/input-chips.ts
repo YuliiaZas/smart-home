@@ -1,8 +1,7 @@
 import { ValidatorFn } from '@angular/forms';
-import { Type } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ValidationErrorOptions } from '@shared/validation';
-import { InputType, OptionInfo } from '../models';
+import { InputType, OptionInfo } from '..';
 import { InputBase } from './input-base';
 
 export class InputChips<K extends OptionInfo> extends InputBase<string> {
@@ -14,7 +13,6 @@ export class InputChips<K extends OptionInfo> extends InputBase<string> {
     value?: string[];
     options?: K[];
     optionsAsync: Observable<K[]>;
-    optionTemplate?: Type<unknown>;
     label?: string;
     required?: boolean;
     hint?: string;

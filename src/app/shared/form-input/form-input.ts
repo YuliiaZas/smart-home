@@ -10,6 +10,7 @@ import {
   OnInit,
   DestroyRef,
 } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ControlContainer, ReactiveFormsModule } from '@angular/forms';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
@@ -23,7 +24,7 @@ import { MatOption, MatSelect } from '@angular/material/select';
 import { getValidationErrorMessage } from '@shared/validation';
 import { isObjectKey } from '@shared/utils';
 import { InputType, OptionInfo, PasswordDataInfo } from './models';
-import { InputBase } from './typed-inputs/input-base';
+import { InputBase } from './models/typed-inputs';
 import { passwordDataMap } from './constants/password-data-map';
 
 @Component({
@@ -31,6 +32,7 @@ import { passwordDataMap } from './constants/password-data-map';
   imports: [
     ReactiveFormsModule,
     FormsModule,
+    NgTemplateOutlet,
     MatFormFieldModule,
     MatInputModule,
     MatIconModule,

@@ -6,7 +6,7 @@ import { Entity, HomeCardWithItemsIdsInfo } from '@shared/models';
 import { EDIT_MESSAGES } from '@shared/constants';
 import { CardsFacade, HomeItemsFacade } from '@state';
 import { BaseEditFormService } from './base-edit-form.service';
-import { InputChips } from '@shared/form-input/typed-inputs/input-chips';
+import { InputChips } from '@shared/form-input/models/typed-inputs/input-chips';
 import { CustomValidators } from '@shared/validation';
 import { HOME_ITEMS_NUMBER_FOR_LAYOUT } from '@shared/constants/home-items-number-for-layout';
 
