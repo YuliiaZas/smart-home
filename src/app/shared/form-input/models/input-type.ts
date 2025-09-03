@@ -3,4 +3,5 @@ export enum InputType {
   TEXT = 'text',
   ICON = 'icon',
   SELECT = 'select',
+  CHIPS = 'chips',
 }

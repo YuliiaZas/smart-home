@@ -32,9 +32,11 @@ const reducer = createReducer<TabsState>(
 
   on(tabsActions.setCurrentTabId, (state, { tabId }): TabsState => ({ ...state, currentTabId: tabId })),
 
-  on(tabsActions.setTabsData, (_, { tabs }): TabsState => {
+  on(tabsActions.setTabsData, (state, { tabs }): TabsState => {
     const newState: TabsState = {
-      ...initialState,
+      ...state,
+      originalTabs: [],
+      originalTabsIdsOrdered: [],
       tabsIdsOrdered: tabs.map((tab) => tab.id),
     };
     return tabsAdapter.setAll(

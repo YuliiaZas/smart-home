@@ -27,6 +27,12 @@ const reducer = createReducer<HomeItemsState>(
     return homeItemsAdapter.setAll(homeItems, initialState);
   }),
 
+  on(homeItemsActions.loadAllHomeItems, (state): HomeItemsState => {
+    if (state.allItemsLoadingStatus === initialState.allItemsLoadingStatus) {
+      return { ...state, allItemsLoadingStatus: LoadingStatus.NotUpdated };
+    }
+    return state;
+  }),
   on(
     homeItemsApiActions.loadAllHomeItems,
     (state): HomeItemsState => ({ ...state, allItemsLoadingStatus: LoadingStatus.Loading })

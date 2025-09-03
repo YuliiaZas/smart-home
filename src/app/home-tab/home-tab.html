@@ -1,14 +1,19 @@
-@let cardIdsArray = cardIds();
-
-@if (cardIdsArray?.length) {
-  <app-card-list [cardIds]="cardIdsArray" [cardTemplateRef]="cardTemplateRef"></app-card-list>
+@if (cardIds().length) {
+  <app-card-list [cardIds]="cardIds()" [cardTemplateRef]="cardTemplateRef"></app-card-list>
 
   <ng-template #cardTemplateRef let-cardId="cardId">
     @let cardData = cardsEntities()[cardId];
     @if (cardData) {
-      <app-home-card [cardData]="cardData" [sortedIds]="cardIdsArray"></app-home-card>
+      <app-home-card [cardData]="cardData" [sortedIds]="cardIds()"></app-home-card>
     }
   </ng-template>
 } @else {
   <app-home-empty class="card-list-empty" [entity]="cardEntity"></app-home-empty>
+}
+
+@if (isEditMode()) {
+  <button class="add-card-button" matButton (click)="addCard()">
+    <mat-icon class="nav-button-icon" fontIcon="add"></mat-icon>
+    <span>Add Card</span>
+  </button>
 }

@@ -19,6 +19,12 @@ export const EDIT_MESSAGES = {
     id: (entity: Entity) => `${ENTITY_MESSAGES[entity]} ID`,
     title: (entity: Entity) => `${ENTITY_MESSAGES[entity]} Title`,
     icon: (entity: Entity) => `${ENTITY_MESSAGES[entity]} Icon`,
+    layout: 'Card Layout',
+    items: 'Devices and sensors',
+  },
+  hint: {
+    icon: 'Full list of supported icons: https://fonts.google.com/icons?icon.set=Material+Icons',
+    layout: 'Layout of the card could not be changed in the future',
   },
 };
 
