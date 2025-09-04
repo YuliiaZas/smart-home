@@ -1,6 +1,6 @@
 import { ValidatorFn } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { ValidationErrorOptions } from '@shared/validation';
+import { ValidationErrorOptions } from '@shared/models';
 import { InputType } from '../input-type';
 import { OptionInfo } from '..';
 

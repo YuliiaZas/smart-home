@@ -1,3 +1,7 @@
+@if (isLoading()) {
+  <app-spinner></app-spinner>
+}
+
 @let editMode = isEditMode();
 @let dashboard = currentDashboardInfo();
 

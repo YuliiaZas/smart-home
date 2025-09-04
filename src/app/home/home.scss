@@ -3,6 +3,7 @@
 @use '/styles/breakpoints';
 
 $gap: 1rem;
+$edit-mode-padding-bottom: 5rem;
 $tab-bg: #111f24;
 $tab-bg-edit: #1c343d;
 
@@ -90,6 +91,10 @@ $tab-bg-edit: #1c343d;
 
   .nav-container {
     background-color: $tab-bg-edit;
+  }
+
+  .tab-content {
+    padding-bottom: $edit-mode-padding-bottom;
   }
 }
 

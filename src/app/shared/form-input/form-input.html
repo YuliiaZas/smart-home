@@ -7,9 +7,6 @@
         <mat-option [value]="option.id">{{ option.label }}</mat-option>
       }
     </mat-select>
-    @if (inputData().hint) {
-      <mat-hint>{{ inputData().hint }}</mat-hint>
-    }
   } @else if (inputData().controlType === inputType.CHIPS && allOptions().length) {
     <!-- //TODO: refactor part and component -->
     <!-- //TODO: improve autocomplete open on click event after adding/removing chips  -->
@@ -48,33 +45,29 @@
       [required]="inputData().required"
       [type]="currentElementType()"
       autocomplete="on"
-      #inputControl
     />
-    @if (inputData().hint) {
-      <mat-hint>{{ inputData().hint }}</mat-hint>
+  }
+
+  @switch (inputData().controlType) {
+    @case (inputType.PASSWORD) {
+      @let passwordState = currentPasswordState();
+      @if (passwordState) {
+        <button matSuffix matIconButton [title]="passwordState.title" (click)="togglePasswordVisibility($event)">
+          <mat-icon>{{ passwordState.icon }}</mat-icon>
+        </button>
+      }
     }
 
-    @switch (inputData().controlType) {
-      @case (inputType.PASSWORD) {
-        <ng-container matSuffix>
-          @let passwordState = currentPasswordState();
-          @if (passwordState) {
-            <button matIconButton [title]="passwordState.title" (click)="togglePasswordVisibility($event)">
-              <mat-icon>{{ passwordState.icon }}</mat-icon>
-            </button>
-          }
-        </ng-container>
-      }
-
-      @case (inputType.ICON) {
-        <ng-container matSuffix>
-          <mat-icon>{{ inputControl.value }}</mat-icon>
-        </ng-container>
-      }
+    @case (inputType.ICON) {
+      <mat-icon matSuffix>{{ formControl()?.value }}</mat-icon>
     }
   }
 
-  @if (formControl?.touched && formControl?.invalid) {
+  @if (inputData().hint) {
+    <mat-hint [innerHTML]="inputData().hint | safeHtml"></mat-hint>
+  }
+
+  @if (formControl()?.touched && formControl()?.invalid) {
     <mat-error>{{ getErrorMessage() }}</mat-error>
   }
 </mat-form-field>

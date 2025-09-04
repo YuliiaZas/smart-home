@@ -11,3 +11,4 @@ export * from './failure-action.enum';
 export * from './entity.enum';
 export * from './state-error';
 export * from './device-update-result';
+export * from './validation-error-options';

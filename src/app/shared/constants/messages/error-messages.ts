@@ -9,6 +9,7 @@ export const ERROR_MESSAGES = {
   },
   formValidation: {
     required: 'This field is required',
+    pattern: (requiredPattern: string) => `This value must contain only ${requiredPattern}`,
     minlength: (minLength: number) => `Minimum length is ${minLength}`,
     maxlength: (maxLength: number) => `Maximum length is ${maxLength}`,
     maxLengthConditional: (maxLength: number, key: CardLayout) =>

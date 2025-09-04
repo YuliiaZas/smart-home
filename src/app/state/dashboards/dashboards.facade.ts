@@ -43,6 +43,21 @@ export class DashboardsFacade {
     );
   }
 
+  get isLoading$(): Observable<boolean> {
+    return combineLatest([
+      this.#store
+        .select(dashboardsListFeature.selectLoadingStatus)
+        .pipe(map((status) => status === LoadingStatus.Loading)),
+      this.#store
+        .select(currentDashboardFeature.selectLoadingStatus)
+        .pipe(map((status) => status === LoadingStatus.Loading)),
+    ]).pipe(
+      map(
+        ([isDashboardsListLoading, isCurrentDashboardLoading]) => isDashboardsListLoading || isCurrentDashboardLoading
+      )
+    );
+  }
+
   get addDashboardError$(): Observable<FailureAction | null> {
     return this.#store.select(dashboardsListFeature.selectError).pipe(
       map((error: StateError | null) => (error?.action === FailureAction.AddDashboard ? error.action : null)),

@@ -25,8 +25,8 @@ export const EDIT_MESSAGES = {
     items: 'Devices and sensors',
   },
   hint: {
-    icon: 'Full list of supported icons: https://fonts.google.com/icons?icon.set=Material+Icons',
-    layout: 'Layout of the card could not be changed in the future',
+    icon: 'Full list of supported icons: <a href="https://fonts.google.com/icons?icon.set=Material+Icons" target="_blank" rel="noopener noreferrer">Material Icons</a>',
+    layout: 'Card layout could not be changed in the future',
   },
 };
 

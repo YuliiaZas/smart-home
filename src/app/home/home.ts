@@ -8,7 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { DashboardInfo, Entity, TabInfo } from '@shared/models';
 import { EDIT_MESSAGES } from '@shared/constants';
-import { EditActionButtons, Mover, MoverButtonStyle, MoverSurroundDirective } from '@shared/components';
+import { EditActionButtons, Mover, MoverButtonStyle, MoverSurroundDirective, Spinner } from '@shared/components';
 import { TabInfoFormService, DashboardInfoFormService } from '@shared/edit';
 import { DashboardsFacade, TabsFacade } from '@state';
 
@@ -26,6 +26,7 @@ import { DashboardsFacade, TabsFacade } from '@state';
     EditActionButtons,
     Mover,
     MoverSurroundDirective,
+    Spinner,
   ],
   templateUrl: './home.html',
   styleUrl: './home.scss',
@@ -54,6 +55,8 @@ export class Home {
   currentTabInfo = toSignal<TabInfo | null>(this.#tabsFacade.currentTabInfo$);
 
   isEditMode = toSignal(this.#dashboardsFacade.isEditMode$);
+
+  isLoading = toSignal(this.#dashboardsFacade.isLoading$);
 
   enterEditMode() {
     this.#dashboardsFacade.enterEditMode();

@@ -6,7 +6,7 @@ import { CustomValidators } from '@shared/validation';
 import { InputBase, InputIcon, InputText } from '@shared/form-input';
 import { DashboardInfo } from '@shared/models/dashboard-info';
 import { Entity, FailureAction } from '@shared/models';
-import { EDIT_MESSAGES, failureActionMessages } from '@shared/constants';
+import { EDIT_MESSAGES, failureActionMessages, ID_VALIDATION_MESSAGES } from '@shared/constants';
 import { DashboardsFacade } from '@state';
 import { BaseEditFormService } from './base-edit-form.service';
 
@@ -64,6 +64,7 @@ export class DashboardInfoFormService extends BaseEditFormService<DashboardInfo>
         label: EDIT_MESSAGES.label.icon(this.#entity),
         required: true,
         value: dashboardInfo?.icon,
+        hint: EDIT_MESSAGES.hint.icon,
       }),
     ];
     return showIdField
@@ -74,9 +75,10 @@ export class DashboardInfoFormService extends BaseEditFormService<DashboardInfo>
             required: true,
             validators: [
               Validators.maxLength(30),
+              Validators.pattern(ID_VALIDATION_MESSAGES.regExp),
               CustomValidators.uniqueWithinArray(this.userDashboardIds(), dashboardInfo?.id),
             ],
-            validationErrorOptions: { uniqueArea: this.#entity },
+            validationErrorOptions: { uniqueArea: this.#entity, requiredPattern: ID_VALIDATION_MESSAGES.pattern },
             value: dashboardInfo?.id,
           }),
           ...defaultInputs,

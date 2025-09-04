@@ -25,6 +25,7 @@ export class CardLayoutFormService extends BaseEditFormService<Pick<CardInfo, 'i
         options: this.cardLayouts,
         label: EDIT_MESSAGES.label.layout,
         required: true,
+        hint: EDIT_MESSAGES.hint.layout,
       }),
     ];
   }

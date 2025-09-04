@@ -1,14 +1,14 @@
 import { AbstractControl, FormGroup, FormsModule } from '@angular/forms';
 import {
-  AfterViewInit,
   Component,
   computed,
   inject,
   input,
   linkedSignal,
   model,
-  OnInit,
   DestroyRef,
+  ChangeDetectionStrategy,
+  effect,
 } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -23,6 +23,7 @@ import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/ma
 import { MatOption, MatSelect } from '@angular/material/select';
 import { getValidationErrorMessage } from '@shared/validation';
 import { isObjectKey } from '@shared/utils';
+import { SafeHtmlPipe } from '@shared/pipes';
 import { InputType, OptionInfo, PasswordDataInfo } from './models';
 import { InputBase } from './models/typed-inputs';
 import { passwordDataMap } from './constants/password-data-map';
@@ -41,6 +42,7 @@ import { passwordDataMap } from './constants/password-data-map';
     MatOption,
     MatChipsModule,
     MatAutocompleteModule,
+    SafeHtmlPipe,
   ],
   templateUrl: './form-input.html',
   styleUrl: './form-input.scss',
@@ -50,8 +52,9 @@ import { passwordDataMap } from './constants/password-data-map';
       useFactory: () => inject(ControlContainer, { skipSelf: true }),
     },
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FormInput implements AfterViewInit, OnInit {
+export class FormInput {
   #parentContainer = inject(ControlContainer);
   #destroyRef = inject(DestroyRef);
   #announcer = inject(LiveAnnouncer);
@@ -59,7 +62,11 @@ export class FormInput implements AfterViewInit, OnInit {
 
   inputData = input.required<InputBase<string>>();
 
-  formControl: AbstractControl | undefined | null;
+  readonly formControl = computed<AbstractControl | null>(() => {
+    const formGroup = this.#parentContainer.control as FormGroup;
+    const controlKey = this.inputData().controlKey;
+    return formGroup?.get(controlKey);
+  });
 
   currentElementType = linkedSignal(() => this.#getType(this.inputData().controlType));
 
@@ -77,21 +84,17 @@ export class FormInput implements AfterViewInit, OnInit {
   readonly currentSearch = model('');
   readonly filteredOptions = computed(() => this.#getFilteredOptions());
 
-  get #parentContainerForm() {
-    return this.#parentContainer.control as FormGroup;
-  }
-
-  ngOnInit() {
-    this.#resolveOptions();
-  }
-
-  ngAfterViewInit() {
-    this.formControl = this.#parentContainerForm?.get(this.inputData().controlKey);
+  constructor() {
+    effect(() => {
+      const inputData = this.inputData();
+      this.#resolveOptions(inputData);
+    });
   }
 
   getErrorMessage(): string {
-    if (!this.formControl) return '';
-    return getValidationErrorMessage(this.formControl, this.inputData().validationErrorOptions);
+    const formControl = this.formControl();
+    if (!formControl) return '';
+    return getValidationErrorMessage(formControl, this.inputData().validationErrorOptions);
   }
 
   togglePasswordVisibility(event: MouseEvent) {
@@ -109,7 +112,7 @@ export class FormInput implements AfterViewInit, OnInit {
     const currentValue = [...this.selectedItemIds(), event.option.value];
 
     this.selectedItemIds.set(currentValue);
-    this.formControl?.setValue(currentValue);
+    this.formControl()?.setValue(currentValue);
 
     event.option.deselect();
   }
@@ -123,7 +126,7 @@ export class FormInput implements AfterViewInit, OnInit {
     currentValue.splice(itemIndex, 1);
 
     this.selectedItemIds.set(currentValue);
-    this.formControl?.setValue(currentValue);
+    this.formControl()?.setValue(currentValue);
 
     this.#announcer.announce(`Removed ${selectedOptionItem?.label || 'item'}`);
   }
@@ -136,9 +139,7 @@ export class FormInput implements AfterViewInit, OnInit {
     return allOptions.filter((option) => option.label.toLowerCase().includes(currentSearch.trim().toLowerCase()));
   }
 
-  #resolveOptions() {
-    const inputData = this.inputData();
-
+  #resolveOptions(inputData: InputBase<string>) {
     if (inputData.hasSyncOptions()) {
       this.allOptions.set(inputData.options || []);
     } else if (inputData.hasAsyncOptions()) {
