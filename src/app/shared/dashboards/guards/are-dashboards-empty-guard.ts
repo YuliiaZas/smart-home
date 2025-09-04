@@ -7,6 +7,7 @@ import { DashboardsFacade } from '@state';
 export const areDashboardsEmptyGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
   const dashboardsFacade = inject(DashboardsFacade);
   const router = inject(Router);
+
   return dashboardsFacade.userDashboardsWithRequest$.pipe(
     map((dashboards) => {
       if (dashboards.length === 0) return true;
