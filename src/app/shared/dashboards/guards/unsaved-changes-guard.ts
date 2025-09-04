@@ -24,7 +24,10 @@ export const unsavedChangesGuard: CanDeactivateFn<unknown> = () => {
       hasUnsavedChanges ? modalService.openDialog(confirmationDialogConfig).afterClosed() : of(undefined)
     ),
     map((confirmed) => {
-      if (confirmed === undefined) return true;
+      if (confirmed === undefined) {
+        dashboardsFacade.exitEditMode();
+        return true;
+      }
 
       if (confirmed) {
         dashboardsFacade.discardChanges();
