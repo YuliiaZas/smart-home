@@ -38,6 +38,13 @@ export class DashboardsOrchestratorEffects {
     )
   );
 
+  setCurrentDashboardId$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(currentDashboardActions.setCurrentDashboardId),
+      map(() => tabsActions.setCurrentTabId({ tabId: null }))
+    )
+  );
+
   enterEditMode$ = createEffect(() =>
     this.actions$.pipe(
       ofType(currentDashboardActions.enterEditMode),
