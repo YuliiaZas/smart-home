@@ -1,5 +1,6 @@
 import { createFeature, createReducer, createSelector, on } from '@ngrx/store';
 import { createEntityAdapter, EntityState } from '@ngrx/entity';
+import { isEqual } from 'lodash';
 import { TabInfo } from '@shared/models';
 import { tabsActions } from './tabs.actions';
 
@@ -74,7 +75,9 @@ const reducer = createReducer<TabsState>(
   on(tabsActions.renameTab, (state, { tabInfo }): TabsState => {
     const currentTabId = state.currentTabId;
     if (currentTabId !== tabInfo.id) return state;
-    const newState: TabsState = { ...state, isChanged: true };
+    const isChanged = !isEqual(state.entities[currentTabId], tabInfo);
+    const newState: TabsState = { ...state, isChanged };
+    if (!isChanged) return newState;
     return tabsAdapter.upsertOne(tabInfo, newState);
   }),
 

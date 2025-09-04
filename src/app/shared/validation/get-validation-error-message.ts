@@ -22,6 +22,10 @@ export function getValidationErrorMessage(
         const requiredLength = formControl.getError(errorKey).requiredLength;
         return ERROR_MESSAGES.formValidation[errorKey](requiredLength);
       }
+      if (errorKey === 'maxLengthConditional') {
+        const { requiredLength, key } = formControl.getError(errorKey);
+        return ERROR_MESSAGES.formValidation[errorKey](requiredLength, key);
+      }
       if (errorKey === 'notUnique') {
         return ERROR_MESSAGES.formValidation[errorKey](validationErrorOptions?.uniqueArea);
       }

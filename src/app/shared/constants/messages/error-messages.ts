@@ -1,4 +1,4 @@
-import { Entity } from '@shared/models';
+import { CardLayout, Entity } from '@shared/models';
 
 export const ERROR_MESSAGES = {
   emptyHomeData: {
@@ -11,6 +11,8 @@ export const ERROR_MESSAGES = {
     required: 'This field is required',
     minlength: (minLength: number) => `Minimum length is ${minLength}`,
     maxlength: (maxLength: number) => `Maximum length is ${maxLength}`,
+    maxLengthConditional: (maxLength: number, key: CardLayout) =>
+      `Maximum number of items for ${CARD_LAYOUT[key]} card layout is ${maxLength}`,
     notUnique: (entity?: Entity) => {
       const uniqueArea = entity ? UNIQUE_AREA[entity] || '' : '';
       return 'This value must be unique' + (uniqueArea ? ` within ${uniqueArea}` : '');
@@ -30,4 +32,10 @@ export const ERROR_MESSAGES = {
 const UNIQUE_AREA: Partial<Record<Entity, string>> = {
   [Entity.DASHBOARD]: 'your dashboards IDs',
   [Entity.TAB]: 'dashboard tabs',
+};
+
+const CARD_LAYOUT: Record<CardLayout, string> = {
+  [CardLayout.SINGLE]: 'single item',
+  [CardLayout.VERTICAL]: 'vertical',
+  [CardLayout.HORIZONTAL]: 'horizontal',
 };

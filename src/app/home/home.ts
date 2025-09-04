@@ -78,7 +78,7 @@ export class Home {
         takeUntilDestroyed(this.#destroyRef)
       )
       .subscribe((dashboardInfo: DashboardInfo) => {
-        this.#dashboardsFacade.editDashboardInfo(dashboardInfo);
+        this.#dashboardsFacade.changeDashboardInfo(dashboardInfo);
       });
   }
 

@@ -17,7 +17,6 @@ export interface CustomModalData<TComponent = unknown> extends ModalConfigData {
   component: Type<TComponent>;
   componentBindings?: Binding[];
   confirmButtonText: string;
-  // directives?: Type<unknown>[] | undefined;
 }
 
 export interface FormModalData<TFormComponent extends ComponentWithForm = ComponentWithForm>

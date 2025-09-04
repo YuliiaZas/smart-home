@@ -26,7 +26,10 @@ export class TabInfoFormService extends BaseEditFormService<TabInfo> {
         controlKey: 'title',
         label: EDIT_MESSAGES.label.title(this.#entity),
         required: true,
-        validators: [Validators.maxLength(50), CustomValidators.uniqueWithinArray(this.userTabsTitles())],
+        validators: [
+          Validators.maxLength(50),
+          CustomValidators.uniqueWithinArray(this.userTabsTitles(), dashboardInfo?.title),
+        ],
         validationErrorOptions: { uniqueArea: this.#entity },
         value: dashboardInfo?.title,
       }),

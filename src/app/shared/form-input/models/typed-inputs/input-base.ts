@@ -1,9 +1,8 @@
 import { ValidatorFn } from '@angular/forms';
-import { Type } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ValidationErrorOptions } from '@shared/validation';
-import { InputType } from '../models/input-type';
-import { OptionInfo } from '../models';
+import { InputType } from '../input-type';
+import { OptionInfo } from '..';
 
 export class InputBase<T, K = OptionInfo> {
   controlType: InputType;
@@ -16,7 +15,6 @@ export class InputBase<T, K = OptionInfo> {
   hint: string;
   validators: ValidatorFn[];
   validationErrorOptions: ValidationErrorOptions;
-  optionTemplate?: Type<unknown>;
 
   constructor(options: {
     controlType?: InputType;
@@ -29,7 +27,6 @@ export class InputBase<T, K = OptionInfo> {
     hint?: string;
     validators?: ValidatorFn[];
     validationErrorOptions?: ValidationErrorOptions;
-    optionTemplate?: Type<unknown>;
   }) {
     this.controlType = options.controlType || InputType.TEXT;
     this.controlKey = options.controlKey;
@@ -41,7 +38,6 @@ export class InputBase<T, K = OptionInfo> {
     this.hint = options.hint || '';
     this.validators = options.validators || [];
     this.validationErrorOptions = options.validationErrorOptions || {};
-    this.optionTemplate = options.optionTemplate;
   }
 
   hasAsyncOptions(): boolean {

@@ -6,7 +6,7 @@ import { homeItemsActions } from '@state/home-items';
 import { cardsFeature } from '@state/cards';
 import { tabsFeature } from '@state/tabs';
 import { dashboardsListActions, dashboardsListApiActions, dashboardsListFeature } from './dashboards-list';
-import { currentDashboardActions, currentDashboardFeature, dashboardApiActions } from './current-dashboard';
+import { currentDashboardActions, currentDashboardFeature, currentDashboardApiActions } from './current-dashboard';
 
 @Injectable({
   providedIn: 'root',
@@ -54,10 +54,6 @@ export class DashboardsFacade {
     return this.#store.select(currentDashboardFeature.selectIsDashboardDataApplied);
   }
 
-  get currentDashboardId$(): Observable<string | null> {
-    return this.#store.select(currentDashboardFeature.selectDashboardId);
-  }
-
   get currentDashboardInfo$(): Observable<DashboardInfo | null> {
     return combineLatest([
       this.#store.select(currentDashboardFeature.selectDashboardId),
@@ -87,7 +83,7 @@ export class DashboardsFacade {
 
         this.#store.dispatch(currentDashboardActions.setCurrentDashboardId({ dashboardId }));
         if (dashboardId) {
-          this.#store.dispatch(dashboardApiActions.loadDashboardData({ dashboardId }));
+          this.#store.dispatch(currentDashboardApiActions.loadDashboardData({ dashboardId }));
         } else {
           this.#store.dispatch(currentDashboardActions.resetCurrentDashboard());
         }
@@ -98,7 +94,7 @@ export class DashboardsFacade {
     this.#store.dispatch(dashboardsListApiActions.addDashboard({ dashboardInfo }));
   }
 
-  editDashboardInfo(dashboardInfo: DashboardInfo): void {
+  changeDashboardInfo(dashboardInfo: DashboardInfo): void {
     this.#store.dispatch(dashboardsListActions.changeDashboardInfo({ dashboardInfo }));
   }
 

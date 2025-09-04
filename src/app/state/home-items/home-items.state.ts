@@ -83,11 +83,7 @@ const { selectAll } = homeItemsAdapter.getSelectors();
 export const homeItemsFeature = createFeature({
   name: 'homeItems',
   reducer,
-  extraSelectors: ({ selectAllItemsLoadingStatus, selectHomeItemsState }) => ({
-    selectAreAllItemsLoading: createSelector(
-      selectAllItemsLoadingStatus,
-      (loadingStatus) => loadingStatus === LoadingStatus.Loading
-    ),
+  extraSelectors: ({ selectHomeItemsState }) => ({
     selectAll: createSelector(selectHomeItemsState, selectAll),
   }),
 });

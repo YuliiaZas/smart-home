@@ -11,12 +11,13 @@
       <mat-hint>{{ inputData().hint }}</mat-hint>
     }
   } @else if (inputData().controlType === inputType.CHIPS && allOptions().length) {
+    <!-- //TODO: refactor part and component -->
+    <!-- //TODO: improve autocomplete open on click event after adding/removing chips  -->
     <mat-chip-grid #chipGrid [formControlName]="inputData().controlKey">
       @for (itemId of selectedItemIds(); track $index) {
         @let selectedOptionItem = getOptionItem(itemId);
         <mat-chip-row [value]="itemId" (removed)="removeChip($index, selectedOptionItem)">
-          {{ selectedOptionItem?.label }}
-          <!-- <ng-content select="[chip]">{{ item }}</ng-content> -->
+          <ng-container *ngTemplateOutlet="optionTemplate; context: { $implicit: selectedOptionItem }"></ng-container>
           <button matChipRemove [attr.aria-label]="'remove item'">
             <mat-icon>cancel</mat-icon>
           </button>
@@ -36,8 +37,7 @@
     <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectedChip($event); optionInput.value = ''">
       @for (option of filteredOptions(); track option) {
         <mat-option [value]="option.id">
-          <!-- <ng-content select="[option]">{{ option }}</ng-content> -->
-          {{ option.label }}
+          <ng-container *ngTemplateOutlet="optionTemplate; context: { $implicit: option }"></ng-container>
         </mat-option>
       }
     </mat-autocomplete>
@@ -78,3 +78,13 @@
     <mat-error>{{ getErrorMessage() }}</mat-error>
   }
 </mat-form-field>
+
+<ng-template #optionTemplate let-option>
+  <div class="option">
+    @let icon = option.icon;
+    @if (icon) {
+      <mat-icon>{{ icon }}</mat-icon>
+    }
+    {{ option.label }}
+  </div>
+</ng-template>

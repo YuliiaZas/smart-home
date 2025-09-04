@@ -6,7 +6,9 @@ import { Entity, HomeCardWithItemsIdsInfo } from '@shared/models';
 import { EDIT_MESSAGES } from '@shared/constants';
 import { CardsFacade, HomeItemsFacade } from '@state';
 import { BaseEditFormService } from './base-edit-form.service';
-import { InputChips } from '@shared/form-input/typed-inputs/input-chips';
+import { InputChips } from '@shared/form-input/models/typed-inputs/input-chips';
+import { CustomValidators } from '@shared/validation';
+import { HOME_ITEMS_NUMBER_FOR_LAYOUT } from '@shared/constants/home-items-number-for-layout';
 
 @Injectable({
   providedIn: 'root',
@@ -29,6 +31,12 @@ export class CardDataFormService extends BaseEditFormService<Omit<HomeCardWithIt
       new InputChips({
         controlKey: 'items',
         optionsAsync: this.homeItemsFacade.allHomeItems$,
+        validators: [
+          CustomValidators.maxLengthConditional(
+            HOME_ITEMS_NUMBER_FOR_LAYOUT,
+            (cardInfo as HomeCardWithItemsIdsInfo)?.layout
+          ),
+        ],
         label: EDIT_MESSAGES.label.items,
         value: cardInfo?.items,
       }),

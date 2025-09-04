@@ -2,6 +2,8 @@ import { Entity } from '@shared/models';
 import { ENTITY_MESSAGES } from './entity-messages';
 
 export const EDIT_MESSAGES = {
+  unsavedChanges: 'Confirm discarding unsaved changes',
+  unsavedChangesMessage: 'You have unsaved changes. Do you want to discard them and leave the page?',
   editEntity: (entity: Entity, name?: string) => `Edit ${ENTITY_MESSAGES[entity]}${name ? ` "${name}"` : ''}`,
   renameEntity: (entity: Entity, name?: string) => `Rename ${ENTITY_MESSAGES[entity]}${name ? ` "${name}"` : ''}`,
   deleteEntity: (entity: Entity, name?: string) => `Delete ${ENTITY_MESSAGES[entity]}${name ? ` "${name}"` : ''}`,

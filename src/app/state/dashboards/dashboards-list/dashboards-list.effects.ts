@@ -2,13 +2,12 @@ import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Actions, ofType, createEffect } from '@ngrx/effects';
 import { of } from 'rxjs';
-import { catchError, filter, map, switchMap, tap, withLatestFrom } from 'rxjs/operators';
+import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { UserDashboards } from '@shared/dashboards/services';
 import { dashboardsListApiActions } from './dashboards-list.actions';
-import { DashboardInfo, FailureAction } from '@shared/models';
+import { FailureAction } from '@shared/models';
 import { ROUTING_PATHS } from '@shared/constants';
 import { Store } from '@ngrx/store';
-import { dashboardsListFeature } from './dashboards-list.state';
 
 @Injectable()
 export class DashboardsListEffects {
@@ -64,10 +63,7 @@ export class DashboardsListEffects {
     this.actions$.pipe(
       ofType(dashboardsListApiActions.updateDashboardInfo),
       map(({ dashboardInfo }) => dashboardInfo),
-      filter((dashboardInfo): dashboardInfo is DashboardInfo => dashboardInfo !== null),
-      withLatestFrom(this.store.select(dashboardsListFeature.selectIsChanged)),
-      filter(([, isChanged]) => isChanged),
-      switchMap(([dashboardInfo]) =>
+      switchMap((dashboardInfo) =>
         this.dashboardsService.updateDashboardInfo(dashboardInfo).pipe(
           map(() => dashboardsListApiActions.updateDashboardInfoSuccess()),
           catchError((error) =>

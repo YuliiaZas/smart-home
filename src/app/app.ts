@@ -2,6 +2,7 @@ import { Component, DestroyRef, inject } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import {
+  NavigationCancel,
   NavigationEnd,
   NavigationError,
   NavigationSkipped,
@@ -67,7 +68,8 @@ export class App {
       } else if (
         event instanceof NavigationEnd ||
         event instanceof NavigationError ||
-        event instanceof NavigationSkipped
+        event instanceof NavigationSkipped ||
+        event instanceof NavigationCancel
       ) {
         this.isLoading$.next(false);
       }
