@@ -106,6 +106,10 @@ export class DashboardsFacade {
     this.#store.dispatch(currentDashboardActions.enterEditMode());
   }
 
+  exitEditMode(): void {
+    this.#store.dispatch(currentDashboardActions.exitEditMode());
+  }
+
   discardChanges(): void {
     this.#store.dispatch(currentDashboardActions.discardChanges());
   }
