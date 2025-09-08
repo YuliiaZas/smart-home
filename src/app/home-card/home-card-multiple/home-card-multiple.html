@@ -21,7 +21,7 @@
         @switch (item.type) {
           @case ('sensor') {
             <app-sensor class="card-item" [sensorData]="item" [iconPosition]="iconPosition()">
-              <span class="capitalize">{{ item.value | appUnits: item.icon : sensorTypesWithHiddenAmount }}</span>
+              <span class="capitalize">{{ item.value | appUnits }}</span>
             </app-sensor>
           }
           @case ('device') {

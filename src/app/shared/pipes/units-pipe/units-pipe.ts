@@ -5,14 +5,12 @@ import { UnitsInfo } from './units-info';
   name: 'appUnits',
 })
 export class UnitsPipe implements PipeTransform {
-  transform(value: UnitsInfo, type?: string, typesWithHiddenAmmount: string[] = []): string {
-    const valueWithUnit = `${value.amount} ${value.unit}`;
-
-    if (!type || typesWithHiddenAmmount.length === 0) {
-      return valueWithUnit;
+  transform(valueData: UnitsInfo): string {
+    const { amount, unit } = valueData;
+    if (!unit) {
+      return typeof amount === 'string' ? amount : amount ? 'Detected' : 'Undetected';
     }
 
-    const isAmountHidden = typesWithHiddenAmmount.includes(type);
-    return isAmountHidden ? value.unit : valueWithUnit;
+    return `${amount} ${unit}`;
   }
 }

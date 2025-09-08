@@ -1,4 +1,4 @@
 export interface UnitsInfo {
-  amount: number | string;
-  unit: string;
+  amount: number | string | boolean;
+  unit: string | null;
 }

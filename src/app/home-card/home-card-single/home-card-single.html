@@ -18,8 +18,6 @@
   @if (singleDeviceValue) {
     <span class="capitalize" aria-label="State value">{{ singleDeviceValue.state | appStateValue }}</span>
   } @else if (singleSensorValue) {
-    <span class="capitalize">{{
-      singleSensorValue.value | appUnits: singleSensorValue.icon : sensorTypesWithHiddenAmount
-    }}</span>
+    <span class="capitalize">{{ singleSensorValue.value | appUnits }}</span>
   }
 </div>
