@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { Dictionary } from '@ngrx/entity';
-import { TabInfo } from '@shared/models';
+import { EntityInfo } from '@shared/models';
 import { tabsFeature } from './tabs.state';
 import { tabsActions } from './tabs.actions';
 
@@ -16,7 +16,7 @@ export class TabsFacade {
     return this.#store.select(tabsFeature.selectTabsIdsOrdered);
   }
 
-  get tabsEntities$(): Observable<Dictionary<TabInfo>> {
+  get tabsEntities$(): Observable<Dictionary<EntityInfo>> {
     return this.#store.select(tabsFeature.selectEntities);
   }
 
@@ -28,7 +28,7 @@ export class TabsFacade {
     return this.#store.select(tabsFeature.selectCurrentTabId);
   }
 
-  get currentTabInfo$(): Observable<TabInfo | null> {
+  get currentTabInfo$(): Observable<EntityInfo | null> {
     return this.#store.select(tabsFeature.selectCurrentTab);
   }
 
@@ -36,7 +36,7 @@ export class TabsFacade {
     this.#store.dispatch(tabsActions.setCurrentTabId({ tabId }));
   }
 
-  renameTab(tabInfo: TabInfo): void {
+  renameTab(tabInfo: EntityInfo): void {
     this.#store.dispatch(tabsActions.renameTab({ tabInfo }));
   }
 
@@ -44,7 +44,7 @@ export class TabsFacade {
     this.#store.dispatch(tabsActions.reorderTabs({ tabsIdsOrdered }));
   }
 
-  addTab(tabInfo: TabInfo): void {
+  addTab(tabInfo: EntityInfo): void {
     this.#store.dispatch(tabsActions.addTab({ tabInfo }));
   }
 

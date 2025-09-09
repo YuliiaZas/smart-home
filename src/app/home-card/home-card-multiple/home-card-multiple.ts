@@ -21,7 +21,7 @@ export class HomeCardMultiple extends HomeCardBase {
   isContentVertical = computed(() => this.#cardService.getIsContentVertical(this.cardData()));
   iconPosition = computed(() => this.#cardService.getIconPosition(this.isContentVertical()));
 
-  #devices = computed(() => this.#devicesService.selectDevices(this.cardData().items, this.homeItemsEntities()));
+  #devices = computed(() => this.#devicesService.selectDevices(this.cardData().itemIds, this.homeItemsEntities()));
   #devicesIds = computed(() => this.#devices().map((device) => device.id));
   showAllDevicesState = computed(() => this.#devices().length > 1);
   allDevicesState = computed(() => this.#devicesService.getAllDevicesState(this.#devices()));

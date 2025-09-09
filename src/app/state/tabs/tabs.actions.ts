@@ -1,5 +1,5 @@
 import { createActionGroup, emptyProps, props } from '@ngrx/store';
-import { DashboardTabInfo, TabInfo } from '@shared/models';
+import { DashboardTabInfo, EntityInfo } from '@shared/models';
 
 export const tabsActions = createActionGroup({
   source: 'Tabs',
@@ -12,11 +12,11 @@ export const tabsActions = createActionGroup({
 
     'Set Current Tab Id': props<{ tabId: string | null }>(),
 
-    'Rename Tab': props<{ tabInfo: TabInfo }>(),
+    'Rename Tab': props<{ tabInfo: EntityInfo }>(),
 
     'Reorder Tabs': props<{ tabsIdsOrdered: string[] }>(),
 
-    'Add Tab': props<{ tabInfo: TabInfo }>(),
+    'Add Tab': props<{ tabInfo: EntityInfo }>(),
 
     'Delete Current Tab': emptyProps(),
   },

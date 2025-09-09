@@ -18,7 +18,7 @@ export class DashboardsListEffects {
 
   loadUserDashboards$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(dashboardsListApiActions.loadUserDashboards, dashboardsListApiActions.updateDashboardInfoSuccess),
+      ofType(dashboardsListApiActions.loadUserDashboards),
       switchMap(() =>
         this.dashboardsService.fetchUserDashboards().pipe(
           map((dashboardsList) => dashboardsListApiActions.loadUserDashboardsSuccess({ dashboardsList })),
@@ -57,26 +57,6 @@ export class DashboardsListEffects {
         tap(({ dashboardId }) => this.router.navigate([ROUTING_PATHS.DASHBOARD, dashboardId]))
       ),
     { dispatch: false }
-  );
-
-  updateCurrentDashboardInfo$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(dashboardsListApiActions.updateDashboardInfo),
-      map(({ dashboardInfo }) => dashboardInfo),
-      switchMap((dashboardInfo) =>
-        this.dashboardsService.updateDashboardInfo(dashboardInfo).pipe(
-          map(() => dashboardsListApiActions.updateDashboardInfoSuccess()),
-          catchError((error) =>
-            of(
-              dashboardsListApiActions.updateDashboardInfoFailure({
-                error,
-                action: FailureAction.UpdateCurrentDashboardInfo,
-              })
-            )
-          )
-        )
-      )
-    )
   );
 
   deleteDashboard$ = createEffect(() =>

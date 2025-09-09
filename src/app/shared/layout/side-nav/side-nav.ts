@@ -17,7 +17,7 @@ import { MatListItem } from '@angular/material/list';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { MatIcon } from '@angular/material/icon';
 import { UserProfileInfo } from '@shared/auth';
-import { NavInfo } from '@shared/models/nav-item-info';
+import { Link } from '@shared/models';
 import { SIDE_NAV_WIDTH, BREAKPOINT_MAX_WIDTH } from '@shared/constants';
 import { SideNavButton } from '../side-nav-button/side-nav-button';
 import { SideNavUser } from '../side-nav-user/side-nav-user';
@@ -44,7 +44,7 @@ import { SideNavUser } from '../side-nav-user/side-nav-user';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SideNav implements OnInit {
-  navItems = input.required<NavInfo[]>();
+  navItems = input.required<Link[]>();
   user = input.required<UserProfileInfo | null>();
   addDashboard = output<void>();
   logout = output<void>();

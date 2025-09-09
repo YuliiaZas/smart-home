@@ -4,7 +4,7 @@ import { Validators } from '@angular/forms';
 import { EMPTY, Observable } from 'rxjs';
 import { CustomValidators } from '@shared/validation';
 import { InputBase, InputText } from '@shared/form-input';
-import { Entity, TabInfo } from '@shared/models';
+import { Entity, EntityInfo } from '@shared/models';
 import { EDIT_MESSAGES } from '@shared/constants';
 import { getKebabCase, getUniqueId } from '@shared/utils';
 import { TabsFacade } from '@state';
@@ -13,14 +13,14 @@ import { BaseEditFormService } from './base-edit-form.service';
 @Injectable({
   providedIn: 'root',
 })
-export class TabInfoFormService extends BaseEditFormService<TabInfo> {
+export class TabInfoFormService extends BaseEditFormService<EntityInfo> {
   private tabsFacade = inject(TabsFacade);
   #entity = Entity.TAB;
 
   userTabsTitles = toSignal(this.tabsFacade.tabsTitles$, { initialValue: [] });
   userTabsIds = toSignal(this.tabsFacade.tabsIds$, { initialValue: [] });
 
-  protected createInputsData(dashboardInfo?: TabInfo): InputBase<string>[] {
+  protected createInputsData(dashboardInfo?: EntityInfo): InputBase<string>[] {
     return [
       new InputText({
         controlKey: 'title',
@@ -36,7 +36,7 @@ export class TabInfoFormService extends BaseEditFormService<TabInfo> {
     ];
   }
 
-  addNew(): Observable<TabInfo | null> {
+  addNew(): Observable<EntityInfo | null> {
     const controlsInfo: InputBase<string>[] = this.createInputsData();
     const title = EDIT_MESSAGES.createEntity(this.#entity);
 
@@ -47,7 +47,7 @@ export class TabInfoFormService extends BaseEditFormService<TabInfo> {
     });
   }
 
-  edit(entityInfo: TabInfo): Observable<TabInfo | null> {
+  edit(entityInfo: EntityInfo): Observable<EntityInfo | null> {
     if (!entityInfo) return EMPTY;
 
     const controlsInfo: InputBase<string>[] = this.createInputsData(entityInfo);

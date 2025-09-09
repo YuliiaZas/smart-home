@@ -13,7 +13,7 @@ import { HomeItemIcon } from '../../home-item-icon/home-item-icon';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeCardSingle extends HomeCardBase {
-  singleItem = computed(() => this.homeItemsEntities()[this.cardData().items[0]]);
+  singleItem = computed(() => this.homeItemsEntities()[this.cardData().itemIds[0]]);
 
   singleDevice = computed<DeviceInfo | undefined>(() => {
     const item = this.singleItem();

@@ -29,7 +29,7 @@ export class CardDataFormService extends BaseEditFormService<Omit<HomeCardWithIt
         value: cardInfo?.title,
       }),
       new InputChips({
-        controlKey: 'items',
+        controlKey: 'itemIds',
         optionsAsync: this.homeItemsFacade.allHomeItems$,
         validators: [
           CustomValidators.maxLengthConditional(
@@ -38,7 +38,7 @@ export class CardDataFormService extends BaseEditFormService<Omit<HomeCardWithIt
           ),
         ],
         label: EDIT_MESSAGES.label.items,
-        value: cardInfo?.items,
+        value: cardInfo?.itemIds,
       }),
     ];
   }

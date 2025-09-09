@@ -12,5 +12,5 @@ export interface HomeCardInfo extends CardInfo {
 }
 
 export interface HomeCardWithItemsIdsInfo extends CardInfo {
-  items: string[];
+  itemIds: string[];
 }

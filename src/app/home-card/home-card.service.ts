@@ -7,7 +7,7 @@ import { CardLayout, HomeCardWithItemsIdsInfo } from '@shared/models';
 })
 export class HomeCardService {
   getIsSingleItem(cardData: HomeCardWithItemsIdsInfo): boolean {
-    return cardData.layout === CardLayout.SINGLE && cardData.items.length === 1;
+    return cardData.layout === CardLayout.SINGLE && cardData.itemIds.length === 1;
   }
 
   getIsContentVertical(cardData: HomeCardWithItemsIdsInfo): boolean {

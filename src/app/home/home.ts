@@ -6,7 +6,7 @@ import { Dictionary } from '@ngrx/entity';
 import { MatTabLink, MatTabNav, MatTabNavPanel } from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { DashboardInfo, Entity, TabInfo } from '@shared/models';
+import { DashboardInfo, Entity, EntityInfo } from '@shared/models';
 import { EDIT_MESSAGES } from '@shared/constants';
 import { EditActionButtons, Mover, MoverButtonStyle, MoverSurroundDirective, Spinner } from '@shared/components';
 import { TabInfoFormService, DashboardInfoFormService } from '@shared/edit';
@@ -49,10 +49,10 @@ export class Home {
   addTabButtonLabel = this.editMessages.createEntity(this.tabEntity);
 
   tabsIds = toSignal<string[]>(this.#tabsFacade.tabsIds$, { requireSync: true });
-  tabsEntities = toSignal<Dictionary<TabInfo>>(this.#tabsFacade.tabsEntities$, { requireSync: true });
+  tabsEntities = toSignal<Dictionary<EntityInfo>>(this.#tabsFacade.tabsEntities$, { requireSync: true });
 
   currentDashboardInfo = toSignal<DashboardInfo | null>(this.#dashboardsFacade.currentDashboardInfo$);
-  currentTabInfo = toSignal<TabInfo | null>(this.#tabsFacade.currentTabInfo$);
+  currentTabInfo = toSignal<EntityInfo | null>(this.#tabsFacade.currentTabInfo$);
 
   isEditMode = toSignal(this.#dashboardsFacade.isEditMode$);
 
@@ -99,7 +99,7 @@ export class Home {
         filter((tabInfo) => tabInfo !== null),
         takeUntilDestroyed(this.#destroyRef)
       )
-      .subscribe((tabInfo: TabInfo) => {
+      .subscribe((tabInfo: EntityInfo) => {
         this.#tabsFacade.addTab(tabInfo);
       });
   }
@@ -114,7 +114,7 @@ export class Home {
         filter((tabInfo) => tabInfo !== null),
         takeUntilDestroyed(this.#destroyRef)
       )
-      .subscribe((tabInfo: TabInfo) => {
+      .subscribe((tabInfo: EntityInfo) => {
         this.#tabsFacade.renameTab(tabInfo);
       });
   }

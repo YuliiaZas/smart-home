@@ -37,7 +37,13 @@ const reducer = createReducer<CardsState>(
   on(cardsActions.setCardsData, (_, { tabs }): CardsState => {
     const newState: CardsState = { ...initialState, cardsOrderedByTab: getCardIdsOrderedByTab(tabs) };
     return cardsAdapter.setAll(
-      tabs.flatMap(({ cards }) => cards.map((card) => ({ ...card, items: map(card.items, 'id') }))),
+      tabs.flatMap(({ cards }) =>
+        cards.map((card) => {
+          const { items, ...cardInfo } = card;
+          const cardWithItemsIds: HomeCardWithItemsIdsInfo = { ...cardInfo, itemIds: map(card.items, 'id') };
+          return cardWithItemsIds;
+        })
+      ),
       newState
     );
   }),
@@ -115,7 +121,7 @@ const reducer = createReducer<CardsState>(
   ),
 
   on(cardsActions.addCard, (state, { tabId, cardInfo }): CardsState => {
-    const card: HomeCardWithItemsIdsInfo = { ...cardInfo, title: '', items: [] };
+    const card: HomeCardWithItemsIdsInfo = { ...cardInfo, title: '', itemIds: [] };
     const newState: CardsState = {
       ...state,
       cardsOrderedByTab: {

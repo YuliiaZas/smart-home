@@ -63,14 +63,14 @@ const reducer = createReducer<CurrentDashboardState>(
   on(currentDashboardActions.exitEditMode, (state): CurrentDashboardState => ({ ...state, isEditMode: false })),
 
   on(
-    currentDashboardActions.startUpdatingDashboardData,
+    currentDashboardActions.startUpdatingDashboard,
     (state): CurrentDashboardState => ({
       ...state,
       loadingStatus: LoadingStatus.Loading,
     })
   ),
   on(
-    currentDashboardApiActions.updateDashboardDataSuccess,
+    currentDashboardApiActions.updateDashboardSuccess,
     (state): CurrentDashboardState => ({
       ...state,
       loadingStatus: LoadingStatus.Success,
@@ -78,7 +78,7 @@ const reducer = createReducer<CurrentDashboardState>(
     })
   ),
   on(
-    currentDashboardApiActions.updateDashboardDataFailure,
+    currentDashboardApiActions.updateDashboardFailure,
     (state, errorInfo): CurrentDashboardState => ({
       ...state,
       loadingStatus: LoadingStatus.Failure,

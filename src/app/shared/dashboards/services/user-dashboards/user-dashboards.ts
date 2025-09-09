@@ -1,7 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { DashboardDataInfo, DashboardInfo } from '@shared/models';
+import {
+  DashboardDataInfo,
+  DashboardDataInfoWithItemsIds,
+  DashboardDataWithItemsIds,
+  DashboardInfo,
+} from '@shared/models';
 import { environment } from 'src/environments/environments';
 
 @Injectable({
@@ -28,11 +33,22 @@ export class UserDashboards {
     return this.http.delete<void>(`${this.dashboardsPath}/${dashboardId}`);
   }
 
-  updateDashboardInfo({ id, title, icon }: DashboardInfo): Observable<DashboardInfo> {
-    return this.http.put<DashboardInfo>(`${this.dashboardsPath}/${id}/info`, { title, icon });
+  updateDashboardData(
+    dashboardId: string,
+    dashboardInfo: DashboardInfo | null,
+    dashboardData: DashboardDataWithItemsIds | null
+  ): Observable<DashboardDataInfo> {
+    const dashboard: Partial<DashboardDataInfoWithItemsIds> = {
+      ...(dashboardInfo ? { title: dashboardInfo.title, icon: dashboardInfo.icon } : {}),
+      ...dashboardData,
+    };
+    return this.#updateDashboardData(dashboardId, dashboard);
   }
 
-  updateDashboardData(dashboardId: string, dashboardData: DashboardDataInfo): Observable<DashboardDataInfo> {
-    return this.http.put<DashboardDataInfo>(`${this.dashboardsPath}/${dashboardId}`, dashboardData);
+  #updateDashboardData(
+    dashboardId: string,
+    dashboard: Partial<DashboardDataInfoWithItemsIds>
+  ): Observable<DashboardDataInfo> {
+    return this.http.patch<DashboardDataInfo>(`${this.dashboardsPath}/${dashboardId}`, dashboard);
   }
 }

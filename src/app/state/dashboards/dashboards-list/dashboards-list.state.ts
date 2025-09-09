@@ -49,6 +49,11 @@ const reducer = createReducer<DashboardsListState>(
     })
   ),
 
+  on(dashboardsListActions.propagateCurrentDashboardInfo, (state, { dashboardInfo }): DashboardsListState => {
+    if (!dashboardInfo) return state;
+    return dashboardsListAdapter.upsertOne(dashboardInfo, state);
+  }),
+
   on(dashboardsListActions.enterEditMode, (state, { dashboardId }): DashboardsListState => {
     return {
       ...state,
@@ -80,16 +85,8 @@ const reducer = createReducer<DashboardsListState>(
 
   on(
     dashboardsListApiActions.addDashboard,
-    dashboardsListApiActions.updateDashboardInfo,
     dashboardsListApiActions.deleteDashboard,
     (state): DashboardsListState => ({ ...state, loadingStatus: LoadingStatus.Loading })
-  ),
-  on(
-    dashboardsListApiActions.updateDashboardInfoSuccess,
-    (state): DashboardsListState => ({
-      ...state,
-      loadingStatus: LoadingStatus.Success,
-    })
   ),
   on(
     dashboardsListApiActions.addDashboardSuccess,
@@ -101,7 +98,6 @@ const reducer = createReducer<DashboardsListState>(
   ),
   on(
     dashboardsListApiActions.addDashboardFailure,
-    dashboardsListApiActions.updateDashboardInfoFailure,
     dashboardsListApiActions.deleteDashboardFailure,
     (state, errorInfo): DashboardsListState => ({
       ...state,
@@ -109,6 +105,7 @@ const reducer = createReducer<DashboardsListState>(
       error: errorInfo,
     })
   ),
+
   on(
     dashboardsListActions.clearError,
     (state): DashboardsListState => ({

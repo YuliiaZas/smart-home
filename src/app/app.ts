@@ -15,7 +15,7 @@ import { SideNav } from '@shared/layout/side-nav/side-nav';
 import { Spinner } from '@shared/components';
 import { Auth } from '@shared/auth';
 import { ROUTING_PATHS } from '@shared/constants';
-import { DashboardInfo, FailureAction, NavInfo } from '@shared/models';
+import { DashboardInfo, FailureAction, Link } from '@shared/models';
 import { DashboardInfoFormService } from '@shared/edit';
 import { DashboardsFacade } from '@state';
 
@@ -43,7 +43,7 @@ export class App {
     map(([isAuthenticated, isLogin]) => isAuthenticated && !isLogin)
   );
 
-  dashboards$: Observable<NavInfo[]> = this.dashboardsFacade.userDashboardsWithRequest$.pipe(
+  dashboards$: Observable<Link[]> = this.dashboardsFacade.userDashboardsWithRequest$.pipe(
     map((dashboards) =>
       (dashboards || []).map((dashboard) => ({
         ...dashboard,

@@ -10,7 +10,7 @@ export const dashboardsListActions = createActionGroup({
     'Change Dashboard Info': props<{ dashboardInfo: DashboardInfo }>(),
     'Discard Changes For Current Dashboard Info': emptyProps(),
 
-    'Start Updating Dashboard Info': props<{ dashboardId: string }>(),
+    'Propagate Current Dashboard Info': props<{ dashboardInfo: DashboardInfo | null }>(),
 
     'Reset User Dashboards': emptyProps(),
 
@@ -28,10 +28,6 @@ export const dashboardsListApiActions = createActionGroup({
     'Add Dashboard': props<{ dashboardInfo: DashboardInfo }>(),
     'Add Dashboard Success': props<{ dashboardId: string }>(),
     'Add Dashboard Failure': props<{ action: FailureAction; data: DashboardInfo; error: Error }>(),
-
-    'Update Dashboard Info': props<{ dashboardInfo: DashboardInfo }>(),
-    'Update Dashboard Info Success': emptyProps(),
-    'Update Dashboard Info Failure': props<{ action: FailureAction; error: Error }>(),
 
     'Delete Dashboard': props<{ dashboardId: string }>(),
     'Delete Dashboard Success': emptyProps(),

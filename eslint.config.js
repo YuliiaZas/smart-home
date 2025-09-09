@@ -35,6 +35,12 @@ export default tseslint.config(
         },
       ],
       '@typescript-eslint/no-explicit-any': 'error',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          ignoreRestSiblings: true,
+        },
+      ],
       'unicorn/prefer-top-level-await': 'off',
       'unicorn/no-useless-undefined': 'off',
       'unicorn/no-null': 'off',

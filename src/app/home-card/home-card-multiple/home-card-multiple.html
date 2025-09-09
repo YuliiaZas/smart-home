@@ -14,7 +14,7 @@
 </ng-template>
 
 <ul class="card-content" [class.card-content-vertical]="isContentVertical()">
-  @for (itemId of cardData().items; track $index) {
+  @for (itemId of cardData().itemIds; track $index) {
     @let item = homeItemsEntities()[itemId];
     @if (item) {
       <li class="card-row">

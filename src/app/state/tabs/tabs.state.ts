@@ -1,21 +1,21 @@
 import { createFeature, createReducer, createSelector, on } from '@ngrx/store';
 import { createEntityAdapter, EntityState } from '@ngrx/entity';
 import { isEqual } from 'lodash';
-import { TabInfo } from '@shared/models';
+import { EntityInfo } from '@shared/models';
 import { tabsActions } from './tabs.actions';
 
-interface TabsState extends EntityState<TabInfo> {
+interface TabsState extends EntityState<EntityInfo> {
   currentTabId: string | null;
   tabsIdsOrdered: string[];
 
-  originalTabs: TabInfo[];
+  originalTabs: EntityInfo[];
   originalTabsIdsOrdered: string[];
 
   isChanged: boolean;
 }
 
-const tabsAdapter = createEntityAdapter<TabInfo>({
-  selectId: (tab: TabInfo) => tab.id,
+const tabsAdapter = createEntityAdapter<EntityInfo>({
+  selectId: (tab: EntityInfo) => tab.id,
 });
 
 const initialState: TabsState = tabsAdapter.getInitialState({
@@ -50,7 +50,7 @@ const reducer = createReducer<TabsState>(
     tabsActions.enterEditMode,
     (state): TabsState => ({
       ...state,
-      originalTabs: Object.values(state.entities).filter((entity): entity is TabInfo => !!entity),
+      originalTabs: Object.values(state.entities).filter((entity): entity is EntityInfo => !!entity),
       originalTabsIdsOrdered: [...state.tabsIdsOrdered],
     })
   ),
@@ -113,7 +113,7 @@ export const tabsFeature = createFeature({
   reducer,
   extraSelectors: ({ selectEntities, selectTabsIdsOrdered, selectCurrentTabId }) => ({
     selectOrderedTabs: createSelector(selectTabsIdsOrdered, selectEntities, (tabsIdsOrdered, entities) =>
-      tabsIdsOrdered.map((id) => entities[id]).filter((tab): tab is TabInfo => !!tab)
+      tabsIdsOrdered.map((id) => entities[id]).filter((tab): tab is EntityInfo => !!tab)
     ),
     selectCurrentTab: createSelector(selectEntities, selectCurrentTabId, (entities, currentTabId) =>
       currentTabId ? entities[currentTabId] || null : null
