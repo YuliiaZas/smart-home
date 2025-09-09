@@ -16,7 +16,7 @@ import { MatSidenav, MatSidenavContainer, MatSidenavContent } from '@angular/mat
 import { MatListItem } from '@angular/material/list';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { MatIcon } from '@angular/material/icon';
-import { UserProfileInfo } from '@shared/auth';
+import { UserProfileInfo } from '@core/auth';
 import { Link } from '@shared/models';
 import { SIDE_NAV_WIDTH, BREAKPOINT_MAX_WIDTH } from '@shared/constants';
 import { SideNavButton } from '../side-nav-button/side-nav-button';

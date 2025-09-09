@@ -1,4 +1,4 @@
-import { Entity } from './entity.enum';
+import { Entity } from './enums';
 
 export interface ValidationErrorOptions {
   uniqueArea?: Entity;

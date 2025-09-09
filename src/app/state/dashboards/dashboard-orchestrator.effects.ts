@@ -3,7 +3,7 @@ import { Actions, ofType, createEffect } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { from } from 'rxjs';
 import { filter, map, switchMap, withLatestFrom } from 'rxjs/operators';
-import { DashboardTabInfo } from '@shared/models';
+import { DashboardTab } from '@shared/models';
 import { tabsActions, tabsFeature } from '@state/tabs';
 import { cardsActions, cardsFeature } from '@state/cards';
 import { dashboardsListActions, dashboardsListFeature } from './dashboards-list';
@@ -26,7 +26,7 @@ export class DashboardsOrchestratorEffects {
   setCurrentDashboardData$ = createEffect(() =>
     this.actions$.pipe(
       ofType(currentDashboardActions.propagateCurrentDashboardData),
-      map(({ dashboard }) => dashboard?.tabs || ([] as DashboardTabInfo[])),
+      map(({ dashboard }) => dashboard?.tabs || ([] as DashboardTab[])),
       switchMap((tabs) =>
         from([
           tabsActions.setTabsData({ tabs }),

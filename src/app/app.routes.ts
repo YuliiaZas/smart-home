@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuard, loginGuard } from '@shared/auth';
+import { authGuard, loginGuard } from '@core/auth';
 import { ROUTING_PATHS } from '@shared/constants';
 import {
   areDashboardsEmptyGuard,
@@ -9,7 +9,7 @@ import {
   isDashboardValidGuard,
   isTabValidGuard,
   unsavedChangesGuard,
-} from '@shared/dashboards/guards';
+} from '@core/dashboards/guards';
 import { Entity } from '@shared/models';
 
 export const routes: Routes = [
@@ -17,7 +17,7 @@ export const routes: Routes = [
   {
     path: ROUTING_PATHS.DASHBOARD,
     canActivate: [authGuard, userDashboardsGuard],
-    loadComponent: () => import('./home-redirect/home-redirect').then((m) => m.HomeRedirect),
+    loadComponent: () => import('./redirect/redirect').then((m) => m.Redirect),
     children: [
       {
         path: '',

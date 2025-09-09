@@ -1,10 +1,10 @@
 import { createActionGroup, emptyProps, props } from '@ngrx/store';
-import { CardInfo, DashboardTabInfo, HomeCardWithItemsIdsInfo } from '@shared/models';
+import { CardInfo, DashboardTab, HomeCardWithItemsIdsInfo } from '@shared/models';
 
 export const cardsActions = createActionGroup({
   source: 'Cards',
   events: {
-    'Set Cards Data': props<{ tabs: DashboardTabInfo[] }>(),
+    'Set Cards Data': props<{ tabs: DashboardTab[] }>(),
 
     'Enter Edit Mode': emptyProps(),
     'Exit Edit Mode': emptyProps(),

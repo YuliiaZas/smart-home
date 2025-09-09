@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { UnitsPipe } from '@shared/pipes';
-import { DevicesService } from '@shared/home-items';
-import { Sensor } from '../../home-sensor/home-sensor';
-import { Device } from '../../home-device/home-device';
+import { DevicesService } from '@core/home-items';
+import { Sensor } from '../../home-item/home-sensor/home-sensor';
+import { Device } from '../../home-item/home-device/home-device';
 import { HomeCardBase } from '../home-card-base/home-card-base';
 import { HomeCardService } from '../home-card.service';
 

@@ -1,10 +1,10 @@
 import { createActionGroup, emptyProps, props } from '@ngrx/store';
-import { DashboardTabInfo, FailureAction, HomeItemInfo } from '@shared/models';
+import { DashboardTab, FailureAction, HomeItemInfo } from '@shared/models';
 
 export const homeItemsActions = createActionGroup({
   source: 'Home Items',
   events: {
-    'Set Current Dashboard Home Items': props<{ tabs: DashboardTabInfo[] }>(),
+    'Set Current Dashboard Home Items': props<{ tabs: DashboardTab[] }>(),
 
     'Set Device State': props<{ deviceId: string; newState: boolean }>(),
 

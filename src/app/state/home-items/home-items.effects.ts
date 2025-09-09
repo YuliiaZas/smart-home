@@ -3,7 +3,7 @@ import { Store } from '@ngrx/store';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { map, of } from 'rxjs';
 import { catchError, filter, switchMap, withLatestFrom } from 'rxjs/operators';
-import { DevicesService, HomeItemsApi } from '@shared/home-items';
+import { DevicesService, HomeItemsApi } from '@core/home-items';
 import { homeItemsActions, homeItemsApiActions } from './home-items.actions';
 import { homeItemsFeature } from './home-items.state';
 import { FailureAction } from '@shared/models';

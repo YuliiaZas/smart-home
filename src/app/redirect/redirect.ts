@@ -6,4 +6,4 @@ import { RouterOutlet } from '@angular/router';
   imports: [RouterOutlet],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HomeRedirect {}
+export class Redirect {}

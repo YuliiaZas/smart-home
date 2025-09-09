@@ -1,7 +1,7 @@
-import { DashboardTabInfo, DashboardTabWithItemsIds } from '@shared/models';
+import { DashboardTab, DashboardTabWithItemsIds } from '@shared/models';
 
 export interface DashboardData {
-  tabs: DashboardTabInfo[];
+  tabs: DashboardTab[];
 }
 
 export interface DashboardDataWithItemsIds {

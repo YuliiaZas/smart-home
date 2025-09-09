@@ -1,4 +1,4 @@
-import { FailureAction } from './failure-action.enum';
+import { FailureAction } from './enums';
 
 export interface StateError {
   action: FailureAction;

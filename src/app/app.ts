@@ -13,10 +13,10 @@ import {
 import { BehaviorSubject, combineLatest, filter, map, Observable } from 'rxjs';
 import { SideNav } from '@shared/layout/side-nav/side-nav';
 import { Spinner } from '@shared/components';
-import { Auth } from '@shared/auth';
+import { Auth } from '@core/auth';
 import { ROUTING_PATHS } from '@shared/constants';
 import { DashboardInfo, FailureAction, Link } from '@shared/models';
-import { DashboardInfoFormService } from '@shared/edit';
+import { DashboardInfoFormService } from '@core/edit';
 import { DashboardsFacade } from '@state';
 
 @Component({

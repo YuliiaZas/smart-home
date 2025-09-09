@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { Actions, ofType, createEffect } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
-import { UserDashboards } from '@shared/dashboards/services';
+import { UserDashboards } from '@core/dashboards/services';
 import { FailureAction } from '@shared/models';
 import { currentDashboardActions, currentDashboardApiActions } from './current-dashboard.actions';
 

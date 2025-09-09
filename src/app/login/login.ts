@@ -5,7 +5,7 @@ import { combineLatest, map } from 'rxjs';
 import { Router } from '@angular/router';
 import { MatError } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
-import { Auth, LoginRequestInfo } from '@shared/auth';
+import { Auth, LoginRequestInfo } from '@core/auth';
 import { ERROR_MESSAGES, ROUTING_PATHS } from '@shared/constants';
 import { Spinner } from '@shared/components';
 import { LoadingStatus } from '@shared/models';

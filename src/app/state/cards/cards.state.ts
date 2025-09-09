@@ -1,7 +1,7 @@
 import { createEntityAdapter, EntityState } from '@ngrx/entity';
 import { createFeature, createReducer, createSelector, on } from '@ngrx/store';
 import { isEqual, map } from 'lodash';
-import { DashboardTabInfo, HomeCardWithItemsIdsInfo } from '@shared/models';
+import { DashboardTab, HomeCardWithItemsIdsInfo } from '@shared/models';
 import { cardsActions } from './cards.actions';
 
 interface CardsState extends EntityState<HomeCardWithItemsIdsInfo> {
@@ -165,7 +165,7 @@ export const cardsFeature = createFeature({
   }),
 });
 
-function getCardIdsOrderedByTab(tabs: DashboardTabInfo[]): Record<string, string[]> {
+function getCardIdsOrderedByTab(tabs: DashboardTab[]): Record<string, string[]> {
   const cardIdsOrderedByTab: Record<string, string[]> = {};
   for (const tab of tabs) {
     cardIdsOrderedByTab[tab.id] = tab.cards.map((card) => card.id);
