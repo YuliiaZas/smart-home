@@ -50,12 +50,14 @@
 
   @switch (inputData().controlType) {
     @case (inputType.PASSWORD) {
-      @let passwordState = currentPasswordState();
-      @if (passwordState) {
-        <button matSuffix matIconButton [title]="passwordState.title" (click)="togglePasswordVisibility($event)">
-          <mat-icon>{{ passwordState.icon }}</mat-icon>
-        </button>
-      }
+      <button
+        matSuffix
+        matIconButton
+        [title]="currentPasswordState()?.title"
+        (click)="togglePasswordVisibility($event)"
+      >
+        <mat-icon>{{ currentPasswordState()?.icon }}</mat-icon>
+      </button>
     }
 
     @case (inputType.ICON) {
