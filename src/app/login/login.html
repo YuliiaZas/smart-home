@@ -3,14 +3,46 @@
 }
 
 <div class="container">
-  <h1 class="title">Welcome home!</h1>
-  <app-base-form
-    [controlsInfo]="loginControlsInfo"
-    [errorMessage]="errorMessage()"
-    [submitButtonText]="'Log in'"
-    [disableSubmitWhileInvalid]="true"
-    [globalControlsErrors]="globalControlsErrors()"
-    (formFocus)="formFocus()"
-    (formSubmit)="login($event)"
-  ></app-base-form>
+  <div class="container-info">
+    <div class="container-move">
+      <div class="move login">
+        <p class="info-title">Don't have an account?</p>
+        <button matButton (click)="setIsSignup(true)">Sign up</button>
+      </div>
+      <div class="move signup">
+        <p class="info-title">Have an account?</p>
+        <button matButton (click)="setIsSignup(false)">Log in</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container-main">
+    <h1 class="title">Welcome home!</h1>
+
+    <div class="container-move">
+      <app-base-form
+        class="move login"
+        [controlsInfo]="loginControlsInfo"
+        [showError]="true"
+        [errorMessage]="loginErrorMessage()"
+        [submitButtonText]="'Log in'"
+        [disableSubmitWhileInvalid]="true"
+        [globalControlsErrors]="loginGlobalControlsErrors()"
+        (formFocus)="formFocus()"
+        (formSubmit)="login($event)"
+      ></app-base-form>
+
+      <app-base-form
+        class="move signup"
+        [controlsInfo]="signupControlsInfo"
+        [showError]="true"
+        [errorMessage]="signupErrorMessage()"
+        [submitButtonText]="'Sign up'"
+        [disableSubmitWhileInvalid]="true"
+        [globalControlsErrors]="signupGlobalControlsErrors()"
+        (formFocus)="formFocus()"
+        (formSubmit)="signup($event)"
+      ></app-base-form>
+    </div>
+  </div>
 </div>

@@ -3,7 +3,7 @@
     <app-form-input class="form-input" [inputData]="controlInfo"></app-form-input>
   }
 
-  @if (errorMessage()) {
+  @if (showError()) {
     <mat-error>{{ errorMessage() }}</mat-error>
   }
 

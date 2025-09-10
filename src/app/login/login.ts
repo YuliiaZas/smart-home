@@ -3,7 +3,8 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule } from '@angular/forms';
 import { combineLatest, map } from 'rxjs';
 import { Router } from '@angular/router';
-import { Auth, LoginRequestInfo } from '@core/auth';
+import { MatButtonModule } from '@angular/material/button';
+import { Auth, LoginRequestInfo, SignupRequestInfo } from '@core/auth';
 import { ERROR_MESSAGES, ROUTING_PATHS } from '@shared/constants';
 import { Spinner } from '@shared/components';
 import { LoadingStatus } from '@shared/models';
@@ -12,10 +13,13 @@ import { LoginFormService } from './services';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, Spinner, BaseForm],
+  imports: [ReactiveFormsModule, MatButtonModule, Spinner, BaseForm],
   templateUrl: './login.html',
   styleUrl: './login.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '[class.signup-mode]': 'isSignup()',
+  },
 })
 export class Login implements OnInit {
   private loginFormService = inject(LoginFormService);
@@ -29,10 +33,15 @@ export class Login implements OnInit {
   isLoading = toSignal(this.authService.isTokenLoading$);
 
   loginControlsInfo = this.loginFormService.getInputsData();
+  signupControlsInfo = this.loginFormService.getInputsDataForSignup();
 
-  errorMessage = signal('');
+  isSignup = signal(false);
   isDataInvalid = signal(false);
-  globalControlsErrors = model<FormControlsError | null>(null);
+
+  loginErrorMessage = model('');
+  signupErrorMessage = model('');
+  loginGlobalControlsErrors = model<FormControlsError | null>(null);
+  signupGlobalControlsErrors = model<FormControlsError | null>(null);
 
   ngOnInit() {
     combineLatest([
@@ -41,18 +50,26 @@ export class Login implements OnInit {
     ])
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(([isFailure, invalidCredentials]) => {
+        this.isDataInvalid.set(isFailure);
+        const isSignup = this.isSignup();
         if (isFailure && invalidCredentials) {
-          this.errorMessage.set(this.invalidErrorMessage);
-          this.markIsDataInvalid(true);
+          this.setErrorMessage(this.invalidErrorMessage(isSignup), isSignup);
+          this.markIsDataInvalid(true, isSignup);
           return;
         }
-        this.errorMessage.set(isFailure ? this.defaultErrorMessage : '');
+        this.setErrorMessage(isFailure ? this.defaultErrorMessage : '', isSignup);
       });
   }
 
+  setIsSignup(isSignup: boolean) {
+    this.isSignup.set(isSignup);
+    this.setErrorMessage('', isSignup);
+    this.markIsDataInvalid(false, isSignup);
+  }
+
   formFocus() {
-    this.errorMessage.set('');
-    this.markIsDataInvalid(false);
+    this.setErrorMessage('');
+    this.markIsDataInvalid(false, this.isSignup());
   }
 
   login(value: LoginRequestInfo) {
@@ -62,14 +79,36 @@ export class Login implements OnInit {
       .subscribe(() => this.router.navigate([ROUTING_PATHS.DASHBOARD]));
   }
 
-  private markIsDataInvalid(isInvalid: boolean) {
-    if (this.isDataInvalid() === isInvalid) return;
+  signup(value: SignupRequestInfo) {
+    this.authService
+      .signup(value)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.router.navigate([ROUTING_PATHS.DASHBOARD]));
+  }
 
-    this.isDataInvalid.set(isInvalid);
+  private markIsDataInvalid(isInvalid: boolean, isSignup?: boolean) {
+    if (isSignup) {
+      this.loginGlobalControlsErrors.set(null);
+      this.signupGlobalControlsErrors.set({
+        errors: isInvalid ? { defaultError: true } : null,
+        controlNames: [this.loginControlsInfo[0].controlKey],
+      });
+    } else {
+      this.loginGlobalControlsErrors.set({
+        errors: isInvalid ? { defaultError: true } : null,
+        controlNames: this.loginControlsInfo.map((control) => control.controlKey),
+      });
+      this.signupGlobalControlsErrors.set(null);
+    }
+  }
 
-    this.globalControlsErrors.set({
-      errors: isInvalid ? { defaultError: true } : null,
-      controlNames: this.loginControlsInfo.map((control) => control.controlKey),
-    });
+  private setErrorMessage(message: string, isSignup?: boolean) {
+    if (isSignup) {
+      this.loginErrorMessage.set('');
+      this.signupErrorMessage.set(message);
+    } else {
+      this.loginErrorMessage.set(message);
+      this.signupErrorMessage.set('');
+    }
   }
 }

@@ -24,4 +24,16 @@ export class LoginFormService {
       }),
     ];
   }
+
+  getInputsDataForSignup(): InputBase<string>[] {
+    return [
+      ...this.getInputsData(),
+      new InputText({
+        controlKey: 'fullName',
+        label: 'Full Name',
+        validators: [Validators.minLength(2)],
+        validationErrorOptions: { skipDefaultError: true },
+      }),
+    ];
+  }
 }

@@ -18,7 +18,8 @@ export const ERROR_MESSAGES = {
       const uniqueArea = entity ? UNIQUE_AREA[entity] || '' : '';
       return 'This value must be unique' + (uniqueArea ? ` within ${uniqueArea}` : '');
     },
-    invalidCredentials: 'Invalid username or password',
+    invalidCredentials: (signUp: boolean) =>
+      signUp ? 'The username is already taken' : 'Invalid username or password',
     defaultError: 'Invalid value',
   },
   notFound: {

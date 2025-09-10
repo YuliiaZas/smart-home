@@ -23,6 +23,7 @@ export class BaseForm<TFormValue> implements ComponentWithForm<TFormValue> {
 
   controlsInfo = input<InputBase<TFormValue[keyof TFormValue]>[]>([]);
   errorMessage = input<string>('');
+  showError = input<boolean>(false);
   submitButtonText = input<string>('');
   disableSubmitWhileInvalid = input<boolean>(true);
   globalControlsErrors = input<FormControlsError | null>(null);

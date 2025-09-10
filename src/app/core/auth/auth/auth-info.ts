@@ -3,6 +3,10 @@ export interface LoginRequestInfo {
   password: string;
 }
 
+export interface SignupRequestInfo extends LoginRequestInfo {
+  fullName?: string;
+}
+
 export interface LoginResponseInfo {
   token: string;
 }

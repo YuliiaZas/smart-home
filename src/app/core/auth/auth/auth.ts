@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { combineLatest, map, Observable } from 'rxjs';
-import { LoginRequestInfo, LoginResponseInfo } from './auth-info';
+import { LoginRequestInfo, LoginResponseInfo, SignupRequestInfo } from './auth-info';
 import { AuthUser } from '../auth-user/auth-user';
 import { AuthToken } from '../auth-token/auth-token';
 import { LoadingStatus } from '@shared/models';
@@ -24,6 +24,10 @@ export class Auth {
 
   login(loginRequest: LoginRequestInfo): Observable<LoginResponseInfo> {
     return this.authTokenService.loginUser(loginRequest);
+  }
+
+  signup(signupRequest: SignupRequestInfo): Observable<LoginResponseInfo> {
+    return this.authTokenService.signupNewUser(signupRequest);
   }
 
   logout(): void {

@@ -20,6 +20,10 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
           authService.setInvalidCredentials(true);
           return EMPTY;
         }
+        if (error.status === HTTPStatusCode.Conflict) {
+          authService.setInvalidCredentials(true);
+          return EMPTY;
+        }
         return throwError(() => error);
       })
     );
