@@ -1,20 +1,19 @@
 import { inject, Injectable, inputBinding, Signal } from '@angular/core';
 import { filter, map, merge, Observable, take, tap } from 'rxjs';
 import { EDIT_MESSAGES } from '@shared/constants';
-import { InputBase } from '@shared/form-input';
+import { BaseForm, InputBase } from '@shared/form';
 import { FormDialogReference, ModalService } from '@shared/modal';
-import { EditInfoForm } from '../components';
 
 @Injectable({
   providedIn: 'root',
 })
-export abstract class BaseEditFormService<T extends object> {
+export abstract class BaseEditFormService<TFormValue> {
   #modalService = inject(ModalService);
 
-  abstract addNew(...arguments_: unknown[]): Observable<T | null>;
-  abstract edit(entityInfo: T): Observable<T | null>;
+  abstract addNew(...arguments_: unknown[]): Observable<TFormValue | null>;
+  abstract edit(entityInfo: TFormValue): Observable<TFormValue | null>;
 
-  protected abstract createInputsData(entityInfo?: T): InputBase<string>[];
+  protected abstract createInputsData(entityInfo?: TFormValue): InputBase<TFormValue[keyof TFormValue]>[];
 
   protected getSubmittedValueFromCreatedForm({
     title,
@@ -24,11 +23,11 @@ export abstract class BaseEditFormService<T extends object> {
     closeObservable,
   }: {
     title: string;
-    controlsInfo: InputBase<string>[];
-    initDataId?: string | ((data: T) => string);
+    controlsInfo: InputBase<TFormValue[keyof TFormValue]>[];
+    initDataId?: string | ((data: TFormValue) => string);
     errorMessage?: Signal<string>;
     closeObservable?: Observable<void>;
-  }): Observable<T | null> {
+  }): Observable<TFormValue | null> {
     const modalForm = this.#createModalForm({
       title,
       controlsInfo,
@@ -39,11 +38,11 @@ export abstract class BaseEditFormService<T extends object> {
       closeObservable.pipe(take(1)).subscribe(() => modalForm.close(true));
     }
 
-    const submit$ = this.#getFormSubmitValue<T>(modalForm).pipe(
+    const submit$ = modalForm.onConfirm().pipe(
       tap(() => {
         if (!closeObservable) modalForm.close(true);
       }),
-      map((formData: T) => this.#addIdToFormValue(formData, initDataId))
+      map((formData) => this.#addIdToFormValue(formData, initDataId))
     );
 
     return merge(submit$, this.#getFormCancelEvent(modalForm));
@@ -55,13 +54,13 @@ export abstract class BaseEditFormService<T extends object> {
     errorMessage,
   }: {
     title: string;
-    controlsInfo: InputBase<string>[];
+    controlsInfo: InputBase<TFormValue[keyof TFormValue]>[];
     errorMessage?: Signal<string>;
-  }): FormDialogReference<EditInfoForm> {
+  }): FormDialogReference<TFormValue, BaseForm<TFormValue>> {
     return this.#modalService.openFormModal({
       data: {
         title: title,
-        component: EditInfoForm,
+        component: BaseForm<TFormValue>,
         componentBindings: [
           inputBinding('controlsInfo', () => controlsInfo),
           inputBinding('errorMessage', () => (errorMessage ? errorMessage() : '')),
@@ -72,26 +71,15 @@ export abstract class BaseEditFormService<T extends object> {
     });
   }
 
-  #getFormSubmitValue<T>(modalForm: FormDialogReference<EditInfoForm>): Observable<T> {
-    return modalForm.onConfirm().pipe(
-      tap((form) => {
-        form.markAllAsTouched();
-        form.updateValueAndValidity();
-      }),
-      filter((form) => form.valid),
-      map((form) => form.getRawValue() as T)
-    );
-  }
-
-  #getFormCancelEvent(modalForm: FormDialogReference<EditInfoForm>): Observable<null> {
+  #getFormCancelEvent(modalForm: FormDialogReference<TFormValue, BaseForm<TFormValue>>): Observable<null> {
     return modalForm.afterClosed().pipe(
       filter((result) => result === false),
       map(() => null)
     );
   }
 
-  #addIdToFormValue(formData: T, initDataId?: string | ((data: T) => string)) {
-    if (!('id' in formData) && initDataId) {
+  #addIdToFormValue(formData: TFormValue, initDataId?: string | ((data: TFormValue) => string)): TFormValue {
+    if (initDataId && formData && typeof formData === 'object' && !('id' in formData)) {
       const id = typeof initDataId === 'function' ? initDataId(formData) : initDataId;
       return { ...formData, id };
     }

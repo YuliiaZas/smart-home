@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Validators } from '@angular/forms';
-import { InputBase, InputPassword, InputText } from '@shared/form-input';
+import { InputBase, InputPassword, InputText } from '@shared/form';
 
 @Injectable({
   providedIn: 'root',

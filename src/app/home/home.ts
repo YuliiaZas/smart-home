@@ -9,7 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { DashboardInfo, Entity, EntityInfo } from '@shared/models';
 import { EDIT_MESSAGES } from '@shared/constants';
 import { EditActionButtons, Mover, MoverButtonStyle, MoverSurroundDirective, Spinner } from '@shared/components';
-import { TabInfoFormService, DashboardInfoFormService } from '@core/edit';
+import { TabInfoFormService, DashboardInfoFormService } from '@core/edit-entity';
 import { DashboardsFacade, TabsFacade } from '@state';
 
 @Component({

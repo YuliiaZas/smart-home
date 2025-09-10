@@ -1,7 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
+import { ComponentWithForm } from '@shared/models';
 import { ModalDialog, ModalForm } from '../components';
-import { ComponentWithForm, DialogData, FormDialogReference, FormModalData, ModalConfig } from '../models';
+import { DialogData, FormDialogReference, FormModalData, ModalConfig } from '../models';
 
 @Injectable({
   providedIn: 'root',
@@ -18,16 +19,17 @@ export class ModalService {
     return dialogReference;
   }
 
-  openFormModal<TComponent extends ComponentWithForm>(
-    modalConfig: ModalConfig<FormModalData<TComponent>>
-  ): FormDialogReference<TComponent> {
-    const dialogReference = this.dialog.open<ModalForm<TComponent>, FormModalData<TComponent>, boolean>(
-      ModalForm,
-      this.#getDialogConfig(modalConfig)
-    );
+  openFormModal<TFormValue, TComponent extends ComponentWithForm<TFormValue>>(
+    modalConfig: ModalConfig<FormModalData<TFormValue, TComponent>>
+  ): FormDialogReference<TFormValue, TComponent> {
+    const dialogReference = this.dialog.open<
+      ModalForm<TFormValue, TComponent>,
+      FormModalData<TFormValue, TComponent>,
+      boolean
+    >(ModalForm, this.#getDialogConfig(modalConfig));
 
-    const customDialogReference = dialogReference as unknown as FormDialogReference<TComponent>;
-    customDialogReference.onConfirm = () => dialogReference.componentInstance?.onConfirm$.asObservable();
+    const customDialogReference = dialogReference as unknown as FormDialogReference<TFormValue, TComponent>;
+    customDialogReference.onConfirm = () => dialogReference.componentInstance?.onConfirm;
     return customDialogReference;
   }
 

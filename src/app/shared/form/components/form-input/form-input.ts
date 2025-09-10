@@ -54,13 +54,13 @@ import { passwordDataMap } from './constants/password-data-map';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FormInput {
+export class FormInput<T> {
   #parentContainer = inject(ControlContainer);
   #destroyRef = inject(DestroyRef);
   #announcer = inject(LiveAnnouncer);
   inputType = InputType;
 
-  inputData = input.required<InputBase<string>>();
+  inputData = input.required<InputBase<T>>();
 
   readonly formControl = computed<AbstractControl | null>(() => {
     const formGroup = this.#parentContainer.control as FormGroup;
@@ -75,9 +75,9 @@ export class FormInput {
     return isObjectKey(currentType, passwordDataMap) ? passwordDataMap[currentType] : null;
   });
 
-  readonly selectedItemIds = linkedSignal(() => {
+  readonly selectedItemIds = linkedSignal<T[]>(() => {
     const value = this.inputData().value;
-    return (typeof value === 'string' ? [value] : value) || [];
+    return value && Array.isArray(value) ? value : [];
   });
   readonly allOptions = model<OptionInfo[]>([]);
   readonly isLoadingOptions = model(false);
@@ -104,7 +104,7 @@ export class FormInput {
     event.stopPropagation();
   }
 
-  getOptionItem(itemId: string): OptionInfo | undefined {
+  getOptionItem(itemId: T): OptionInfo | undefined {
     return this.allOptions().find((item) => item.id === itemId);
   }
 
@@ -139,7 +139,7 @@ export class FormInput {
     return allOptions.filter((option) => option.label.toLowerCase().includes(currentSearch.trim().toLowerCase()));
   }
 
-  #resolveOptions(inputData: InputBase<string>) {
+  #resolveOptions(inputData: InputBase<T | T[]>) {
     if (inputData.hasSyncOptions()) {
       this.allOptions.set(inputData.options || []);
     } else if (inputData.hasAsyncOptions()) {

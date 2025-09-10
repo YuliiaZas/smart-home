@@ -8,7 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { HomeCard } from '../home-card/home-card';
 import { HomeEmpty } from '../home-empty/home-empty';
-import { CardDataFormService, CardLayoutFormService } from '@core/edit';
+import { CardDataFormService, CardLayoutFormService } from '@core/edit-entity';
 import { filter } from 'rxjs';
 
 @Component({

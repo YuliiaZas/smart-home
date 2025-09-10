@@ -16,7 +16,7 @@ import { Spinner } from '@shared/components';
 import { Auth } from '@core/auth';
 import { ROUTING_PATHS } from '@shared/constants';
 import { DashboardInfo, FailureAction, Link } from '@shared/models';
-import { DashboardInfoFormService } from '@core/edit';
+import { DashboardInfoFormService } from '@core/edit-entity';
 import { DashboardsFacade } from '@state';
 
 @Component({

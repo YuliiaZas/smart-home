@@ -1,27 +1,24 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, OnInit, model } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule } from '@angular/forms';
 import { combineLatest, map } from 'rxjs';
 import { Router } from '@angular/router';
-import { MatError } from '@angular/material/form-field';
-import { MatButtonModule } from '@angular/material/button';
 import { Auth, LoginRequestInfo } from '@core/auth';
 import { ERROR_MESSAGES, ROUTING_PATHS } from '@shared/constants';
 import { Spinner } from '@shared/components';
 import { LoadingStatus } from '@shared/models';
-import { FormControlsService, FormInput } from '@shared/form-input';
-import { LoginFormService } from './login-form.service';
+import { BaseForm, FormControlsError } from '@shared/form';
+import { LoginFormService } from './services';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, MatError, MatButtonModule, Spinner, FormInput],
+  imports: [ReactiveFormsModule, Spinner, BaseForm],
   templateUrl: './login.html',
   styleUrl: './login.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Login implements OnInit {
   private loginFormService = inject(LoginFormService);
-  private formControlsService = inject(FormControlsService);
   private authService = inject(Auth);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
@@ -32,10 +29,10 @@ export class Login implements OnInit {
   isLoading = toSignal(this.authService.isTokenLoading$);
 
   loginControlsInfo = this.loginFormService.getInputsData();
-  loginForm = this.formControlsService.toFormGroup(this.loginControlsInfo);
 
   errorMessage = signal('');
   isDataInvalid = signal(false);
+  globalControlsErrors = model<FormControlsError | null>(null);
 
   ngOnInit() {
     combineLatest([
@@ -55,33 +52,24 @@ export class Login implements OnInit {
 
   formFocus() {
     this.errorMessage.set('');
-    if (this.isDataInvalid()) {
-      this.markIsDataInvalid(false);
-    }
+    this.markIsDataInvalid(false);
   }
 
-  login() {
+  login(value: LoginRequestInfo) {
     this.authService
-      .login(this.loginForm.getRawValue() as LoginRequestInfo)
+      .login(value)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.router.navigate([ROUTING_PATHS.DASHBOARD]));
   }
 
   private markIsDataInvalid(isInvalid: boolean) {
-    this.isDataInvalid.set(isInvalid);
-    if (isInvalid) {
-      this.setFormGroupErrors({ defaultError: true });
-    } else {
-      this.setFormGroupErrors(null);
-    }
-  }
+    if (this.isDataInvalid() === isInvalid) return;
 
-  private setFormGroupErrors(errors: Record<string, boolean> | null) {
-    for (const controlName of Object.keys(this.loginForm.controls)) {
-      const control = this.loginForm.get(controlName);
-      if (control) {
-        control.setErrors(errors);
-      }
-    }
+    this.isDataInvalid.set(isInvalid);
+
+    this.globalControlsErrors.set({
+      errors: isInvalid ? { defaultError: true } : null,
+      controlNames: this.loginControlsInfo.map((control) => control.controlKey),
+    });
   }
 }

@@ -3,7 +3,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { Validators } from '@angular/forms';
 import { EMPTY, Observable } from 'rxjs';
 import { CustomValidators } from '@shared/validation';
-import { InputBase, InputText } from '@shared/form-input';
+import { InputBase, InputText } from '@shared/form';
 import { Entity, EntityInfo } from '@shared/models';
 import { EDIT_MESSAGES } from '@shared/constants';
 import { getKebabCase, getUniqueId } from '@shared/utils';
@@ -37,7 +37,7 @@ export class TabInfoFormService extends BaseEditFormService<EntityInfo> {
   }
 
   addNew(): Observable<EntityInfo | null> {
-    const controlsInfo: InputBase<string>[] = this.createInputsData();
+    const controlsInfo = this.createInputsData();
     const title = EDIT_MESSAGES.createEntity(this.#entity);
 
     return this.getSubmittedValueFromCreatedForm({
@@ -50,7 +50,7 @@ export class TabInfoFormService extends BaseEditFormService<EntityInfo> {
   edit(entityInfo: EntityInfo): Observable<EntityInfo | null> {
     if (!entityInfo) return EMPTY;
 
-    const controlsInfo: InputBase<string>[] = this.createInputsData(entityInfo);
+    const controlsInfo = this.createInputsData(entityInfo);
     const title = EDIT_MESSAGES.renameEntity(this.#entity);
 
     return this.getSubmittedValueFromCreatedForm({ title, controlsInfo, initDataId: entityInfo.id });

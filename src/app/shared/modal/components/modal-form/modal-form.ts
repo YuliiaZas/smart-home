@@ -7,12 +7,12 @@ import {
   OnInit,
   ComponentRef,
 } from '@angular/core';
-import { FormGroup } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { A11yModule } from '@angular/cdk/a11y';
-import { ComponentWithForm, CustomModalData } from '@shared/modal/models';
+import { CustomModalData } from '@shared/modal/models';
+import { ComponentWithForm } from '@shared/models';
 
 @Component({
   selector: 'app-modal-form',
@@ -21,13 +21,15 @@ import { ComponentWithForm, CustomModalData } from '@shared/modal/models';
   styleUrls: ['../modal.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ModalForm<TComponent extends ComponentWithForm> implements OnInit {
+export class ModalForm<TFormValue, TComponent extends ComponentWithForm<TFormValue>> implements OnInit {
   data = inject<CustomModalData<TComponent>>(MAT_DIALOG_DATA);
 
   dynamicContent = viewChild('dynamicContent', { read: ViewContainerRef });
   dynamicComponent?: ComponentRef<TComponent>;
 
-  onConfirm$ = new Subject<FormGroup>();
+  #onConfirm$ = new Subject<TFormValue>();
+
+  onConfirm = this.#onConfirm$.asObservable();
 
   ngOnInit() {
     this.dynamicComponent = this.dynamicContent()?.createComponent(this.data.component, {
@@ -36,7 +38,7 @@ export class ModalForm<TComponent extends ComponentWithForm> implements OnInit {
   }
 
   handleSubmitForm() {
-    const form = this.dynamicComponent?.instance.form();
-    if (form) this.onConfirm$.next(form);
+    const formValue = this.dynamicComponent?.instance.handleFormSubmit();
+    if (formValue) this.#onConfirm$.next(formValue);
   }
 }

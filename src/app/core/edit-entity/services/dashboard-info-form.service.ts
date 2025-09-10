@@ -3,7 +3,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { Validators } from '@angular/forms';
 import { EMPTY, Observable } from 'rxjs';
 import { CustomValidators } from '@shared/validation';
-import { InputBase, InputIcon, InputText } from '@shared/form-input';
+import { InputBase, InputIcon, InputText } from '@shared/form';
 import { DashboardInfo } from '@shared/models/dashboard-info';
 import { Entity, FailureAction } from '@shared/models';
 import { EDIT_MESSAGES, failureActionMessages, ID_VALIDATION_MESSAGES } from '@shared/constants';
@@ -22,7 +22,7 @@ export class DashboardInfoFormService extends BaseEditFormService<DashboardInfo>
     failureAction: Signal<FailureAction | null>,
     closeObservable: Observable<void>
   ): Observable<DashboardInfo | null> {
-    const controlsInfo: InputBase<string>[] = this.createInputsData(undefined, true);
+    const controlsInfo = this.createInputsData(undefined, true);
     const title = EDIT_MESSAGES.createEntity(this.#entity);
     const errorMessage = computed(() => {
       const failureActionKey = failureAction();
@@ -40,7 +40,7 @@ export class DashboardInfoFormService extends BaseEditFormService<DashboardInfo>
   edit(dashboardInfo: DashboardInfo): Observable<DashboardInfo | null> {
     if (!dashboardInfo) return EMPTY;
 
-    const controlsInfo: InputBase<string>[] = this.createInputsData(dashboardInfo);
+    const controlsInfo = this.createInputsData(dashboardInfo);
     const title = EDIT_MESSAGES.renameEntity(this.#entity);
 
     return this.getSubmittedValueFromCreatedForm({

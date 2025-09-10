@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { EMPTY, Observable } from 'rxjs';
-import { InputBase, InputSelect } from '@shared/form-input';
+import { InputBase, InputSelect } from '@shared/form';
 import { CardInfo, CardLayout, Entity } from '@shared/models';
 import { EDIT_MESSAGES, LAYOUT_MESSAGES } from '@shared/constants';
 import { getKebabCase, getUniqueId } from '@shared/utils';
@@ -31,7 +31,7 @@ export class CardLayoutFormService extends BaseEditFormService<Pick<CardInfo, 'i
   }
 
   addNew(tabId: string): Observable<Pick<CardInfo, 'id' | 'layout'> | null> {
-    const controlsInfo: InputBase<string>[] = this.createInputsData();
+    const controlsInfo = this.createInputsData();
     const title = EDIT_MESSAGES.createEntity(this.#entity);
     const currentTabCardsIds = this.cardsOrderedByTab()[tabId] || [];
 
