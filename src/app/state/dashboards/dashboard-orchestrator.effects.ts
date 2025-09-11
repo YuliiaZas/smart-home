@@ -16,6 +16,13 @@ export class DashboardsOrchestratorEffects {
   private store = inject(Store);
   private actions$ = inject(Actions);
 
+  resetUserDashboards$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(dashboardsListActions.resetUserDashboards),
+      switchMap(() => from([currentDashboardActions.resetCurrentDashboard(), homeItemsActions.resetHomeItems()]))
+    )
+  );
+
   resetCurrentDashboard$ = createEffect(() =>
     this.actions$.pipe(
       ofType(currentDashboardActions.resetCurrentDashboard),

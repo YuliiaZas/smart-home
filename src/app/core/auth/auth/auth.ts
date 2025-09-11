@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { combineLatest, map, Observable } from 'rxjs';
+import { combineLatest, filter, map, Observable, pairwise } from 'rxjs';
 import { LoginRequestInfo, LoginResponseInfo, SignupRequestInfo } from './auth-info';
 import { AuthUser } from '../auth-user/auth-user';
 import { AuthToken } from '../auth-token/auth-token';
@@ -21,6 +21,22 @@ export class Auth {
   tokenLoadingStatus$ = this.authTokenService.tokenLoadingStatus$;
   invalidCredentials$ = this.authTokenService.invalidCredentials$;
   isTokenLoading$ = this.authTokenService.tokenLoadingStatus$.pipe(map((status) => status === LoadingStatus.Loading));
+
+  readonly authStateChanged$ = this.isAuthenticated$.pipe(
+    pairwise(),
+    map(([previous, current]) => ({ previous, current })),
+    filter(({ previous, current }) => previous !== current)
+  );
+
+  readonly userLoggedIn$ = this.authStateChanged$.pipe(
+    filter(({ previous, current }) => !previous && current),
+    map(() => true)
+  );
+
+  readonly userLoggedOut$ = this.authStateChanged$.pipe(
+    filter(({ previous, current }) => previous && !current),
+    map(() => true)
+  );
 
   login(loginRequest: LoginRequestInfo): Observable<LoginResponseInfo> {
     return this.authTokenService.loginUser(loginRequest);

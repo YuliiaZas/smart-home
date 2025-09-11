@@ -66,7 +66,15 @@ const reducer = createReducer<CurrentDashboardState>(
     currentDashboardActions.startUpdatingDashboard,
     (state): CurrentDashboardState => ({
       ...state,
+      loadingStatus: LoadingStatus.NotUpdated,
+    })
+  ),
+  on(
+    currentDashboardApiActions.updateDashboard,
+    (state): CurrentDashboardState => ({
+      ...state,
       loadingStatus: LoadingStatus.Loading,
+      error: null,
     })
   ),
   on(

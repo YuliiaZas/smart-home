@@ -43,7 +43,7 @@ export class App {
     map(([isAuthenticated, isLogin]) => isAuthenticated && !isLogin)
   );
 
-  dashboards$: Observable<Link[]> = this.dashboardsFacade.userDashboardsWithRequest$.pipe(
+  dashboards$: Observable<Link[]> = this.dashboardsFacade.userDashboards$.pipe(
     map((dashboards) =>
       (dashboards || []).map((dashboard) => ({
         ...dashboard,
@@ -55,8 +55,8 @@ export class App {
   addDashboardFailureAction = toSignal<FailureAction | null>(this.dashboardsFacade.addDashboardError$, {
     initialValue: null,
   });
-  updateDashboardsListSuccess$: Observable<void> = this.dashboardsFacade.userDashboardsShouldBeRefetched$.pipe(
-    filter((isSuccess) => isSuccess),
+  dashboardAdded$: Observable<void> = this.dashboardsFacade.userDashboardsShouldBeRefetched$.pipe(
+    filter((isDashboardAdded) => isDashboardAdded),
     map(() => void 0)
   );
 
@@ -78,7 +78,7 @@ export class App {
 
   addDashboard() {
     this.dashboardInfoFormService
-      .addNew(this.addDashboardFailureAction, this.updateDashboardsListSuccess$)
+      .addNew(this.addDashboardFailureAction, this.dashboardAdded$)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((dashboardInfo: DashboardInfo | null) => {
         if (dashboardInfo) {
@@ -89,7 +89,6 @@ export class App {
   }
 
   logout() {
-    this.dashboardsFacade.resetDashboards();
     this.authService.logout();
     this.router.navigate([ROUTING_PATHS.LOGIN]);
   }

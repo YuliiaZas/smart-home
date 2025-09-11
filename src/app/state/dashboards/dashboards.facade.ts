@@ -1,8 +1,8 @@
 import { inject, Injectable } from '@angular/core';
-import { combineLatest, distinctUntilChanged, EMPTY, map, Observable, switchMap, take } from 'rxjs';
+import { combineLatest, distinctUntilChanged, map, Observable, of, pairwise, switchMap, take } from 'rxjs';
 import { DashboardInfo, FailureAction, LoadingStatus, StateError } from '@shared/models';
 import { Store } from '@ngrx/store';
-import { homeItemsActions } from '@state/home-items';
+import { Auth } from '@core/auth';
 import { cardsFeature } from '@state/cards';
 import { tabsFeature } from '@state/tabs';
 import { dashboardsListActions, dashboardsListApiActions, dashboardsListFeature } from './dashboards-list';
@@ -13,27 +13,16 @@ import { currentDashboardActions, currentDashboardFeature, currentDashboardApiAc
 })
 export class DashboardsFacade {
   #store = inject(Store);
+  #auth = inject(Auth);
 
   get userDashboards$(): Observable<DashboardInfo[]> {
-    return this.#store.select(dashboardsListFeature.selectAll);
+    return this.#auth.isAuthenticated$.pipe(
+      switchMap((isAuthenticated) => (isAuthenticated ? this.#store.select(dashboardsListFeature.selectAll) : of([])))
+    );
   }
 
   get userDashboardIds$(): Observable<string[]> {
     return this.#store.select(dashboardsListFeature.selectIds).pipe(map((ids) => ids as string[]));
-  }
-
-  get userDashboardsWithRequest$(): Observable<DashboardInfo[]> {
-    return this.#store.select(dashboardsListFeature.selectLoadingStatus).pipe(
-      switchMap((loadingStatus) => {
-        if (loadingStatus === LoadingStatus.Success || loadingStatus === LoadingStatus.Failure) {
-          return this.#store.select(dashboardsListFeature.selectAll);
-        }
-        if (loadingStatus === LoadingStatus.NotStarted || loadingStatus === LoadingStatus.NotUpdated) {
-          this.#store.dispatch(dashboardsListApiActions.loadUserDashboards());
-        }
-        return EMPTY;
-      })
-    );
   }
 
   get userDashboardsShouldBeRefetched$(): Observable<boolean> {
@@ -43,17 +32,19 @@ export class DashboardsFacade {
     );
   }
 
-  get isLoading$(): Observable<boolean> {
-    return combineLatest([
-      this.#store
-        .select(dashboardsListFeature.selectLoadingStatus)
-        .pipe(map((status) => status === LoadingStatus.Loading)),
-      this.#store
-        .select(currentDashboardFeature.selectLoadingStatus)
-        .pipe(map((status) => status === LoadingStatus.Loading)),
-    ]).pipe(
+  get areUserDashboardsLoaded$(): Observable<boolean> {
+    return this.#store.select(dashboardsListFeature.selectLoadingStatus).pipe(
+      map((loadingStatus) => loadingStatus === LoadingStatus.Success || loadingStatus === LoadingStatus.Failure),
+      distinctUntilChanged()
+    );
+  }
+
+  get isDashboardSaving$(): Observable<boolean> {
+    return this.#store.select(currentDashboardFeature.selectLoadingStatus).pipe(
+      pairwise(),
       map(
-        ([isDashboardsListLoading, isCurrentDashboardLoading]) => isDashboardsListLoading || isCurrentDashboardLoading
+        ([previousStatus, currentStatus]) =>
+          previousStatus === LoadingStatus.NotUpdated && currentStatus === LoadingStatus.Loading
       )
     );
   }
@@ -131,12 +122,6 @@ export class DashboardsFacade {
 
   saveCurrentDashboard(): void {
     this.#store.dispatch(currentDashboardActions.saveCurrentDashboard());
-  }
-
-  resetDashboards(): void {
-    this.#store.dispatch(dashboardsListActions.resetUserDashboards());
-    this.#store.dispatch(currentDashboardActions.resetCurrentDashboard());
-    this.#store.dispatch(homeItemsActions.resetHomeItems());
   }
 
   clearDashboardListError(): void {

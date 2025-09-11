@@ -56,7 +56,7 @@ export class Home {
 
   isEditMode = toSignal(this.#dashboardsFacade.isEditMode$);
 
-  isLoading = toSignal(this.#dashboardsFacade.isLoading$);
+  isDashboardSaving = toSignal(this.#dashboardsFacade.isDashboardSaving$);
 
   enterEditMode() {
     this.#dashboardsFacade.enterEditMode();
