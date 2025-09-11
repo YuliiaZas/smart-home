@@ -9,6 +9,7 @@ import {
   DestroyRef,
   ChangeDetectionStrategy,
   effect,
+  viewChild,
 } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -18,10 +19,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { MatChipInputEvent, MatChipsModule } from '@angular/material/chips';
+import { MatAutocomplete, MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatOption, MatSelect } from '@angular/material/select';
 import { getValidationErrorMessage } from '@shared/validation';
+import { Spinner } from '@shared/components';
 import { isObjectKey } from '@shared/utils';
 import { SafeHtmlPipe } from '@shared/pipes';
 import { InputType, OptionInfo, PasswordDataInfo } from './models';
@@ -43,6 +45,7 @@ import { passwordDataMap } from './constants/password-data-map';
     MatChipsModule,
     MatAutocompleteModule,
     SafeHtmlPipe,
+    Spinner,
   ],
   templateUrl: './form-input.html',
   styleUrl: './form-input.scss',
@@ -68,7 +71,14 @@ export class FormInput<T> {
     return formGroup?.get(controlKey);
   });
 
+  matAutocomplete = viewChild<MatAutocomplete>('auto');
+
   currentElementType = linkedSignal(() => this.#getType(this.inputData().controlType));
+
+  errorMessage = computed(() => {
+    const formControl = this.formControl();
+    return formControl ? getValidationErrorMessage(formControl, this.inputData().validationErrorOptions) : '';
+  });
 
   currentPasswordState = computed<PasswordDataInfo | null>(() => {
     const currentType = this.currentElementType();
@@ -82,19 +92,17 @@ export class FormInput<T> {
   readonly allOptions = model<OptionInfo[]>([]);
   readonly isLoadingOptions = model(false);
   readonly currentSearch = model('');
-  readonly filteredOptions = computed(() => this.#getFilteredOptions());
+  readonly filteredOptions = computed(() => {
+    const currentSearch = this.currentSearch();
+    const allOptions = this.allOptions();
+    return this.#getFilteredOptions(currentSearch, allOptions);
+  });
 
   constructor() {
     effect(() => {
       const inputData = this.inputData();
       this.#resolveOptions(inputData);
     });
-  }
-
-  getErrorMessage(): string {
-    const formControl = this.formControl();
-    if (!formControl) return '';
-    return getValidationErrorMessage(formControl, this.inputData().validationErrorOptions);
   }
 
   togglePasswordVisibility(event: MouseEvent) {
@@ -115,10 +123,18 @@ export class FormInput<T> {
     this.formControl()?.setValue(currentValue);
 
     event.option.deselect();
+    this.currentSearch.set('');
   }
 
-  addChip() {
+  addChip(event: MatChipInputEvent) {
     this.currentSearch.set('');
+    const value = (event.value || '').trim();
+    if (!value) return;
+
+    const matAutocomplete = this.matAutocomplete();
+    if (matAutocomplete && matAutocomplete.options.length > 0) {
+      matAutocomplete._emitSelectEvent(matAutocomplete.options.first);
+    }
   }
 
   removeChip(itemIndex: number, selectedOptionItem?: OptionInfo) {
@@ -131,11 +147,8 @@ export class FormInput<T> {
     this.#announcer.announce(`Removed ${selectedOptionItem?.label || 'item'}`);
   }
 
-  #getFilteredOptions(): OptionInfo[] {
-    const currentSearch = this.currentSearch();
-    const allOptions = this.allOptions();
+  #getFilteredOptions(currentSearch: string, allOptions: OptionInfo[]): OptionInfo[] {
     if (!currentSearch) return allOptions;
-
     return allOptions.filter((option) => option.label.toLowerCase().includes(currentSearch.trim().toLowerCase()));
   }
 

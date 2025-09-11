@@ -1,3 +1,6 @@
+$size: 1.25rem;
+$size-small: 1rem;
+
 .spinner-wrapper {
   position: absolute;
   inset: 0;
@@ -16,12 +19,19 @@
 }
 
 .spinner-border {
-  height: 1.25rem;
-  width: 1.25rem;
+  height: $size;
+  width: $size;
   border: 0.2rem solid #c7cad1;
   border-radius: 50%;
   border-top-color: transparent;
   animation: spinner-border 0.75s linear infinite;
+}
+
+:host(.app-spinner--small) {
+  .spinner-border {
+    height: $size-small;
+    width: $size-small;
+  }
 }
 
 @keyframes spinner-border {
