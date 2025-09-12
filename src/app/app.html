@@ -1,11 +1,11 @@
-@if (isLoading$ | async) {
+@if (isLoading()) {
   <app-spinner></app-spinner>
 }
 
-@if (showSideNav$ | async) {
+@if (showSideNav()) {
   <app-side-nav
-    [navItems]="(dashboards$ | async) || []"
-    [user]="currentUser$ | async"
+    [navItems]="dashboards() || []"
+    [user]="currentUser()"
     (addDashboard)="addDashboard()"
     (logout)="logout()"
   >

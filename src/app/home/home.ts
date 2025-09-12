@@ -1,15 +1,13 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject } from '@angular/core';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { Dictionary } from '@ngrx/entity';
 import { MatTabLink, MatTabNav, MatTabNavPanel } from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { DashboardInfo, Entity, EntityInfo } from '@shared/models';
+import { Entity } from '@shared/models';
 import { EDIT_MESSAGES } from '@shared/constants';
 import { EditActionButtons, Mover, MoverButtonStyle, MoverSurroundDirective, Spinner } from '@shared/components';
-import { TabInfoFormService, DashboardInfoFormService } from '@core/edit-entity';
-import { DashboardsFacade, TabsFacade } from '@state';
+import { HomeService } from './home.service';
 
 @Component({
   selector: 'app-home',
@@ -35,10 +33,7 @@ import { DashboardsFacade, TabsFacade } from '@state';
   },
 })
 export class Home {
-  #dashboardsFacade = inject(DashboardsFacade);
-  #tabsFacade = inject(TabsFacade);
-  #dashboardInfoFormService = inject(DashboardInfoFormService);
-  #tabInfoFormService = inject(TabInfoFormService);
+  #homeService = inject(HomeService);
   #destroyRef = inject(DestroyRef);
   editMessages = EDIT_MESSAGES;
 
@@ -47,58 +42,48 @@ export class Home {
   moverButtonStyles = MoverButtonStyle.ARROWS;
   addTabButtonLabel = this.editMessages.createEntity(this.tabEntity);
 
-  tabsIds = toSignal<string[]>(this.#tabsFacade.tabsIds$, { requireSync: true });
-  tabsEntities = toSignal<Dictionary<EntityInfo>>(this.#tabsFacade.tabsEntities$, { requireSync: true });
+  tabsIds = this.#homeService.tabsIds;
+  tabsEntities = this.#homeService.tabsEntities;
 
-  currentDashboardInfo = toSignal<DashboardInfo | null>(this.#dashboardsFacade.currentDashboardInfo$);
-  currentTabInfo = toSignal<EntityInfo | null>(this.#tabsFacade.currentTabInfo$);
+  currentDashboardInfo = this.#homeService.currentDashboardInfo;
 
-  isEditMode = toSignal(this.#dashboardsFacade.isEditMode$);
+  isEditMode = this.#homeService.isEditMode;
 
-  isDashboardSaving = toSignal(this.#dashboardsFacade.isDashboardSaving$);
+  isDashboardSaving = this.#homeService.isDashboardSaving;
 
   enterEditMode() {
-    this.#dashboardsFacade.enterEditMode();
+    this.#homeService.enterEditMode();
   }
 
   discardChanges() {
-    this.#dashboardsFacade.discardChanges();
+    this.#homeService.discardChanges();
   }
 
   saveChanges() {
-    this.#dashboardsFacade.saveCurrentDashboard();
+    this.#homeService.saveChanges();
   }
 
   renameCurrentDashboard() {
-    const currentDashboardInfo = this.currentDashboardInfo();
-    if (!currentDashboardInfo) return;
-
-    this.#dashboardInfoFormService.edit(currentDashboardInfo).pipe(takeUntilDestroyed(this.#destroyRef)).subscribe();
+    this.#homeService.renameCurrentDashboard().pipe(takeUntilDestroyed(this.#destroyRef)).subscribe();
   }
 
   deleteCurrentDashboard() {
-    const currentDashboardInfo = this.currentDashboardInfo();
-    if (!currentDashboardInfo) return;
-
-    this.#dashboardsFacade.deleteDashboard(currentDashboardInfo.id);
+    this.#homeService.deleteCurrentDashboard();
   }
 
   addTab() {
-    this.#tabInfoFormService.addNew().pipe(takeUntilDestroyed(this.#destroyRef)).subscribe();
+    this.#homeService.addTab().pipe(takeUntilDestroyed(this.#destroyRef)).subscribe();
   }
 
   renameCurrentTab() {
-    const currentTabInfo = this.currentTabInfo();
-    if (!currentTabInfo) return;
-
-    this.#tabInfoFormService.edit(currentTabInfo).pipe(takeUntilDestroyed(this.#destroyRef)).subscribe();
+    this.#homeService.renameCurrentTab().pipe(takeUntilDestroyed(this.#destroyRef)).subscribe();
   }
 
   deleteCurrentTab() {
-    this.#tabsFacade.deleteCurrentTab();
+    this.#homeService.deleteCurrentTab();
   }
 
   setTabSorting(sortedIds: string[]) {
-    this.#tabsFacade.reorderTabs(sortedIds);
+    this.#homeService.setTabSorting(sortedIds);
   }
 }
