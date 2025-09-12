@@ -64,7 +64,7 @@
     }
 
     @case (inputType.ICON) {
-      <mat-icon matSuffix>{{ formControl()?.value }}</mat-icon>
+      <mat-icon matSuffix>{{ formControl?.value }}</mat-icon>
     }
   }
 
@@ -72,7 +72,7 @@
     <mat-hint [innerHTML]="inputData().hint | safeHtml"></mat-hint>
   }
 
-  @if (formControl()?.touched && formControl()?.invalid) {
+  @if (formControl?.touched && formControl?.invalid) {
     <mat-error>{{ errorMessage() }}</mat-error>
   }
 </mat-form-field>

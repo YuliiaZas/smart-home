@@ -5,15 +5,17 @@ import {
   inject,
   input,
   linkedSignal,
-  model,
   DestroyRef,
   ChangeDetectionStrategy,
   effect,
   viewChild,
+  OnInit,
+  signal,
 } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ControlContainer, ReactiveFormsModule } from '@angular/forms';
+import { merge } from 'rxjs';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -57,7 +59,7 @@ import { passwordDataMap } from './constants/password-data-map';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FormInput<T> {
+export class FormInput<T> implements OnInit {
   #parentContainer = inject(ControlContainer);
   #destroyRef = inject(DestroyRef);
   #announcer = inject(LiveAnnouncer);
@@ -65,20 +67,13 @@ export class FormInput<T> {
 
   inputData = input.required<InputBase<T>>();
 
-  readonly formControl = computed<AbstractControl | null>(() => {
-    const formGroup = this.#parentContainer.control as FormGroup;
-    const controlKey = this.inputData().controlKey;
-    return formGroup?.get(controlKey);
-  });
+  formControl: AbstractControl | null = null;
 
   matAutocomplete = viewChild<MatAutocomplete>('auto');
 
   currentElementType = linkedSignal(() => this.#getType(this.inputData().controlType));
 
-  errorMessage = computed(() => {
-    const formControl = this.formControl();
-    return formControl ? getValidationErrorMessage(formControl, this.inputData().validationErrorOptions) : '';
-  });
+  errorMessage = signal<string>('', { equal: (a, b) => a === b });
 
   currentPasswordState = computed<PasswordDataInfo | null>(() => {
     const currentType = this.currentElementType();
@@ -89,9 +84,9 @@ export class FormInput<T> {
     const value = this.inputData().value;
     return value && Array.isArray(value) ? value : [];
   });
-  readonly allOptions = model<OptionInfo[]>([]);
-  readonly isLoadingOptions = model(false);
-  readonly currentSearch = model('');
+  readonly allOptions = signal<OptionInfo[]>([]);
+  readonly isLoadingOptions = signal(false);
+  readonly currentSearch = signal('');
   readonly filteredOptions = computed(() => {
     const currentSearch = this.currentSearch();
     const allOptions = this.allOptions();
@@ -103,6 +98,19 @@ export class FormInput<T> {
       const inputData = this.inputData();
       this.#resolveOptions(inputData);
     });
+  }
+
+  ngOnInit() {
+    if (!this.formControl) {
+      const formGroup = this.#parentContainer.control as FormGroup;
+      this.formControl = formGroup?.get(this.inputData().controlKey) || null;
+    }
+
+    merge(...[this.formControl?.valueChanges, this.formControl?.statusChanges].filter(Boolean))
+      .pipe(takeUntilDestroyed(this.#destroyRef))
+      .subscribe(() =>
+        this.errorMessage.set(getValidationErrorMessage(this.formControl!, this.inputData().validationErrorOptions))
+      );
   }
 
   togglePasswordVisibility(event: MouseEvent) {
@@ -120,7 +128,7 @@ export class FormInput<T> {
     const currentValue = [...this.selectedItemIds(), event.option.value];
 
     this.selectedItemIds.set(currentValue);
-    this.formControl()?.setValue(currentValue);
+    this.formControl?.setValue(currentValue);
 
     event.option.deselect();
     this.currentSearch.set('');
@@ -142,7 +150,7 @@ export class FormInput<T> {
     currentValue.splice(itemIndex, 1);
 
     this.selectedItemIds.set(currentValue);
-    this.formControl()?.setValue(currentValue);
+    this.formControl?.setValue(currentValue);
 
     this.#announcer.announce(`Removed ${selectedOptionItem?.label || 'item'}`);
   }
