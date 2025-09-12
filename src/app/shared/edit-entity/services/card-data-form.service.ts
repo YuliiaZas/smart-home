@@ -1,25 +1,24 @@
 import { inject, Injectable } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { EMPTY, Observable } from 'rxjs';
-import { InputBase, InputText } from '@shared/form-input';
 import { Entity, HomeCardWithItemsIdsInfo } from '@shared/models';
 import { EDIT_MESSAGES } from '@shared/constants';
 import { CardsFacade, HomeItemsFacade } from '@state';
-import { BaseEditFormService } from './base-edit-form.service';
-import { InputChips } from '@shared/form-input/models/typed-inputs/input-chips';
 import { CustomValidators } from '@shared/validation';
 import { HOME_ITEMS_NUMBER_FOR_LAYOUT } from '@shared/constants/home-items-number-for-layout';
+import { InputBase, InputChips, InputText } from '@shared/form';
+import { BaseEditFormService } from './base-edit-form.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CardDataFormService extends BaseEditFormService<Omit<HomeCardWithItemsIdsInfo, 'layout'>> {
-  private cardsFacade = inject(CardsFacade);
-  private homeItemsFacade = inject(HomeItemsFacade);
+  #cardsFacade = inject(CardsFacade);
+  #homeItemsFacade = inject(HomeItemsFacade);
   #entity = Entity.CARD;
 
-  cardsOrderedByTab = toSignal(this.cardsFacade.cardsOrderedByTab$, { initialValue: {} as Record<string, string[]> });
-  allHomeItems = toSignal(this.homeItemsFacade.allHomeItems$, { initialValue: [] });
+  cardsOrderedByTab = toSignal(this.#cardsFacade.cardsOrderedByTab$, { initialValue: {} as Record<string, string[]> });
+  allHomeItems = toSignal(this.#homeItemsFacade.allHomeItems$, { initialValue: [] });
 
   protected createInputsData(cardInfo?: Omit<HomeCardWithItemsIdsInfo, 'layout'>): InputBase<string>[] {
     return [
@@ -30,7 +29,7 @@ export class CardDataFormService extends BaseEditFormService<Omit<HomeCardWithIt
       }),
       new InputChips({
         controlKey: 'items',
-        optionsAsync: this.homeItemsFacade.allHomeItems$,
+        optionsAsync: this.#homeItemsFacade.allHomeItems$,
         validators: [
           CustomValidators.maxLengthConditional(
             HOME_ITEMS_NUMBER_FOR_LAYOUT,
@@ -43,11 +42,11 @@ export class CardDataFormService extends BaseEditFormService<Omit<HomeCardWithIt
     ];
   }
 
-  addNew(): Observable<Omit<HomeCardWithItemsIdsInfo, 'layout'> | null> {
+  addNew(): Observable<void> {
     return EMPTY;
   }
 
-  edit(cardInfo: HomeCardWithItemsIdsInfo): Observable<Omit<HomeCardWithItemsIdsInfo, 'layout'> | null> {
+  edit(cardInfo: HomeCardWithItemsIdsInfo): Observable<void> {
     const controlsInfo: InputBase<string>[] = this.createInputsData(cardInfo);
     const title = EDIT_MESSAGES.editEntity(this.#entity);
 
@@ -55,6 +54,8 @@ export class CardDataFormService extends BaseEditFormService<Omit<HomeCardWithIt
       title,
       controlsInfo,
       initDataId: cardInfo.id,
+      submitHandler: (cardInfoValue) => this.#cardsFacade.changeCurrentCard(cardInfoValue),
+      cancelHandler: () => this.#cardsFacade.discardCurrentCardChanges(),
     });
   }
 }

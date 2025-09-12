@@ -3,7 +3,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { Validators } from '@angular/forms';
 import { EMPTY, Observable } from 'rxjs';
 import { CustomValidators } from '@shared/validation';
-import { InputBase, InputText } from '@shared/form-input';
+import { InputBase, InputText } from '@shared/form';
 import { Entity, TabInfo } from '@shared/models';
 import { EDIT_MESSAGES } from '@shared/constants';
 import { getKebabCase, getUniqueId } from '@shared/utils';
@@ -14,11 +14,11 @@ import { BaseEditFormService } from './base-edit-form.service';
   providedIn: 'root',
 })
 export class TabInfoFormService extends BaseEditFormService<TabInfo> {
-  private tabsFacade = inject(TabsFacade);
+  #tabsFacade = inject(TabsFacade);
   #entity = Entity.TAB;
 
-  userTabsTitles = toSignal(this.tabsFacade.tabsTitles$, { initialValue: [] });
-  userTabsIds = toSignal(this.tabsFacade.tabsIds$, { initialValue: [] });
+  userTabsTitles = toSignal(this.#tabsFacade.tabsTitles$, { initialValue: [] });
+  userTabsIds = toSignal(this.#tabsFacade.tabsIds$, { initialValue: [] });
 
   protected createInputsData(dashboardInfo?: TabInfo): InputBase<string>[] {
     return [
@@ -36,7 +36,7 @@ export class TabInfoFormService extends BaseEditFormService<TabInfo> {
     ];
   }
 
-  addNew(): Observable<TabInfo | null> {
+  addNew(): Observable<void> {
     const controlsInfo: InputBase<string>[] = this.createInputsData();
     const title = EDIT_MESSAGES.createEntity(this.#entity);
 
@@ -44,15 +44,21 @@ export class TabInfoFormService extends BaseEditFormService<TabInfo> {
       title,
       controlsInfo,
       initDataId: (tabInfo) => getUniqueId(getKebabCase(tabInfo.title), this.userTabsIds()),
+      submitHandler: (tabInfo) => this.#tabsFacade.addTab(tabInfo),
     });
   }
 
-  edit(entityInfo: TabInfo): Observable<TabInfo | null> {
+  edit(entityInfo: TabInfo): Observable<void> {
     if (!entityInfo) return EMPTY;
 
     const controlsInfo: InputBase<string>[] = this.createInputsData(entityInfo);
     const title = EDIT_MESSAGES.renameEntity(this.#entity);
 
-    return this.getSubmittedValueFromCreatedForm({ title, controlsInfo, initDataId: entityInfo.id });
+    return this.getSubmittedValueFromCreatedForm({
+      title,
+      controlsInfo,
+      initDataId: entityInfo.id,
+      submitHandler: (tabInfo) => this.#tabsFacade.renameTab(tabInfo),
+    });
   }
 }

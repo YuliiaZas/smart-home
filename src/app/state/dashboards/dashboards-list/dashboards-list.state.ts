@@ -29,7 +29,7 @@ const reducer = createReducer<DashboardsListState>(
 
   on(
     dashboardsListApiActions.loadUserDashboards,
-    (): DashboardsListState => ({ ...initialState, loadingStatus: LoadingStatus.Loading })
+    (state): DashboardsListState => ({ ...state, loadingStatus: LoadingStatus.Loading })
   ),
   on(
     dashboardsListApiActions.loadUserDashboardsSuccess,

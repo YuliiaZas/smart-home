@@ -5,23 +5,27 @@ import {
   inject,
   input,
   linkedSignal,
-  model,
   DestroyRef,
   ChangeDetectionStrategy,
   effect,
+  viewChild,
+  OnInit,
+  signal,
 } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ControlContainer, ReactiveFormsModule } from '@angular/forms';
+import { merge } from 'rxjs';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { MatChipInputEvent, MatChipsModule } from '@angular/material/chips';
+import { MatAutocomplete, MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatOption, MatSelect } from '@angular/material/select';
 import { getValidationErrorMessage } from '@shared/validation';
+import { Spinner } from '@shared/components';
 import { isObjectKey } from '@shared/utils';
 import { SafeHtmlPipe } from '@shared/pipes';
 import { InputType, OptionInfo, PasswordDataInfo } from './models';
@@ -43,6 +47,7 @@ import { passwordDataMap } from './constants/password-data-map';
     MatChipsModule,
     MatAutocompleteModule,
     SafeHtmlPipe,
+    Spinner,
   ],
   templateUrl: './form-input.html',
   styleUrl: './form-input.scss',
@@ -54,35 +59,39 @@ import { passwordDataMap } from './constants/password-data-map';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FormInput {
+export class FormInput<T> implements OnInit {
   #parentContainer = inject(ControlContainer);
   #destroyRef = inject(DestroyRef);
   #announcer = inject(LiveAnnouncer);
   inputType = InputType;
 
-  inputData = input.required<InputBase<string>>();
+  inputData = input.required<InputBase<T>>();
 
-  readonly formControl = computed<AbstractControl | null>(() => {
-    const formGroup = this.#parentContainer.control as FormGroup;
-    const controlKey = this.inputData().controlKey;
-    return formGroup?.get(controlKey);
-  });
+  formControl: AbstractControl | null = null;
+
+  matAutocomplete = viewChild<MatAutocomplete>('auto');
 
   currentElementType = linkedSignal(() => this.#getType(this.inputData().controlType));
+
+  errorMessage = signal<string>('', { equal: (a, b) => a === b });
 
   currentPasswordState = computed<PasswordDataInfo | null>(() => {
     const currentType = this.currentElementType();
     return isObjectKey(currentType, passwordDataMap) ? passwordDataMap[currentType] : null;
   });
 
-  readonly selectedItemIds = linkedSignal(() => {
+  readonly selectedItemIds = linkedSignal<T[]>(() => {
     const value = this.inputData().value;
-    return (typeof value === 'string' ? [value] : value) || [];
+    return value && Array.isArray(value) ? value : [];
   });
-  readonly allOptions = model<OptionInfo[]>([]);
-  readonly isLoadingOptions = model(false);
-  readonly currentSearch = model('');
-  readonly filteredOptions = computed(() => this.#getFilteredOptions());
+  readonly allOptions = signal<OptionInfo[]>([]);
+  readonly isLoadingOptions = signal(false);
+  readonly currentSearch = signal('');
+  readonly filteredOptions = computed(() => {
+    const currentSearch = this.currentSearch();
+    const allOptions = this.allOptions();
+    return this.#getFilteredOptions(currentSearch, allOptions);
+  });
 
   constructor() {
     effect(() => {
@@ -91,10 +100,17 @@ export class FormInput {
     });
   }
 
-  getErrorMessage(): string {
-    const formControl = this.formControl();
-    if (!formControl) return '';
-    return getValidationErrorMessage(formControl, this.inputData().validationErrorOptions);
+  ngOnInit() {
+    if (!this.formControl) {
+      const formGroup = this.#parentContainer.control as FormGroup;
+      this.formControl = formGroup?.get(this.inputData().controlKey) || null;
+    }
+
+    merge(...[this.formControl?.valueChanges, this.formControl?.statusChanges].filter(Boolean))
+      .pipe(takeUntilDestroyed(this.#destroyRef))
+      .subscribe(() =>
+        this.errorMessage.set(getValidationErrorMessage(this.formControl!, this.inputData().validationErrorOptions))
+      );
   }
 
   togglePasswordVisibility(event: MouseEvent) {
@@ -104,7 +120,7 @@ export class FormInput {
     event.stopPropagation();
   }
 
-  getOptionItem(itemId: string): OptionInfo | undefined {
+  getOptionItem(itemId: T): OptionInfo | undefined {
     return this.allOptions().find((item) => item.id === itemId);
   }
 
@@ -112,13 +128,21 @@ export class FormInput {
     const currentValue = [...this.selectedItemIds(), event.option.value];
 
     this.selectedItemIds.set(currentValue);
-    this.formControl()?.setValue(currentValue);
+    this.formControl?.setValue(currentValue);
 
     event.option.deselect();
+    this.currentSearch.set('');
   }
 
-  addChip() {
+  addChip(event: MatChipInputEvent) {
     this.currentSearch.set('');
+    const value = (event.value || '').trim();
+    if (!value) return;
+
+    const matAutocomplete = this.matAutocomplete();
+    if (matAutocomplete && matAutocomplete.options.length > 0) {
+      matAutocomplete._emitSelectEvent(matAutocomplete.options.first);
+    }
   }
 
   removeChip(itemIndex: number, selectedOptionItem?: OptionInfo) {
@@ -126,20 +150,17 @@ export class FormInput {
     currentValue.splice(itemIndex, 1);
 
     this.selectedItemIds.set(currentValue);
-    this.formControl()?.setValue(currentValue);
+    this.formControl?.setValue(currentValue);
 
     this.#announcer.announce(`Removed ${selectedOptionItem?.label || 'item'}`);
   }
 
-  #getFilteredOptions(): OptionInfo[] {
-    const currentSearch = this.currentSearch();
-    const allOptions = this.allOptions();
+  #getFilteredOptions(currentSearch: string, allOptions: OptionInfo[]): OptionInfo[] {
     if (!currentSearch) return allOptions;
-
     return allOptions.filter((option) => option.label.toLowerCase().includes(currentSearch.trim().toLowerCase()));
   }
 
-  #resolveOptions(inputData: InputBase<string>) {
+  #resolveOptions(inputData: InputBase<T | T[]>) {
     if (inputData.hasSyncOptions()) {
       this.allOptions.set(inputData.options || []);
     } else if (inputData.hasAsyncOptions()) {

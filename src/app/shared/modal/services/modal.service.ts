@@ -1,7 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
+import { ComponentWithForm } from '@shared/models';
 import { ModalDialog, ModalForm } from '../components';
-import { ComponentWithForm, DialogData, FormDialogReference, FormModalData, ModalConfig } from '../models';
+import { DialogData, FormDialogReference, FormModalData, ModalConfig } from '../models';
 
 @Injectable({
   providedIn: 'root',
@@ -12,26 +13,34 @@ export class ModalService {
   openDialog(modalConfig: ModalConfig<DialogData>): MatDialogRef<ModalDialog, boolean> {
     const dialogReference = this.dialog.open<ModalDialog, DialogData, boolean>(
       ModalDialog,
-      this.#getDialogConfig(modalConfig)
+      this.#getDialogConfig<DialogData>(modalConfig)
     );
 
     return dialogReference;
   }
 
-  openFormModal<TComponent extends ComponentWithForm>(
-    modalConfig: ModalConfig<FormModalData<TComponent>>
-  ): FormDialogReference<TComponent> {
-    const dialogReference = this.dialog.open<ModalForm<TComponent>, FormModalData<TComponent>, boolean>(
-      ModalForm,
-      this.#getDialogConfig(modalConfig)
-    );
+  openFormModal<TFormValue, TComponent extends ComponentWithForm<TFormValue>>(
+    modalConfig: ModalConfig<FormModalData<TFormValue, TComponent>>
+  ): FormDialogReference<TFormValue, TComponent> {
+    const dialogReference = this.dialog.open<
+      ModalForm<TFormValue, TComponent>,
+      FormModalData<TFormValue, TComponent>,
+      boolean
+    >(ModalForm, this.#getDialogConfig<FormModalData<TFormValue, TComponent>>(modalConfig));
 
-    const customDialogReference = dialogReference as unknown as FormDialogReference<TComponent>;
-    customDialogReference.onConfirm = () => dialogReference.componentInstance?.onConfirm$.asObservable();
+    const modalInstance = dialogReference.componentInstance;
+    if (!modalInstance) throw new Error('Modal component instance not found');
+
+    const customDialogReference = dialogReference as unknown as FormDialogReference<TFormValue, TComponent>;
+
+    customDialogReference.onConfirm = () => modalInstance.onConfirm$;
+    customDialogReference.setLoading = (loading: boolean) => modalInstance.setLoading(loading);
+    customDialogReference.setError = (error: string) => modalInstance.setError(error);
+
     return customDialogReference;
   }
 
-  #getDialogConfig(modalConfig: ModalConfig): MatDialogConfig {
+  #getDialogConfig<TData>(modalConfig: ModalConfig<TData>): MatDialogConfig {
     return {
       data: modalConfig.data,
       disableClose: modalConfig.disableClose ?? true,

@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivateFn, RedirectCommand, Router } from '@angular/router';
-import { map } from 'rxjs';
+import { combineLatest, filter, map } from 'rxjs';
 import { DashboardsFacade } from '@state';
 import { NOTIFICATION_MESSAGES, ROUTING_PATHS } from '@shared/constants';
 import { NotificationService } from '@shared/services';
@@ -11,8 +11,9 @@ export const isDashboardValidGuard: CanActivateFn = (route: ActivatedRouteSnapsh
   const router = inject(Router);
   const notification = inject(NotificationService);
 
-  return dashboardsFacade.userDashboardsWithRequest$.pipe(
-    map((dashboards) => dashboards.some((dashboard) => dashboard.id === route.paramMap.get('dashboardId'))),
+  return combineLatest([dashboardsFacade.userDashboards$, dashboardsFacade.areUserDashboardsLoaded$]).pipe(
+    filter(([, areLoaded]) => areLoaded),
+    map(([dashboards]) => dashboards.some((dashboard) => dashboard.id === route.paramMap.get('dashboardId'))),
     map((isDashboardValid) => {
       if (isDashboardValid) return true;
 

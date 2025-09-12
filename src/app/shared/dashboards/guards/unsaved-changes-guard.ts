@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { CanDeactivateFn } from '@angular/router';
-import { map, of, switchMap } from 'rxjs';
+import { combineLatest, map, of, switchMap } from 'rxjs';
 import { DashboardsFacade } from '@state';
 import { EDIT_MESSAGES } from '@shared/constants';
 import { DialogData, ModalConfig, ModalService } from '@shared/modal';
@@ -19,20 +19,24 @@ export const unsavedChangesGuard: CanDeactivateFn<unknown> = () => {
     autoFocus: 'dialog',
   };
 
-  return dashboardsFacade.isChangedState$.pipe(
-    switchMap((hasUnsavedChanges) =>
-      hasUnsavedChanges ? modalService.openDialog(confirmationDialogConfig).afterClosed() : of(undefined)
-    ),
-    map((confirmed) => {
-      if (confirmed === undefined) {
+  return combineLatest([dashboardsFacade.isChangedState$, dashboardsFacade.isEditMode$]).pipe(
+    switchMap(([hasUnsavedChanges, isEditMode]) => {
+      if (!isEditMode) return of(true);
+      if (!hasUnsavedChanges) {
         dashboardsFacade.exitEditMode();
-        return true;
+        return of(true);
       }
-
-      if (confirmed) {
-        dashboardsFacade.discardChanges();
-      }
-      return confirmed;
+      return modalService
+        .openDialog(confirmationDialogConfig)
+        .afterClosed()
+        .pipe(
+          map((confirmed) => {
+            if (confirmed) {
+              dashboardsFacade.discardChanges();
+            }
+            return confirmed ?? false;
+          })
+        );
     })
   );
 };

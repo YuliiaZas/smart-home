@@ -12,3 +12,4 @@ export * from './entity.enum';
 export * from './state-error';
 export * from './device-update-result';
 export * from './validation-error-options';
+export * from './component-with-form';

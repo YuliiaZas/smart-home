@@ -1,5 +1,5 @@
 import { Binding, Type } from '@angular/core';
-import { ComponentWithForm } from './component-with-form';
+import { ComponentWithForm } from '@shared/models';
 
 interface ModalConfigData {
   title: string;
@@ -19,7 +19,7 @@ export interface CustomModalData<TComponent = unknown> extends ModalConfigData {
   confirmButtonText: string;
 }
 
-export interface FormModalData<TFormComponent extends ComponentWithForm = ComponentWithForm>
+export interface FormModalData<TFormValue, TFormComponent extends ComponentWithForm<TFormValue>>
   extends CustomModalData<TFormComponent> {
   component: Type<TFormComponent>;
 }

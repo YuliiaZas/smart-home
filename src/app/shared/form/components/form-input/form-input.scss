@@ -1,5 +1,9 @@
 $input-width: 280px;
 
+.input-wrapper {
+  position: relative;
+}
+
 .input {
   min-width: $input-width;
   width: 100%;

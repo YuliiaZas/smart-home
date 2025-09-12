@@ -1,7 +1,7 @@
 import { Router } from '@angular/router';
-import { HttpEvent, HttpInterceptorFn } from '@angular/common/http';
+import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { catchError, EMPTY, Observable, switchMap, take, throwError } from 'rxjs';
+import { catchError, EMPTY, switchMap, take, throwError } from 'rxjs';
 import { HTTPStatusCode, NOTIFICATION_MESSAGES, ROUTING_PATHS } from '@shared/constants';
 import { NotificationService } from '@shared/services';
 import { LoadingStatus } from '@shared/models';
@@ -28,32 +28,28 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
     take(1),
     switchMap((userToken) => {
       if (!userToken) {
-        return logoutAndRedirect(authService, router, notification);
+        logoutAndRedirect(authService, router, notification);
+        throw new Error('No token found');
       }
 
       const modifiedRequest = request.clone({
         headers: request.headers.set('Authorization', `Bearer ${userToken}`),
       });
-
       return next(modifiedRequest);
     }),
     catchError((error) => {
       if (error.status === HTTPStatusCode.Unauthorized) {
-        return logoutAndRedirect(authService, router, notification);
+        logoutAndRedirect(authService, router, notification);
+        return EMPTY;
       }
       return throwError(() => error);
     })
   );
 };
 
-function logoutAndRedirect(
-  authService: Auth,
-  router: Router,
-  notification: NotificationService
-): Observable<HttpEvent<void>> {
+function logoutAndRedirect(authService: Auth, router: Router, notification: NotificationService) {
   notification.show(NOTIFICATION_MESSAGES.message.unauthorized);
 
   router.navigate([ROUTING_PATHS.LOGIN]);
   authService.logout();
-  return EMPTY;
 }

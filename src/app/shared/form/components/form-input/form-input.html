@@ -8,8 +8,6 @@
       }
     </mat-select>
   } @else if (inputData().controlType === inputType.CHIPS && allOptions().length) {
-    <!-- //TODO: refactor part and component -->
-    <!-- //TODO: improve autocomplete open on click event after adding/removing chips  -->
     <mat-chip-grid #chipGrid [formControlName]="inputData().controlKey">
       @for (itemId of selectedItemIds(); track $index) {
         @let selectedOptionItem = getOptionItem(itemId);
@@ -21,15 +19,20 @@
         </mat-chip-row>
       }
     </mat-chip-grid>
-    <input
-      #optionInput
-      placeholder="Search"
-      [(ngModel)]="currentSearch"
-      [ngModelOptions]="{ standalone: true }"
-      [matChipInputFor]="chipGrid"
-      [matAutocomplete]="auto"
-      (matChipInputTokenEnd)="addChip()"
-    />
+    <div class="input-wrapper">
+      <input
+        #optionInput
+        placeholder="Search"
+        [(ngModel)]="currentSearch"
+        [ngModelOptions]="{ standalone: true }"
+        [matChipInputFor]="chipGrid"
+        [matAutocomplete]="auto"
+        (matChipInputTokenEnd)="addChip($event)"
+      />
+      @if (isLoadingOptions()) {
+        <app-spinner [small]="true"></app-spinner>
+      }
+    </div>
 
     <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectedChip($event); optionInput.value = ''">
       @for (option of filteredOptions(); track option) {
@@ -50,16 +53,18 @@
 
   @switch (inputData().controlType) {
     @case (inputType.PASSWORD) {
-      @let passwordState = currentPasswordState();
-      @if (passwordState) {
-        <button matSuffix matIconButton [title]="passwordState.title" (click)="togglePasswordVisibility($event)">
-          <mat-icon>{{ passwordState.icon }}</mat-icon>
-        </button>
-      }
+      <button
+        matSuffix
+        matIconButton
+        [title]="currentPasswordState()?.title"
+        (click)="togglePasswordVisibility($event)"
+      >
+        <mat-icon>{{ currentPasswordState()?.icon }}</mat-icon>
+      </button>
     }
 
     @case (inputType.ICON) {
-      <mat-icon matSuffix>{{ formControl()?.value }}</mat-icon>
+      <mat-icon matSuffix>{{ formControl?.value }}</mat-icon>
     }
   }
 
@@ -67,8 +72,8 @@
     <mat-hint [innerHTML]="inputData().hint | safeHtml"></mat-hint>
   }
 
-  @if (formControl()?.touched && formControl()?.invalid) {
-    <mat-error>{{ getErrorMessage() }}</mat-error>
+  @if (formControl?.touched && formControl?.invalid) {
+    <mat-error>{{ errorMessage() }}</mat-error>
   }
 </mat-form-field>
 

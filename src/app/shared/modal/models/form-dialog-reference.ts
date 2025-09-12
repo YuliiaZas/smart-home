@@ -1,10 +1,9 @@
 import { MatDialogRef } from '@angular/material/dialog';
-import { Observable } from 'rxjs';
-import { FormGroup } from '@angular/forms';
-import { ModalForm } from '../components';
-import { ComponentWithForm } from './component-with-form';
+import { ComponentWithForm } from '@shared/models';
+import { ModalFormFacade, ModalFormInterface } from './modal-form-interface';
 
-export interface FormDialogReference<TComponent extends ComponentWithForm>
-  extends MatDialogRef<ModalForm<TComponent>, boolean> {
-  onConfirm: () => Observable<FormGroup>;
+export interface FormDialogReference<TFormValue, TComponent extends ComponentWithForm<TFormValue>>
+  extends MatDialogRef<ModalFormInterface<TFormValue, TComponent>, boolean>,
+    Omit<ModalFormFacade<TFormValue>, 'onConfirm$'> {
+  onConfirm: () => ModalFormFacade<TFormValue>['onConfirm$'];
 }

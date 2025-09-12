@@ -4,13 +4,15 @@
 
 <div class="container">
   <h1 class="title">Welcome home!</h1>
-  <form [formGroup]="loginForm" class="form" (focusin)="formFocus()">
-    @for (controlInfo of loginControlsInfo; track $index) {
-      <app-form-input [inputData]="controlInfo"></app-form-input>
-    }
-
-    <mat-error>{{ errorMessage() }}</mat-error>
-
-    <button class="button" matButton="filled" [disabled]="loginForm.invalid" (click)="login()">Log in</button>
-  </form>
+  <app-base-form
+    class="form"
+    [controlsInfo]="loginControlsInfo"
+    [showError]="true"
+    [errorMessage]="errorMessage()"
+    [submitButtonText]="'Log in'"
+    [disableSubmitWhileInvalid]="true"
+    [globalControlsErrors]="globalControlsErrors()"
+    (formFocus)="formFocus()"
+    (formSubmit)="login($event)"
+  ></app-base-form>
 </div>
