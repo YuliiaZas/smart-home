@@ -1,5 +1,5 @@
 import { createFeature, createReducer, createSelector, on } from '@ngrx/store';
-import { FailureAction, LoadingStatus } from '@shared/models';
+import { FailureAction, LoadingStatus, StateError } from '@shared/models';
 import { currentDashboardActions, currentDashboardApiActions } from './current-dashboard.actions';
 
 interface CurrentDashboardState {
@@ -7,7 +7,7 @@ interface CurrentDashboardState {
   loadingStatus: LoadingStatus;
   dashboardId: string | null;
   isEditMode: boolean;
-  error: { action: FailureAction; error: Error } | null;
+  error: { action: FailureAction; error: StateError['error'] } | null;
 }
 
 const initialState: CurrentDashboardState = {

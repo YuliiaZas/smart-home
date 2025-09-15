@@ -1,11 +1,11 @@
-import { FailureAction, HomeItemInfo, LoadingStatus } from '@shared/models';
+import { FailureAction, HomeItemInfo, LoadingStatus, StateError } from '@shared/models';
 import { createEntityAdapter, EntityState } from '@ngrx/entity';
 import { createFeature, createReducer, createSelector, on } from '@ngrx/store';
 import { homeItemsActions, homeItemsApiActions } from './home-items.actions';
 
 interface HomeItemsState extends EntityState<HomeItemInfo> {
   allItemsLoadingStatus: LoadingStatus;
-  error: { action: FailureAction; error: Error } | null;
+  error: { action: FailureAction; error: StateError['error'] } | null;
 }
 
 const homeItemsAdapter = createEntityAdapter<HomeItemInfo>({
