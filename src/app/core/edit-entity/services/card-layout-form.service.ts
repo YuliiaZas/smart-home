@@ -33,12 +33,12 @@ export class CardLayoutFormService extends BaseEditFormService<Pick<CardInfo, 'i
   addNew(tabId: string): Observable<void> {
     const controlsInfo = this.createInputsData();
     const title = EDIT_MESSAGES.createEntity(this.#entity);
-    const currentTabCardsIds = this.cardsOrderedByTab()[tabId] || [];
+    const cardsIds = Object.values(this.cardsOrderedByTab()).flat();
 
     return this.getSubmittedValueFromCreatedForm({
       title,
       controlsInfo,
-      initDataId: () => getUniqueId(getKebabCase(tabId), currentTabCardsIds),
+      initDataId: () => getUniqueId(getKebabCase(tabId), cardsIds),
       submitHandler: (cardInfo) => this.#cardsFacade.addCard(tabId, cardInfo),
     });
   }
