@@ -13,12 +13,12 @@ import { BaseEditFormService } from './base-edit-form.service';
   providedIn: 'root',
 })
 export class CardDataFormService extends BaseEditFormService<Omit<HomeCardWithItemsIdsInfo, 'layout'>> {
-  private cardsFacade = inject(CardsFacade);
-  private homeItemsFacade = inject(HomeItemsFacade);
+  #cardsFacade = inject(CardsFacade);
+  #homeItemsFacade = inject(HomeItemsFacade);
   #entity = Entity.CARD;
 
-  cardsOrderedByTab = toSignal(this.cardsFacade.cardsOrderedByTab$, { initialValue: {} as Record<string, string[]> });
-  allHomeItems = toSignal(this.homeItemsFacade.allHomeItems$, { initialValue: [] });
+  cardsOrderedByTab = toSignal(this.#cardsFacade.cardsOrderedByTab$, { initialValue: {} as Record<string, string[]> });
+  allHomeItems = toSignal(this.#homeItemsFacade.allHomeItems$, { initialValue: [] });
 
   protected createInputsData(cardInfo?: Omit<HomeCardWithItemsIdsInfo, 'layout'>): InputBase<string | string[]>[] {
     return [
@@ -29,7 +29,7 @@ export class CardDataFormService extends BaseEditFormService<Omit<HomeCardWithIt
       }),
       new InputChips({
         controlKey: 'itemIds',
-        optionsAsync: this.homeItemsFacade.allHomeItems$,
+        optionsAsync: this.#homeItemsFacade.allHomeItems$,
         validators: [
           CustomValidators.maxLengthConditional(
             HOME_ITEMS_NUMBER_FOR_LAYOUT,
@@ -42,11 +42,11 @@ export class CardDataFormService extends BaseEditFormService<Omit<HomeCardWithIt
     ];
   }
 
-  addNew(): Observable<Omit<HomeCardWithItemsIdsInfo, 'layout'> | null> {
+  addNew(): Observable<void> {
     return EMPTY;
   }
 
-  edit(cardInfo: HomeCardWithItemsIdsInfo): Observable<Omit<HomeCardWithItemsIdsInfo, 'layout'> | null> {
+  edit(cardInfo: HomeCardWithItemsIdsInfo): Observable<void> {
     const controlsInfo = this.createInputsData(cardInfo);
     const title = EDIT_MESSAGES.editEntity(this.#entity);
 
@@ -54,6 +54,8 @@ export class CardDataFormService extends BaseEditFormService<Omit<HomeCardWithIt
       title,
       controlsInfo,
       initDataId: cardInfo.id,
+      submitHandler: (cardInfoValue) => this.#cardsFacade.changeCurrentCard(cardInfoValue),
+      cancelHandler: () => this.#cardsFacade.discardCurrentCardChanges(),
     });
   }
 }

@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { combineLatest, distinctUntilChanged, map, Observable, of, pairwise, switchMap, take } from 'rxjs';
+import { combineLatest, distinctUntilChanged, filter, map, Observable, of, pairwise, switchMap, take } from 'rxjs';
 import { DashboardInfo, FailureAction, LoadingStatus, StateError } from '@shared/models';
 import { Store } from '@ngrx/store';
 import { Auth } from '@core/auth';
@@ -51,8 +51,8 @@ export class DashboardsFacade {
 
   get addDashboardError$(): Observable<FailureAction | null> {
     return this.#store.select(dashboardsListFeature.selectError).pipe(
-      map((error: StateError | null) => (error?.action === FailureAction.AddDashboard ? error.action : null)),
-      distinctUntilChanged()
+      filter((error) => error !== null),
+      map((error: StateError) => (error.action === FailureAction.AddDashboard ? error.action : null))
     );
   }
 

@@ -14,11 +14,11 @@ import { BaseEditFormService } from './base-edit-form.service';
   providedIn: 'root',
 })
 export class TabInfoFormService extends BaseEditFormService<EntityInfo> {
-  private tabsFacade = inject(TabsFacade);
+  #tabsFacade = inject(TabsFacade);
   #entity = Entity.TAB;
 
-  userTabsTitles = toSignal(this.tabsFacade.tabsTitles$, { initialValue: [] });
-  userTabsIds = toSignal(this.tabsFacade.tabsIds$, { initialValue: [] });
+  userTabsTitles = toSignal(this.#tabsFacade.tabsTitles$, { initialValue: [] });
+  userTabsIds = toSignal(this.#tabsFacade.tabsIds$, { initialValue: [] });
 
   protected createInputsData(dashboardInfo?: EntityInfo): InputBase<string>[] {
     return [
@@ -36,7 +36,7 @@ export class TabInfoFormService extends BaseEditFormService<EntityInfo> {
     ];
   }
 
-  addNew(): Observable<EntityInfo | null> {
+  addNew(): Observable<void> {
     const controlsInfo = this.createInputsData();
     const title = EDIT_MESSAGES.createEntity(this.#entity);
 
@@ -44,15 +44,21 @@ export class TabInfoFormService extends BaseEditFormService<EntityInfo> {
       title,
       controlsInfo,
       initDataId: (tabInfo) => getUniqueId(getKebabCase(tabInfo.title), this.userTabsIds()),
+      submitHandler: (tabInfo) => this.#tabsFacade.addTab(tabInfo),
     });
   }
 
-  edit(entityInfo: EntityInfo): Observable<EntityInfo | null> {
+  edit(entityInfo: EntityInfo): Observable<void> {
     if (!entityInfo) return EMPTY;
 
     const controlsInfo = this.createInputsData(entityInfo);
     const title = EDIT_MESSAGES.renameEntity(this.#entity);
 
-    return this.getSubmittedValueFromCreatedForm({ title, controlsInfo, initDataId: entityInfo.id });
+    return this.getSubmittedValueFromCreatedForm({
+      title,
+      controlsInfo,
+      initDataId: entityInfo.id,
+      submitHandler: (tabInfo) => this.#tabsFacade.renameTab(tabInfo),
+    });
   }
 }

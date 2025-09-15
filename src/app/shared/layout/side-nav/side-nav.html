@@ -16,7 +16,7 @@
 
     <mat-nav-list class="nav-content" aria-label="Dashboards">
       <ul>
-        @for (nav of navItems(); track nav) {
+        @for (nav of navItems(); track nav.id) {
           <li class="nav-item" routerLinkActive="nav-item__active" [routerLinkActiveOptions]="{ exact: false }">
             <a mat-list-item [routerLink]="nav.link" [attr.aria-label]="nav.title">
               @if (nav.icon) {

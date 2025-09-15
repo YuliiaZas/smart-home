@@ -1,6 +1,6 @@
 import { Component, DestroyRef, inject } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   NavigationCancel,
   NavigationEnd,
@@ -15,7 +15,7 @@ import { SideNav } from '@shared/layout/side-nav/side-nav';
 import { Spinner } from '@shared/components';
 import { Auth } from '@core/auth';
 import { ROUTING_PATHS } from '@shared/constants';
-import { DashboardInfo, FailureAction, Link } from '@shared/models';
+import { Link } from '@shared/models';
 import { DashboardInfoFormService } from '@core/edit-entity';
 import { DashboardsFacade } from '@state';
 
@@ -52,14 +52,6 @@ export class App {
     )
   );
 
-  addDashboardFailureAction = toSignal<FailureAction | null>(this.dashboardsFacade.addDashboardError$, {
-    initialValue: null,
-  });
-  dashboardAdded$: Observable<void> = this.dashboardsFacade.userDashboardsShouldBeRefetched$.pipe(
-    filter((isDashboardAdded) => isDashboardAdded),
-    map(() => void 0)
-  );
-
   constructor() {
     this.router.events.pipe(takeUntilDestroyed()).subscribe((event) => {
       if (event instanceof NavigationStart) {
@@ -77,15 +69,7 @@ export class App {
   }
 
   addDashboard() {
-    this.dashboardInfoFormService
-      .addNew(this.addDashboardFailureAction, this.dashboardAdded$)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((dashboardInfo: DashboardInfo | null) => {
-        if (dashboardInfo) {
-          this.dashboardsFacade.addDashboard(dashboardInfo);
-        }
-        this.dashboardsFacade.clearDashboardListError();
-      });
+    this.dashboardInfoFormService.addNew().pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
   }
 
   logout() {

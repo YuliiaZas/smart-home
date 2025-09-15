@@ -2,14 +2,13 @@ import { ChangeDetectionStrategy, Component, inject, computed, DestroyRef, effec
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { Dictionary } from '@ngrx/entity';
 import { CardList } from '@shared/components';
-import { CardInfo, Entity, HomeCardWithItemsIdsInfo } from '@shared/models';
+import { Entity, HomeCardWithItemsIdsInfo } from '@shared/models';
 import { TabsFacade, CardsFacade, DashboardsFacade, HomeItemsFacade } from '@state';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { HomeCard } from '../home-card/home-card';
 import { HomeEmpty } from '../home-empty/home-empty';
 import { CardDataFormService, CardLayoutFormService } from '@core/edit-entity';
-import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-home-tab',
@@ -55,15 +54,7 @@ export class HomeTab {
   addCard() {
     const tabId = this.#tabId();
     if (!tabId) return;
-    this.#cardLayoutFormService
-      .addNew(tabId)
-      .pipe(
-        filter((cardInfo) => cardInfo !== null),
-        takeUntilDestroyed(this.#destroyRef)
-      )
-      .subscribe((cardInfo: Pick<CardInfo, 'id' | 'layout'>) => {
-        this.#cardsFacade.addCard(tabId, cardInfo);
-      });
+    this.#cardLayoutFormService.addNew(tabId).pipe(takeUntilDestroyed(this.#destroyRef)).subscribe();
   }
 
   editCurrentCard(currentCardId: string) {
@@ -72,15 +63,6 @@ export class HomeTab {
 
     this.#homeItemsFacade.loadAllHomeItems();
 
-    this.#cardDataFormService
-      .edit(cardData)
-      .pipe(takeUntilDestroyed(this.#destroyRef))
-      .subscribe((cardData: Omit<HomeCardWithItemsIdsInfo, 'layout'> | null) => {
-        if (cardData) {
-          this.#cardsFacade.changeCurrentCard(cardData);
-        } else {
-          this.#cardsFacade.discardCurrentCardChanges();
-        }
-      });
+    this.#cardDataFormService.edit(cardData).pipe(takeUntilDestroyed(this.#destroyRef)).subscribe();
   }
 }

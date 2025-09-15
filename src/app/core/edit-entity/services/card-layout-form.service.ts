@@ -12,11 +12,11 @@ import { BaseEditFormService } from './base-edit-form.service';
   providedIn: 'root',
 })
 export class CardLayoutFormService extends BaseEditFormService<Pick<CardInfo, 'id' | 'layout'>> {
-  private cardsFacade = inject(CardsFacade);
+  #cardsFacade = inject(CardsFacade);
   #entity = Entity.CARD;
   cardLayouts = Object.values(CardLayout).map((layout) => ({ id: layout, label: LAYOUT_MESSAGES[layout] }));
 
-  cardsOrderedByTab = toSignal(this.cardsFacade.cardsOrderedByTab$, { initialValue: {} as Record<string, string[]> });
+  cardsOrderedByTab = toSignal(this.#cardsFacade.cardsOrderedByTab$, { initialValue: {} as Record<string, string[]> });
 
   protected createInputsData(): InputBase<string>[] {
     return [
@@ -30,7 +30,7 @@ export class CardLayoutFormService extends BaseEditFormService<Pick<CardInfo, 'i
     ];
   }
 
-  addNew(tabId: string): Observable<Pick<CardInfo, 'id' | 'layout'> | null> {
+  addNew(tabId: string): Observable<void> {
     const controlsInfo = this.createInputsData();
     const title = EDIT_MESSAGES.createEntity(this.#entity);
     const currentTabCardsIds = this.cardsOrderedByTab()[tabId] || [];
@@ -39,10 +39,11 @@ export class CardLayoutFormService extends BaseEditFormService<Pick<CardInfo, 'i
       title,
       controlsInfo,
       initDataId: () => getUniqueId(getKebabCase(tabId), currentTabCardsIds),
+      submitHandler: (cardInfo) => this.#cardsFacade.addCard(tabId, cardInfo),
     });
   }
 
-  edit(): Observable<CardInfo | null> {
+  edit(): Observable<void> {
     return EMPTY;
   }
 }

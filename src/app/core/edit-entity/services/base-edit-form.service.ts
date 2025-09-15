@@ -1,5 +1,5 @@
-import { inject, Injectable, inputBinding, Signal } from '@angular/core';
-import { filter, map, merge, Observable, take, tap } from 'rxjs';
+import { inject, Injectable, inputBinding } from '@angular/core';
+import { EMPTY, filter, map, merge, Observable, of, race, switchMap, take, tap } from 'rxjs';
 import { EDIT_MESSAGES } from '@shared/constants';
 import { BaseForm, InputBase } from '@shared/form';
 import { FormDialogReference, ModalService } from '@shared/modal';
@@ -10,72 +10,102 @@ import { FormDialogReference, ModalService } from '@shared/modal';
 export abstract class BaseEditFormService<TFormValue> {
   #modalService = inject(ModalService);
 
-  abstract addNew(...arguments_: unknown[]): Observable<TFormValue | null>;
-  abstract edit(entityInfo: TFormValue): Observable<TFormValue | null>;
+  abstract addNew(...arguments_: unknown[]): Observable<void>;
+  abstract edit(entityInfo: TFormValue): Observable<void>;
 
   protected abstract createInputsData(entityInfo?: TFormValue): InputBase<TFormValue[keyof TFormValue]>[];
 
+  // TODO: rename (formDialog ?)
   protected getSubmittedValueFromCreatedForm({
     title,
     controlsInfo,
     initDataId,
-    errorMessage,
-    closeObservable,
+    submitHandler,
+    cancelHandler,
+    successObservable,
+    errorObservable,
   }: {
     title: string;
     controlsInfo: InputBase<TFormValue[keyof TFormValue]>[];
     initDataId?: string | ((data: TFormValue) => string);
-    errorMessage?: Signal<string>;
-    closeObservable?: Observable<void>;
-  }): Observable<TFormValue | null> {
+    submitHandler: (formValue: TFormValue) => void;
+    cancelHandler?: () => void;
+    successObservable?: Observable<void>;
+    errorObservable?: Observable<string | null>;
+  }): Observable<void> {
     const modalForm = this.#createModalForm({
       title,
       controlsInfo,
-      errorMessage,
     });
 
-    if (closeObservable) {
-      closeObservable.pipe(take(1)).subscribe(() => modalForm.close(true));
-    }
+    let isSubmitting = false;
 
     const submit$ = modalForm.onConfirm().pipe(
-      tap(() => {
-        if (!closeObservable) modalForm.close(true);
-      }),
-      map((formData) => this.#addIdToFormValue(formData, initDataId))
+      filter(() => !isSubmitting),
+      tap(() => (isSubmitting = true)),
+      map((formValue) => this.#addIdToFormValue(formValue, initDataId)),
+      switchMap((formData) => {
+        submitHandler(formData);
+
+        if (!successObservable && !errorObservable) {
+          modalForm.close();
+          return of(void 0);
+        }
+
+        modalForm.setLoading(true);
+
+        return race([
+          successObservable!.pipe(
+            take(1),
+            tap(() => {
+              isSubmitting = false;
+              modalForm.setLoading(false);
+              modalForm.close();
+            })
+          ),
+          errorObservable!.pipe(
+            filter((error) => error !== null),
+            take(1),
+            tap((errorMessage) => {
+              isSubmitting = false;
+              modalForm.setLoading(false);
+              modalForm.setError(errorMessage);
+            }),
+            switchMap(() => EMPTY)
+          ),
+        ]);
+      })
     );
 
-    return merge(submit$, this.#getFormCancelEvent(modalForm));
+    const cancel$ = modalForm.afterClosed().pipe(
+      filter((result) => result === false),
+      tap(() => {
+        if (cancelHandler) {
+          cancelHandler();
+        }
+      }),
+      map(() => void 0)
+    );
+
+    return merge(submit$, cancel$).pipe(take(1));
   }
 
   #createModalForm({
     controlsInfo,
     title,
-    errorMessage,
   }: {
     title: string;
     controlsInfo: InputBase<TFormValue[keyof TFormValue]>[];
-    errorMessage?: Signal<string>;
   }): FormDialogReference<TFormValue, BaseForm<TFormValue>> {
     return this.#modalService.openFormModal({
       data: {
         title: title,
         component: BaseForm<TFormValue>,
-        componentBindings: [
-          inputBinding('controlsInfo', () => controlsInfo),
-          inputBinding('errorMessage', () => (errorMessage ? errorMessage() : '')),
-        ],
+        componentBindings: [inputBinding('controlsInfo', () => controlsInfo)],
         cancelButtonText: EDIT_MESSAGES.cancelButton,
         confirmButtonText: EDIT_MESSAGES.applyButton,
       },
     });
-  }
-
-  #getFormCancelEvent(modalForm: FormDialogReference<TFormValue, BaseForm<TFormValue>>): Observable<null> {
-    return modalForm.afterClosed().pipe(
-      filter((result) => result === false),
-      map(() => null)
-    );
   }
 
   #addIdToFormValue(formData: TFormValue, initDataId?: string | ((data: TFormValue) => string)): TFormValue {

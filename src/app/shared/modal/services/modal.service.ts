@@ -13,7 +13,7 @@ export class ModalService {
   openDialog(modalConfig: ModalConfig<DialogData>): MatDialogRef<ModalDialog, boolean> {
     const dialogReference = this.dialog.open<ModalDialog, DialogData, boolean>(
       ModalDialog,
-      this.#getDialogConfig(modalConfig)
+      this.#getDialogConfig<DialogData>(modalConfig)
     );
 
     return dialogReference;
@@ -26,14 +26,21 @@ export class ModalService {
       ModalForm<TFormValue, TComponent>,
       FormModalData<TFormValue, TComponent>,
       boolean
-    >(ModalForm, this.#getDialogConfig(modalConfig));
+    >(ModalForm, this.#getDialogConfig<FormModalData<TFormValue, TComponent>>(modalConfig));
+
+    const modalInstance = dialogReference.componentInstance;
+    if (!modalInstance) throw new Error('Modal component instance not found');
 
     const customDialogReference = dialogReference as unknown as FormDialogReference<TFormValue, TComponent>;
-    customDialogReference.onConfirm = () => dialogReference.componentInstance?.onConfirm;
+
+    customDialogReference.onConfirm = () => modalInstance.onConfirm$;
+    customDialogReference.setLoading = (loading: boolean) => modalInstance.setLoading(loading);
+    customDialogReference.setError = (error: string) => modalInstance.setError(error);
+
     return customDialogReference;
   }
 
-  #getDialogConfig(modalConfig: ModalConfig): MatDialogConfig {
+  #getDialogConfig<TData>(modalConfig: ModalConfig<TData>): MatDialogConfig {
     return {
       data: modalConfig.data,
       disableClose: modalConfig.disableClose ?? true,

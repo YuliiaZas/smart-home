@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { filter } from 'rxjs';
 import { Dictionary } from '@ngrx/entity';
 import { MatTabLink, MatTabNav, MatTabNavPanel } from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
@@ -74,15 +73,7 @@ export class Home {
     const currentDashboardInfo = this.currentDashboardInfo();
     if (!currentDashboardInfo) return;
 
-    this.#dashboardInfoFormService
-      .edit(currentDashboardInfo)
-      .pipe(
-        filter((dashboardInfo) => dashboardInfo !== null),
-        takeUntilDestroyed(this.#destroyRef)
-      )
-      .subscribe((dashboardInfo: DashboardInfo) => {
-        this.#dashboardsFacade.changeDashboardInfo(dashboardInfo);
-      });
+    this.#dashboardInfoFormService.edit(currentDashboardInfo).pipe(takeUntilDestroyed(this.#destroyRef)).subscribe();
   }
 
   deleteCurrentDashboard() {
@@ -93,30 +84,14 @@ export class Home {
   }
 
   addTab() {
-    this.#tabInfoFormService
-      .addNew()
-      .pipe(
-        filter((tabInfo) => tabInfo !== null),
-        takeUntilDestroyed(this.#destroyRef)
-      )
-      .subscribe((tabInfo: EntityInfo) => {
-        this.#tabsFacade.addTab(tabInfo);
-      });
+    this.#tabInfoFormService.addNew().pipe(takeUntilDestroyed(this.#destroyRef)).subscribe();
   }
 
   renameCurrentTab() {
     const currentTabInfo = this.currentTabInfo();
     if (!currentTabInfo) return;
 
-    this.#tabInfoFormService
-      .edit(currentTabInfo)
-      .pipe(
-        filter((tabInfo) => tabInfo !== null),
-        takeUntilDestroyed(this.#destroyRef)
-      )
-      .subscribe((tabInfo: EntityInfo) => {
-        this.#tabsFacade.renameTab(tabInfo);
-      });
+    this.#tabInfoFormService.edit(currentTabInfo).pipe(takeUntilDestroyed(this.#destroyRef)).subscribe();
   }
 
   deleteCurrentTab() {

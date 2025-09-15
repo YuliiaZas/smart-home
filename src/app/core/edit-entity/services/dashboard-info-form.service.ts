@@ -1,11 +1,11 @@
-import { computed, inject, Injectable, Signal } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Validators } from '@angular/forms';
-import { EMPTY, Observable } from 'rxjs';
+import { EMPTY, filter, map, Observable } from 'rxjs';
 import { CustomValidators } from '@shared/validation';
 import { InputBase, InputIcon, InputText } from '@shared/form';
 import { DashboardInfo } from '@shared/models/dashboard-info';
-import { Entity, FailureAction } from '@shared/models';
+import { Entity } from '@shared/models';
 import { EDIT_MESSAGES, failureActionMessages, ID_VALIDATION_MESSAGES } from '@shared/constants';
 import { DashboardsFacade } from '@state';
 import { BaseEditFormService } from './base-edit-form.service';
@@ -18,26 +18,32 @@ export class DashboardInfoFormService extends BaseEditFormService<DashboardInfo>
   #entity = Entity.DASHBOARD;
   userDashboardIds = toSignal(this.#dashboardsFacade.userDashboardIds$, { initialValue: [] });
 
-  addNew(
-    failureAction: Signal<FailureAction | null>,
-    closeObservable: Observable<void>
-  ): Observable<DashboardInfo | null> {
+  dashboardAdded$ = this.#dashboardsFacade.userDashboardsShouldBeRefetched$.pipe(
+    filter((isDashboardAdded) => isDashboardAdded),
+    map(() => void 0)
+  );
+
+  addDashboardError$ = this.#dashboardsFacade.addDashboardError$.pipe(
+    map((failureActionKey) => (failureActionKey ? failureActionMessages[failureActionKey] : ''))
+  );
+
+  addNew(): Observable<void> {
     const controlsInfo = this.createInputsData(undefined, true);
     const title = EDIT_MESSAGES.createEntity(this.#entity);
-    const errorMessage = computed(() => {
-      const failureActionKey = failureAction();
-      return failureActionKey ? failureActionMessages[failureActionKey] : '';
-    });
 
     return this.getSubmittedValueFromCreatedForm({
       title,
       controlsInfo,
-      errorMessage,
-      closeObservable,
+      submitHandler: (dashboardInfo) => {
+        this.#dashboardsFacade.clearDashboardListError();
+        this.#dashboardsFacade.addDashboard(dashboardInfo);
+      },
+      successObservable: this.dashboardAdded$,
+      errorObservable: this.addDashboardError$,
     });
   }
 
-  edit(dashboardInfo: DashboardInfo): Observable<DashboardInfo | null> {
+  edit(dashboardInfo: DashboardInfo): Observable<void> {
     if (!dashboardInfo) return EMPTY;
 
     const controlsInfo = this.createInputsData(dashboardInfo);
@@ -47,6 +53,9 @@ export class DashboardInfoFormService extends BaseEditFormService<DashboardInfo>
       title,
       controlsInfo,
       initDataId: dashboardInfo.id,
+      submitHandler: (dashboardInfo) => {
+        this.#dashboardsFacade.changeDashboardInfo(dashboardInfo);
+      },
     });
   }
 
