@@ -5,7 +5,7 @@ import { EMPTY, Observable } from 'rxjs';
 import { CustomValidators } from '@shared/validation';
 import { InputBase, InputText } from '@shared/form';
 import { Entity, EntityInfo } from '@shared/models';
-import { EDIT_MESSAGES } from '@shared/constants';
+import { EDIT_MESSAGES, VALIDATION_LIMITS } from '@shared/constants';
 import { getKebabCase, getUniqueId } from '@shared/utils';
 import { TabsFacade } from '@state';
 import { BaseEditFormService } from './base-edit-form.service';
@@ -27,7 +27,7 @@ export class TabInfoFormService extends BaseEditFormService<EntityInfo> {
         label: EDIT_MESSAGES.label.title(this.#entity),
         required: true,
         validators: [
-          Validators.maxLength(50),
+          Validators.maxLength(VALIDATION_LIMITS.TAB_TITLE_MAX_LENGTH),
           CustomValidators.uniqueWithinArray(this.userTabsTitles(), dashboardInfo?.title),
         ],
         validationErrorOptions: { uniqueArea: this.#entity },

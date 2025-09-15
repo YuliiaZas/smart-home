@@ -6,7 +6,12 @@ import { CustomValidators } from '@shared/validation';
 import { InputBase, InputIcon, InputText } from '@shared/form';
 import { DashboardInfo } from '@shared/models/dashboard-info';
 import { Entity } from '@shared/models';
-import { EDIT_MESSAGES, failureActionMessages, ID_VALIDATION_MESSAGES } from '@shared/constants';
+import {
+  EDIT_MESSAGES,
+  failureActionMessages,
+  PATTERN_VALIDATION_MESSAGES,
+  VALIDATION_LIMITS,
+} from '@shared/constants';
 import { DashboardsFacade } from '@state';
 import { BaseEditFormService } from './base-edit-form.service';
 
@@ -63,7 +68,7 @@ export class DashboardInfoFormService extends BaseEditFormService<DashboardInfo>
         controlKey: 'title',
         label: EDIT_MESSAGES.label.title(this.#entity),
         required: true,
-        validators: [Validators.maxLength(50)],
+        validators: [Validators.maxLength(VALIDATION_LIMITS.DASHBOARD_TITLE_MAX_LENGTH)],
         value: dashboardInfo?.title,
       }),
       new InputIcon({
@@ -81,11 +86,11 @@ export class DashboardInfoFormService extends BaseEditFormService<DashboardInfo>
             label: EDIT_MESSAGES.label.id(this.#entity),
             required: true,
             validators: [
-              Validators.maxLength(30),
-              Validators.pattern(ID_VALIDATION_MESSAGES.regExp),
+              Validators.maxLength(VALIDATION_LIMITS.DASHBOARD_ID_MAX_LENGTH),
+              Validators.pattern(VALIDATION_LIMITS.PATTERN.ID),
               CustomValidators.uniqueWithinArray(this.userDashboardIds(), dashboardInfo?.id),
             ],
-            validationErrorOptions: { uniqueArea: this.#entity, requiredPattern: ID_VALIDATION_MESSAGES.pattern },
+            validationErrorOptions: { uniqueArea: this.#entity, patternMessage: PATTERN_VALIDATION_MESSAGES.ID },
             value: dashboardInfo?.id,
           }),
           ...defaultInputs,

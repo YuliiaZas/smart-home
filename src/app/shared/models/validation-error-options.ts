@@ -3,5 +3,5 @@ import { Entity } from './enums';
 export interface ValidationErrorOptions {
   uniqueArea?: Entity;
   skipDefaultError?: boolean;
-  requiredPattern?: string;
+  patternMessage?: string;
 }

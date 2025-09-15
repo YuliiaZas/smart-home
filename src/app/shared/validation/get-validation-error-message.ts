@@ -16,9 +16,9 @@ export function getValidationErrorMessage(
 
       switch (errorKey) {
         case 'pattern': {
-          const requiredPattern =
-            validationErrorOptions?.requiredPattern || formControl.getError(errorKey).requiredPattern;
-          return ERROR_MESSAGES.formValidation[errorKey](requiredPattern);
+          const patternMessage =
+            validationErrorOptions?.patternMessage || formControl.getError(errorKey).requiredPattern;
+          return ERROR_MESSAGES.formValidation[errorKey](patternMessage);
         }
 
         case 'minlength':
