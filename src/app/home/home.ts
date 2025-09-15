@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { MatTabLink, MatTabNav, MatTabNavPanel } from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
@@ -7,6 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { Entity } from '@shared/models';
 import { EDIT_MESSAGES } from '@shared/constants';
 import { EditActionButtons, Mover, MoverButtonStyle, MoverSurroundDirective, Spinner } from '@shared/components';
+import { executeWithDestroy } from '@shared/utils';
 import { HomeService } from '@core/services';
 
 @Component({
@@ -64,7 +64,7 @@ export class Home {
   }
 
   renameCurrentDashboard() {
-    this.#homeService.renameCurrentDashboard().pipe(takeUntilDestroyed(this.#destroyRef)).subscribe();
+    executeWithDestroy(this.#homeService.renameCurrentDashboard(), this.#destroyRef);
   }
 
   deleteCurrentDashboard() {
@@ -72,11 +72,11 @@ export class Home {
   }
 
   addTab() {
-    this.#homeService.addTab().pipe(takeUntilDestroyed(this.#destroyRef)).subscribe();
+    executeWithDestroy(this.#homeService.addTab(), this.#destroyRef);
   }
 
   renameCurrentTab() {
-    this.#homeService.renameCurrentTab().pipe(takeUntilDestroyed(this.#destroyRef)).subscribe();
+    executeWithDestroy(this.#homeService.renameCurrentTab(), this.#destroyRef);
   }
 
   deleteCurrentTab() {

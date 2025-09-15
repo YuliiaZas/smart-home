@@ -1,8 +1,8 @@
 import { Component, DestroyRef, inject, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterOutlet } from '@angular/router';
 import { SideNav } from '@shared/layout/side-nav/side-nav';
 import { Spinner } from '@shared/components';
+import { executeWithDestroy } from '@shared/utils';
 import { AppService } from '@core/services';
 
 @Component({
@@ -25,16 +25,16 @@ export class App {
   readonly dashboards = this.#appService.dashboards;
 
   constructor() {
-    this.#appService.navigationStart$.pipe(takeUntilDestroyed()).subscribe(() => {
+    executeWithDestroy(this.#appService.navigationStart$, this.#destroyRef, () => {
       this.isLoading.set(true);
       this.#appService.checkAuthentication();
     });
 
-    this.#appService.navigationEnd$.pipe(takeUntilDestroyed()).subscribe(() => this.isLoading.set(false));
+    executeWithDestroy(this.#appService.navigationEnd$, this.#destroyRef, () => this.isLoading.set(false));
   }
 
   addDashboard() {
-    this.#appService.addDashboard().pipe(takeUntilDestroyed(this.#destroyRef)).subscribe();
+    executeWithDestroy(this.#appService.addDashboard(), this.#destroyRef);
   }
 
   logout() {

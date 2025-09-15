@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, OnInit, computed } from '@angular/core';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule } from '@angular/forms';
 import { combineLatest, map } from 'rxjs';
 import { Router } from '@angular/router';
@@ -9,6 +9,7 @@ import { ERROR_MESSAGES, ROUTING_PATHS } from '@shared/constants';
 import { Spinner } from '@shared/components';
 import { LoadingStatus } from '@shared/models';
 import { BaseForm, FormControlsError } from '@shared/form';
+import { executeWithDestroy } from '@shared/utils';
 import { Auth, LoginRequestInfo, SignupRequestInfo } from '@core/auth';
 import { LoginFormService } from '@core/services';
 
@@ -23,86 +24,90 @@ import { LoginFormService } from '@core/services';
   },
 })
 export class Login implements OnInit {
-  private loginFormService = inject(LoginFormService);
-  private authService = inject(Auth);
-  private router = inject(Router);
-  private destroyRef = inject(DestroyRef);
+  #loginFormService = inject(LoginFormService);
+  #authService = inject(Auth);
+  #router = inject(Router);
+  #destroyRef = inject(DestroyRef);
 
-  invalidErrorMessage = ERROR_MESSAGES.formValidation.invalidCredentials;
-  defaultErrorMessage = ERROR_MESSAGES.defaultError;
+  #invalidErrorMessage = ERROR_MESSAGES.formValidation.invalidCredentials;
+  #defaultErrorMessage = ERROR_MESSAGES.defaultError;
 
-  isLoading = toSignal(this.authService.isTokenLoading$);
+  isLoading = toSignal(this.#authService.isTokenLoading$);
 
-  loginControlsInfo = this.loginFormService.getInputsData();
-  signupControlsInfo = this.loginFormService.getInputsDataForSignup();
-  loginControlNames = computed(() => this.loginControlsInfo.map((control) => control.controlKey));
-  signupControlNames = computed(() => [this.signupControlsInfo[0].controlKey]);
+  loginControlsInfo = this.#loginFormService.getInputsData();
+  signupControlsInfo = this.#loginFormService.getInputsDataForSignup();
 
   isSignup = signal(false);
   isDataInvalid = signal(false);
 
   loginErrorMessage = signal<string>('', { equal: isEqual });
   signupErrorMessage = signal<string>('', { equal: isEqual });
+
+  #loginGlobalErrorControlNames = computed(() => this.loginControlsInfo.map((control) => control.controlKey));
+  #signupGlobalErrorControlNames = computed(() => [this.signupControlsInfo[0].controlKey]);
   loginGlobalControlsErrors = signal<FormControlsError | null>(null, { equal: isEqual });
   signupGlobalControlsErrors = signal<FormControlsError | null>(null, { equal: isEqual });
 
   ngOnInit() {
-    combineLatest([
-      this.authService.tokenLoadingStatus$.pipe(map((status) => status === LoadingStatus.Failure)),
-      this.authService.invalidCredentials$,
-    ])
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(([isFailure, invalidCredentials]) => {
-        this.isDataInvalid.set(isFailure);
-        const isSignup = this.isSignup();
-        if (isFailure && invalidCredentials) {
-          this.setErrorMessage(this.invalidErrorMessage(isSignup), isSignup);
-          this.markIsDataInvalid(true, isSignup);
-          return;
-        }
-        this.setErrorMessage(isFailure ? this.defaultErrorMessage : '', isSignup);
-      });
+    executeWithDestroy(
+      combineLatest([
+        this.#authService.tokenLoadingStatus$.pipe(map((status) => status === LoadingStatus.Failure)),
+        this.#authService.invalidCredentials$,
+      ]),
+      this.#destroyRef,
+      ([isFailure, invalidCredentials]) => this.#handleLoginFailure(isFailure, invalidCredentials)
+    );
   }
 
   setIsSignup(isSignup: boolean) {
     this.isSignup.set(isSignup);
-    this.setErrorMessage('', isSignup);
-    this.markIsDataInvalid(false, isSignup);
+    this.#setErrorMessage('', isSignup);
+    this.#markIsDataInvalid(false, isSignup);
   }
 
   formFocus() {
     const isSignup = this.isSignup();
-    this.setErrorMessage('', isSignup);
-    this.markIsDataInvalid(false, isSignup);
+    this.#setErrorMessage('', isSignup);
+    this.#markIsDataInvalid(false, isSignup);
   }
 
   login(value: LoginRequestInfo) {
-    this.authService
-      .login(value)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.router.navigate([ROUTING_PATHS.DASHBOARD]));
+    executeWithDestroy(this.#authService.login(value), this.#destroyRef, () =>
+      this.#router.navigate([ROUTING_PATHS.DASHBOARD])
+    );
   }
 
   signup(value: SignupRequestInfo) {
-    this.authService
-      .signup(value)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.router.navigate([ROUTING_PATHS.DASHBOARD]));
+    executeWithDestroy(this.#authService.signup(value), this.#destroyRef, () =>
+      this.#router.navigate([ROUTING_PATHS.DASHBOARD])
+    );
   }
 
-  private markIsDataInvalid(isInvalid: boolean, isSignup: boolean) {
+  #markIsDataInvalid(isInvalid: boolean, isSignup: boolean) {
     this.loginGlobalControlsErrors.set({
       errors: !isSignup && isInvalid ? { defaultError: true } : null,
-      controlNames: this.loginControlNames(),
+      controlNames: this.#loginGlobalErrorControlNames(),
     });
     this.signupGlobalControlsErrors.set({
       errors: isSignup && isInvalid ? { defaultError: true } : null,
-      controlNames: this.signupControlNames(),
+      controlNames: this.#signupGlobalErrorControlNames(),
     });
   }
 
-  private setErrorMessage(message: string, isSignup: boolean) {
+  #setErrorMessage(message: string, isSignup: boolean) {
     this.loginErrorMessage.set(isSignup ? '' : message);
     this.signupErrorMessage.set(isSignup ? message : '');
+  }
+
+  #handleLoginFailure(isFailure: boolean, invalidCredentials: boolean) {
+    this.isDataInvalid.set(isFailure);
+    const isSignup = this.isSignup();
+
+    if (isFailure && invalidCredentials) {
+      this.#setErrorMessage(this.#invalidErrorMessage(isSignup), isSignup);
+      this.#markIsDataInvalid(true, isSignup);
+      return;
+    }
+    this.#setErrorMessage(isFailure ? this.#defaultErrorMessage : '', isSignup);
   }
 }

@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, inject, DestroyRef, effect } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { CardList } from '@shared/components';
 import { Entity } from '@shared/models';
+import { executeWithDestroy } from '@shared/utils';
 import { HomeTabService } from '@core/services';
 import { HomeCard } from '../home-card/home-card';
 import { HomeEmpty } from '../home-empty/home-empty';
@@ -36,10 +36,10 @@ export class HomeTab {
   }
 
   addCard() {
-    this.#homeTabService.addCard().pipe(takeUntilDestroyed(this.#destroyRef)).subscribe();
+    executeWithDestroy(this.#homeTabService.addCard(), this.#destroyRef);
   }
 
   editCurrentCard(currentCardId: string) {
-    this.#homeTabService.editCurrentCard(currentCardId).pipe(takeUntilDestroyed(this.#destroyRef)).subscribe();
+    executeWithDestroy(this.#homeTabService.editCurrentCard(currentCardId), this.#destroyRef);
   }
 }

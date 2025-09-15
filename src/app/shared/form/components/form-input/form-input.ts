@@ -13,7 +13,6 @@ import {
   signal,
 } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ControlContainer, ReactiveFormsModule } from '@angular/forms';
 import { merge } from 'rxjs';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
@@ -26,7 +25,7 @@ import { MatAutocomplete, MatAutocompleteModule, MatAutocompleteSelectedEvent } 
 import { MatOption, MatSelect } from '@angular/material/select';
 import { getValidationErrorMessage } from '@shared/validation';
 import { Spinner } from '@shared/components';
-import { isObjectKey } from '@shared/utils';
+import { executeWithDestroy, isObjectKey } from '@shared/utils';
 import { SafeHtmlPipe } from '@shared/pipes';
 import { InputType, OptionInfo, PasswordDataInfo } from './models';
 import { InputBase } from './models/typed-inputs';
@@ -106,11 +105,11 @@ export class FormInput<T> implements OnInit {
       this.formControl = formGroup?.get(this.inputData().controlKey) || null;
     }
 
-    merge(...[this.formControl?.valueChanges, this.formControl?.statusChanges].filter(Boolean))
-      .pipe(takeUntilDestroyed(this.#destroyRef))
-      .subscribe(() =>
-        this.errorMessage.set(getValidationErrorMessage(this.formControl!, this.inputData().validationErrorOptions))
-      );
+    executeWithDestroy(
+      merge(...[this.formControl?.valueChanges, this.formControl?.statusChanges].filter(Boolean)),
+      this.#destroyRef,
+      () => this.errorMessage.set(getValidationErrorMessage(this.formControl!, this.inputData().validationErrorOptions))
+    );
   }
 
   togglePasswordVisibility(event: MouseEvent) {
@@ -165,17 +164,20 @@ export class FormInput<T> implements OnInit {
       this.allOptions.set(inputData.options || []);
     } else if (inputData.hasAsyncOptions()) {
       this.isLoadingOptions.set(true);
-      inputData.optionsAsync!.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe({
-        next: (options) => {
+
+      executeWithDestroy(
+        inputData.optionsAsync!,
+        this.#destroyRef,
+        (options) => {
           this.allOptions.set(options);
           this.isLoadingOptions.set(false);
         },
-        error: (error) => {
+        (error) => {
           console.error('Error loading async options:', error);
           this.allOptions.set([]);
           this.isLoadingOptions.set(false);
-        },
-      });
+        }
+      );
     }
   }
 
