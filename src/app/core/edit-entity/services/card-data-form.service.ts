@@ -50,7 +50,7 @@ export class CardDataFormService extends BaseEditFormService<Omit<HomeCardWithIt
     const controlsInfo = this.createInputsData(cardInfo);
     const title = EDIT_MESSAGES.editEntity(this.#entity);
 
-    return this.getSubmittedValueFromCreatedForm({
+    return this.handleFormModal({
       title,
       controlsInfo,
       initDataId: cardInfo.id,

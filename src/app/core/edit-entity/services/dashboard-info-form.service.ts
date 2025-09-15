@@ -31,7 +31,7 @@ export class DashboardInfoFormService extends BaseEditFormService<DashboardInfo>
     const controlsInfo = this.createInputsData(undefined, true);
     const title = EDIT_MESSAGES.createEntity(this.#entity);
 
-    return this.getSubmittedValueFromCreatedForm({
+    return this.handleFormModal({
       title,
       controlsInfo,
       submitHandler: (dashboardInfo) => {
@@ -49,13 +49,11 @@ export class DashboardInfoFormService extends BaseEditFormService<DashboardInfo>
     const controlsInfo = this.createInputsData(dashboardInfo);
     const title = EDIT_MESSAGES.renameEntity(this.#entity);
 
-    return this.getSubmittedValueFromCreatedForm({
+    return this.handleFormModal({
       title,
       controlsInfo,
       initDataId: dashboardInfo.id,
-      submitHandler: (dashboardInfo) => {
-        this.#dashboardsFacade.changeDashboardInfo(dashboardInfo);
-      },
+      submitHandler: (dashboardInfo) => this.#dashboardsFacade.changeDashboardInfo(dashboardInfo),
     });
   }
 

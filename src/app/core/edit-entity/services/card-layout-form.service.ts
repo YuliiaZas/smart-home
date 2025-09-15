@@ -35,7 +35,7 @@ export class CardLayoutFormService extends BaseEditFormService<Pick<CardInfo, 'i
     const title = EDIT_MESSAGES.createEntity(this.#entity);
     const cardsIds = Object.values(this.cardsOrderedByTab()).flat();
 
-    return this.getSubmittedValueFromCreatedForm({
+    return this.handleFormModal({
       title,
       controlsInfo,
       initDataId: () => getUniqueId(getKebabCase(tabId), cardsIds),

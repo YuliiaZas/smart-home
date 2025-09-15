@@ -4,6 +4,22 @@ import { EDIT_MESSAGES } from '@shared/constants';
 import { BaseForm, InputBase } from '@shared/form';
 import { FormDialogReference, ModalService } from '@shared/modal';
 
+interface FormSubmissionConfig<TFormValue> {
+  initDataId?: string | ((data: TFormValue) => string);
+  submitHandler: (formValue: TFormValue) => void;
+  successObservable?: Observable<void>;
+  errorObservable?: Observable<string | null>;
+}
+
+interface FormCancellationConfig {
+  cancelHandler?: () => void;
+}
+
+interface FormModalConfig<TFormValue> extends FormSubmissionConfig<TFormValue>, FormCancellationConfig {
+  title: string;
+  controlsInfo: InputBase<TFormValue[keyof TFormValue]>[];
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -15,8 +31,7 @@ export abstract class BaseEditFormService<TFormValue> {
 
   protected abstract createInputsData(entityInfo?: TFormValue): InputBase<TFormValue[keyof TFormValue]>[];
 
-  // TODO: rename (formDialog ?)
-  protected getSubmittedValueFromCreatedForm({
+  protected handleFormModal({
     title,
     controlsInfo,
     initDataId,
@@ -24,73 +39,78 @@ export abstract class BaseEditFormService<TFormValue> {
     cancelHandler,
     successObservable,
     errorObservable,
-  }: {
-    title: string;
-    controlsInfo: InputBase<TFormValue[keyof TFormValue]>[];
-    initDataId?: string | ((data: TFormValue) => string);
-    submitHandler: (formValue: TFormValue) => void;
-    cancelHandler?: () => void;
-    successObservable?: Observable<void>;
-    errorObservable?: Observable<string | null>;
-  }): Observable<void> {
-    const modalForm = this.#createModalForm({
+  }: FormModalConfig<TFormValue>): Observable<void> {
+    const formModal = this.#createFormModal({
       title,
       controlsInfo,
     });
 
+    return merge(
+      this.#handleFormSubmission(formModal, { initDataId, submitHandler, successObservable, errorObservable }),
+      this.#handleModalCancellation(formModal, { cancelHandler })
+    ).pipe(take(1));
+  }
+
+  #handleFormSubmission(
+    formModal: FormDialogReference<TFormValue, BaseForm<TFormValue>>,
+    config: FormSubmissionConfig<TFormValue>
+  ): Observable<void> {
     let isSubmitting = false;
 
-    const submit$ = modalForm.onConfirm().pipe(
+    return formModal.onConfirm().pipe(
       filter(() => !isSubmitting),
       tap(() => (isSubmitting = true)),
-      map((formValue) => this.#addIdToFormValue(formValue, initDataId)),
+      map((formValue) => this.#addIdToFormValue(formValue, config.initDataId)),
       switchMap((formData) => {
-        submitHandler(formData);
+        config.submitHandler(formData);
 
-        if (!successObservable && !errorObservable) {
-          modalForm.close();
+        if (!config.successObservable && !config.errorObservable) {
+          formModal.close();
           return of(void 0);
         }
 
-        modalForm.setLoading(true);
+        formModal.setLoading(true);
 
         return race([
-          successObservable!.pipe(
+          config.successObservable!.pipe(
             take(1),
             tap(() => {
               isSubmitting = false;
-              modalForm.close();
-              modalForm.setLoading(false);
+              formModal.close();
+              formModal.setLoading(false);
             })
           ),
-          errorObservable!.pipe(
+          config.errorObservable!.pipe(
             filter((error) => error !== null),
             take(1),
             tap((errorMessage) => {
               isSubmitting = false;
-              modalForm.setLoading(false);
-              modalForm.setError(errorMessage);
+              formModal.setLoading(false);
+              formModal.setError(errorMessage);
             }),
             switchMap(() => EMPTY)
           ),
         ]);
       })
     );
+  }
 
-    const cancel$ = modalForm.afterClosed().pipe(
+  #handleModalCancellation(
+    formModal: FormDialogReference<TFormValue, BaseForm<TFormValue>>,
+    config: FormCancellationConfig
+  ): Observable<void> {
+    return formModal.afterClosed().pipe(
       filter((result) => result === false),
       tap(() => {
-        if (cancelHandler) {
-          cancelHandler();
+        if (config.cancelHandler) {
+          config.cancelHandler();
         }
       }),
       map(() => void 0)
     );
-
-    return merge(submit$, cancel$).pipe(take(1));
   }
 
-  #createModalForm({
+  #createFormModal({
     controlsInfo,
     title,
   }: {
