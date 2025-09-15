@@ -6,7 +6,7 @@ import { InputBase } from '../components/form-input';
   providedIn: 'root',
 })
 export class FormControlsService {
-  toFormGroup<T>(inputsData: InputBase<T>[]): FormGroup {
+  toFormGroup<TFormValue>(inputsData: InputBase<TFormValue[keyof TFormValue]>[]): FormGroup {
     const group: Record<string, AbstractControl> = {};
 
     for (const inputData of inputsData) {
