@@ -60,8 +60,8 @@ export class EditActionButtons {
     confirmationModal
       .afterClosed()
       .pipe(
-        takeUntilDestroyed(this.#destroyRef),
-        filter((result) => result === true)
+        filter((result) => result === true),
+        takeUntilDestroyed(this.#destroyRef)
       )
       .subscribe(() => this.deleteEvent.emit());
   }
