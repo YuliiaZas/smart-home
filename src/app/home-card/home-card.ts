@@ -4,9 +4,9 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { Entity, HomeCardWithItemsIdsInfo } from '@shared/models';
 import { Card, EditActionButtons, Mover } from '@shared/components';
 import { CardsFacade, DashboardsFacade, TabsFacade } from '@state';
+import { HomeCardService } from '@core/services';
 import { HomeCardSingle } from './home-card-single/home-card-single';
 import { HomeCardMultiple } from './home-card-multiple/home-card-multiple';
-import { HomeCardService } from './home-card.service';
 
 @Component({
   selector: 'app-home-card',

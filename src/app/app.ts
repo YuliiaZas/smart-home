@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterOutlet } from '@angular/router';
 import { SideNav } from '@shared/layout/side-nav/side-nav';
 import { Spinner } from '@shared/components';
-import { AppService } from './app.service';
+import { AppService } from '@core/services';
 
 @Component({
   selector: 'app-root',

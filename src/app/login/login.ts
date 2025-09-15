@@ -5,12 +5,12 @@ import { combineLatest, map } from 'rxjs';
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { isEqual } from 'lodash';
-import { Auth, LoginRequestInfo, SignupRequestInfo } from '@core/auth';
 import { ERROR_MESSAGES, ROUTING_PATHS } from '@shared/constants';
 import { Spinner } from '@shared/components';
 import { LoadingStatus } from '@shared/models';
 import { BaseForm, FormControlsError } from '@shared/form';
-import { LoginFormService } from './services';
+import { Auth, LoginRequestInfo, SignupRequestInfo } from '@core/auth';
+import { LoginFormService } from '@core/services';
 
 @Component({
   selector: 'app-login',
@@ -99,32 +99,10 @@ export class Login implements OnInit {
       errors: isSignup && isInvalid ? { defaultError: true } : null,
       controlNames: this.signupControlNames(),
     });
-
-    // if (isSignup) {
-    //   this.loginGlobalControlsErrors.set(null);
-    //   this.signupGlobalControlsErrors.set({
-    //     errors: isInvalid ? { defaultError: true } : null,
-    //     controlNames: [this.loginControlsInfo[0].controlKey],
-    //   });
-    // } else {
-    //   this.loginGlobalControlsErrors.set({
-    //     errors: isInvalid ? { defaultError: true } : null,
-    //     controlNames: this.loginControlsInfo.map((control) => control.controlKey),
-    //   });
-    //   this.signupGlobalControlsErrors.set(null);
-    // }
   }
 
   private setErrorMessage(message: string, isSignup: boolean) {
     this.loginErrorMessage.set(isSignup ? '' : message);
     this.signupErrorMessage.set(isSignup ? message : '');
-
-    // if (isSignup) {
-    //   this.loginErrorMessage.set('');
-    //   this.signupErrorMessage.set(message);
-    // } else {
-    //   this.loginErrorMessage.set(message);
-    //   this.signupErrorMessage.set('');
-    // }
   }
 }

@@ -7,7 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { Entity } from '@shared/models';
 import { EDIT_MESSAGES } from '@shared/constants';
 import { EditActionButtons, Mover, MoverButtonStyle, MoverSurroundDirective, Spinner } from '@shared/components';
-import { HomeService } from './home.service';
+import { HomeService } from '@core/services';
 
 @Component({
   selector: 'app-home',

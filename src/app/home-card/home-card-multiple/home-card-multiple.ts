@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { UnitsPipe } from '@shared/pipes';
+import { HomeCardService } from '@core/services';
 import { DevicesService } from '@core/home-items';
 import { Sensor } from '../../home-item/home-sensor/home-sensor';
 import { Device } from '../../home-item/home-device/home-device';
 import { HomeCardBase } from '../home-card-base/home-card-base';
-import { HomeCardService } from '../home-card.service';
 
 @Component({
   selector: 'app-home-card-multiple',

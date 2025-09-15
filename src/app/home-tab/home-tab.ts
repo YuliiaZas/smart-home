@@ -4,9 +4,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { CardList } from '@shared/components';
 import { Entity } from '@shared/models';
+import { HomeTabService } from '@core/services';
 import { HomeCard } from '../home-card/home-card';
 import { HomeEmpty } from '../home-empty/home-empty';
-import { HomeTabService } from './home-tab.service';
 
 @Component({
   selector: 'app-home-tab',
