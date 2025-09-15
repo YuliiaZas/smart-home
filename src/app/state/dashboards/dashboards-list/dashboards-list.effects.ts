@@ -2,12 +2,12 @@ import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Actions, ofType, createEffect } from '@ngrx/effects';
-import { combineLatest, of } from 'rxjs';
-import { catchError, filter, map, switchMap, tap } from 'rxjs/operators';
+import { catchError, filter, map, switchMap, tap, combineLatest, of } from 'rxjs';
 import { UserDashboards } from '@core/dashboards/services';
 import { Auth } from '@core/auth';
 import { FailureAction, LoadingStatus } from '@shared/models';
 import { ROUTING_PATHS } from '@shared/constants';
+import { getErrorValue } from '@shared/utils';
 import { dashboardsListActions, dashboardsListApiActions } from './dashboards-list.actions';
 import { dashboardsListFeature } from './dashboards-list.state';
 
@@ -43,8 +43,13 @@ export class DashboardsListEffects {
       switchMap(() =>
         this.dashboardsService.fetchUserDashboards().pipe(
           map((dashboardsList) => dashboardsListApiActions.loadUserDashboardsSuccess({ dashboardsList })),
-          catchError((error) =>
-            of(dashboardsListApiActions.loadUserDashboardsFailure({ error, action: FailureAction.LoadUserDashboards }))
+          catchError((error: unknown) =>
+            of(
+              dashboardsListApiActions.loadUserDashboardsFailure({
+                error: getErrorValue(error),
+                action: FailureAction.LoadUserDashboards,
+              })
+            )
           )
         )
       )
@@ -57,10 +62,10 @@ export class DashboardsListEffects {
       switchMap(({ dashboardInfo }) =>
         this.dashboardsService.addDashboard(dashboardInfo).pipe(
           map(({ id }) => dashboardsListApiActions.addDashboardSuccess({ dashboardId: id })),
-          catchError((error) =>
+          catchError((error: unknown) =>
             of(
               dashboardsListApiActions.addDashboardFailure({
-                error,
+                error: getErrorValue(error),
                 data: dashboardInfo,
                 action: FailureAction.AddDashboard,
               })
@@ -87,10 +92,10 @@ export class DashboardsListEffects {
         this.dashboardsService.deleteDashboard(dashboardId).pipe(
           map(() => dashboardsListApiActions.deleteDashboardSuccess()),
           tap(() => this.router.navigate([ROUTING_PATHS.DASHBOARD])),
-          catchError((error) =>
+          catchError((error: unknown) =>
             of(
               dashboardsListApiActions.deleteDashboardFailure({
-                error,
+                error: getErrorValue(error),
                 action: FailureAction.DeleteCurrentDashboard,
               })
             )

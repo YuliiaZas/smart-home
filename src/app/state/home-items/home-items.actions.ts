@@ -1,5 +1,5 @@
 import { createActionGroup, emptyProps, props } from '@ngrx/store';
-import { DashboardTab, FailureAction, HomeItemInfo } from '@shared/models';
+import { DashboardTab, FailureAction, HomeItemInfo, StateError } from '@shared/models';
 
 export const homeItemsActions = createActionGroup({
   source: 'Home Items',
@@ -21,7 +21,7 @@ export const homeItemsApiActions = createActionGroup({
   events: {
     'Load All Home Items': emptyProps(),
     'Load All Home Items Success': props<{ homeItems: HomeItemInfo[] }>(),
-    'Load All Home Items Failure': props<{ action: FailureAction; error: Error }>(),
+    'Load All Home Items Failure': props<{ action: FailureAction; error: StateError['error'] }>(),
 
     'Set Device State': props<{ deviceId: string; newState: boolean }>(),
     'Set Device State Success': emptyProps(),
@@ -29,7 +29,7 @@ export const homeItemsApiActions = createActionGroup({
       deviceId: string;
       oldState: boolean;
       action: FailureAction;
-      error: Error;
+      error: StateError['error'];
     }>(),
 
     'Set State For Devices': props<{ devicesIds: string[]; newState: boolean }>(),
@@ -38,7 +38,7 @@ export const homeItemsApiActions = createActionGroup({
       devicesIds: string[];
       oldState: boolean;
       action: FailureAction;
-      error: Error;
+      error: StateError['error'];
     }>(),
   },
 });

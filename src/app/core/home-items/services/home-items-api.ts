@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { catchError, forkJoin, map, Observable, of } from 'rxjs';
 import { DeviceInfo, DeviceUpdateResult, HomeItemInfo } from '@shared/models';
+import { getErrorValueString } from '@shared/utils';
 import { environment } from 'src/environments/environments';
 
 @Injectable({
@@ -28,7 +29,7 @@ export class HomeItemsApi {
     const updateRequests = deviceIds.map((id) =>
       this.updateDeviceState(id, state).pipe(
         map((result) => ({ deviceId: id, result, error: null })),
-        catchError((error: Error) => of({ deviceId: id, result: null, error }))
+        catchError((error: unknown) => of({ deviceId: id, result: null, error: getErrorValueString(error) }))
       )
     );
 
@@ -43,7 +44,7 @@ export class HomeItemsApi {
             success.push(result);
           } else {
             failedIds.push(deviceId);
-            errorArray.push(error!.message || deviceId);
+            errorArray.push(error || deviceId);
           }
         }
         const error: Error | null =

@@ -9,3 +9,4 @@ export * from './get-unique-id';
 export * from './get-kebab-case';
 export * from './collect-dashboard-data';
 export * from './subscription.utils';
+export * from './error.utils';

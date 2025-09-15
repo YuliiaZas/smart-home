@@ -1,9 +1,9 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, ofType, createEffect } from '@ngrx/effects';
-import { of } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { catchError, map, switchMap, of } from 'rxjs';
 import { UserDashboards } from '@core/dashboards/services';
 import { FailureAction } from '@shared/models';
+import { getErrorValue } from '@shared/utils';
 import { currentDashboardActions, currentDashboardApiActions } from './current-dashboard.actions';
 
 @Injectable()
@@ -17,10 +17,10 @@ export class CurrentDashboardEffects {
       switchMap(({ dashboardId }) =>
         this.dashboardsService.fetchDashboardData(dashboardId).pipe(
           map((dashboard) => currentDashboardApiActions.loadDashboardDataSuccess({ dashboard })),
-          catchError((error) =>
+          catchError((error: unknown) =>
             of(
               currentDashboardApiActions.loadDashboardDataFailure({
-                error,
+                error: getErrorValue(error),
                 action: FailureAction.LoadCurrentDashboard,
               })
             )
@@ -43,10 +43,10 @@ export class CurrentDashboardEffects {
       switchMap(({ dashboardId, dashboardInfo, dashboardData }) =>
         this.dashboardsService.updateDashboardData(dashboardId, dashboardInfo, dashboardData).pipe(
           map((dashboard) => currentDashboardApiActions.updateDashboardSuccess({ dashboard })),
-          catchError((error) =>
+          catchError((error: unknown) =>
             of(
               currentDashboardApiActions.updateDashboardFailure({
-                error,
+                error: getErrorValue(error),
                 action: FailureAction.UpdateCurrentDashboardData,
               })
             )

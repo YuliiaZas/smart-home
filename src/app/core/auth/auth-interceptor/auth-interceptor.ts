@@ -5,6 +5,7 @@ import { catchError, EMPTY, switchMap, take, throwError } from 'rxjs';
 import { HTTPStatusCode, NOTIFICATION_MESSAGES, ROUTING_PATHS } from '@shared/constants';
 import { NotificationService } from '@shared/services';
 import { LoadingStatus } from '@shared/models';
+import { isHttpError } from '@shared/utils';
 import { Auth } from '../auth/auth';
 
 export const authInterceptor: HttpInterceptorFn = (request, next) => {
@@ -14,7 +15,8 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
 
   if (authService.getIsUrlForToken(request.url))
     return next(request).pipe(
-      catchError((error) => {
+      catchError((error: unknown) => {
+        if (!isHttpError(error)) return throwError(() => error);
         authService.setTokenLoadingStatus(LoadingStatus.Failure);
         if (error.status === HTTPStatusCode.Unauthorized || error.status === HTTPStatusCode.Conflict) {
           authService.setInvalidCredentials(true);
@@ -37,7 +39,8 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
       });
       return next(modifiedRequest);
     }),
-    catchError((error) => {
+    catchError((error: unknown) => {
+      if (!isHttpError(error)) return throwError(() => error);
       if (error.status === HTTPStatusCode.Unauthorized) {
         logoutAndRedirect(authService, router, notification);
         return EMPTY;

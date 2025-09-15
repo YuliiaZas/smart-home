@@ -2,11 +2,12 @@ import { inject, Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { map, of } from 'rxjs';
-import { catchError, filter, switchMap, withLatestFrom } from 'rxjs/operators';
+import { catchError, filter, switchMap, withLatestFrom } from 'rxjs';
+import { FailureAction } from '@shared/models';
+import { getErrorValue } from '@shared/utils';
 import { DevicesService, HomeItemsApi } from '@core/home-items';
 import { homeItemsActions, homeItemsApiActions } from './home-items.actions';
 import { homeItemsFeature } from './home-items.state';
-import { FailureAction } from '@shared/models';
 
 @Injectable()
 export class HomeItemsEffects {
@@ -46,10 +47,10 @@ export class HomeItemsEffects {
       switchMap(({ deviceId, newState }) =>
         this.homeItemsApi.updateDeviceState(deviceId, newState).pipe(
           map(() => homeItemsApiActions.setDeviceStateSuccess()),
-          catchError((error) =>
+          catchError((error: unknown) =>
             of(
               homeItemsApiActions.setDeviceStateFailure({
-                error,
+                error: getErrorValue(error),
                 action: FailureAction.ChangeDeviceState,
                 deviceId,
                 oldState: !newState,
@@ -69,7 +70,7 @@ export class HomeItemsEffects {
           map(({ failedIds, error }) => {
             return failedIds.length > 0
               ? homeItemsApiActions.setStateForDevicesFailure({
-                  error: error!,
+                  error: getErrorValue(error),
                   action: FailureAction.ChangeDevicesState,
                   devicesIds: failedIds,
                   oldState: !newState,
@@ -87,8 +88,13 @@ export class HomeItemsEffects {
       switchMap(() =>
         this.homeItemsApi.fetchAllHomeItems().pipe(
           map((homeItems) => homeItemsApiActions.loadAllHomeItemsSuccess({ homeItems })),
-          catchError((error) =>
-            of(homeItemsApiActions.loadAllHomeItemsFailure({ error, action: FailureAction.LoadAllHomeItems }))
+          catchError((error: unknown) =>
+            of(
+              homeItemsApiActions.loadAllHomeItemsFailure({
+                error: getErrorValue(error),
+                action: FailureAction.LoadAllHomeItems,
+              })
+            )
           )
         )
       )

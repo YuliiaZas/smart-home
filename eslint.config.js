@@ -4,6 +4,7 @@ import tseslint from 'typescript-eslint';
 import angular from 'angular-eslint';
 import eslintPluginUnicorn from 'eslint-plugin-unicorn';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
+import rxjsX from 'eslint-plugin-rxjs-x';
 
 export default tseslint.config(
   {
@@ -15,8 +16,14 @@ export default tseslint.config(
       ...angular.configs.tsRecommended,
       eslintPluginUnicorn.configs.recommended,
       eslintPluginPrettierRecommended,
+      rxjsX.configs.recommended,
     ],
     processor: angular.processInlineTemplates,
+    languageOptions: {
+      parserOptions: {
+        projectService: true,
+      },
+    },
     rules: {
       '@angular-eslint/directive-selector': [
         'error',
@@ -34,6 +41,12 @@ export default tseslint.config(
           style: 'kebab-case',
         },
       ],
+      'rxjs-x/no-unsafe-takeuntil': [
+        'error',
+        {
+          alias: ['takeUntilDestroyed'],
+        },
+      ],
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/no-unused-vars': [
         'error',
@@ -45,6 +58,7 @@ export default tseslint.config(
       'unicorn/no-useless-undefined': 'off',
       'unicorn/no-null': 'off',
       'unicorn/consistent-function-scoping': ['error', { checkArrowFunctions: false }],
+      'unicorn/prevent-abbreviations': ['error', { allowList: { utils: true } }],
     },
   },
   {

@@ -1,5 +1,5 @@
 import { createActionGroup, emptyProps, props } from '@ngrx/store';
-import { DashboardInfo, FailureAction } from '@shared/models';
+import { DashboardInfo, FailureAction, StateError } from '@shared/models';
 
 export const dashboardsListActions = createActionGroup({
   source: 'Dashboards List',
@@ -23,14 +23,14 @@ export const dashboardsListApiActions = createActionGroup({
   events: {
     'Load User Dashboards': emptyProps(),
     'Load User Dashboards Success': props<{ dashboardsList: DashboardInfo[] }>(),
-    'Load User Dashboards Failure': props<{ action: FailureAction; error: Error }>(),
+    'Load User Dashboards Failure': props<{ action: FailureAction; error: StateError['error'] }>(),
 
     'Add Dashboard': props<{ dashboardInfo: DashboardInfo }>(),
     'Add Dashboard Success': props<{ dashboardId: string }>(),
-    'Add Dashboard Failure': props<{ action: FailureAction; data: DashboardInfo; error: Error }>(),
+    'Add Dashboard Failure': props<{ action: FailureAction; data: DashboardInfo; error: StateError['error'] }>(),
 
     'Delete Dashboard': props<{ dashboardId: string }>(),
     'Delete Dashboard Success': emptyProps(),
-    'Delete Dashboard Failure': props<{ action: FailureAction; error: Error }>(),
+    'Delete Dashboard Failure': props<{ action: FailureAction; error: StateError['error'] }>(),
   },
 });

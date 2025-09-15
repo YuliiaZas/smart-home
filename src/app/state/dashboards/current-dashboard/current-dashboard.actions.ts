@@ -5,6 +5,7 @@ import {
   DashboardDataWithItemsIds,
   DashboardInfo,
   FailureAction,
+  StateError,
 } from '@shared/models';
 
 export const currentDashboardActions = createActionGroup({
@@ -32,7 +33,7 @@ export const currentDashboardApiActions = createActionGroup({
   events: {
     'Load Dashboard Data': props<{ dashboardId: string | null }>(),
     'Load Dashboard Data Success': props<{ dashboard: DashboardDataInfo | null }>(),
-    'Load Dashboard Data Failure': props<{ action: FailureAction; error: Error }>(),
+    'Load Dashboard Data Failure': props<{ action: FailureAction; error: StateError['error'] }>(),
 
     'Update Dashboard': props<{
       dashboardId: string;
@@ -40,6 +41,6 @@ export const currentDashboardApiActions = createActionGroup({
       dashboardData: DashboardDataWithItemsIds | null;
     }>(),
     'Update Dashboard Success': props<{ dashboard: DashboardDataInfo | null }>(),
-    'Update Dashboard Failure': props<{ action: FailureAction; error: Error }>(),
+    'Update Dashboard Failure': props<{ action: FailureAction; error: StateError['error'] }>(),
   },
 });

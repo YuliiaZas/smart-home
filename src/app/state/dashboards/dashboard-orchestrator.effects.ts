@@ -1,8 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, ofType, createEffect } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
-import { from } from 'rxjs';
-import { filter, map, switchMap, withLatestFrom } from 'rxjs/operators';
+import { filter, map, switchMap, withLatestFrom, from } from 'rxjs';
 import { DashboardTab } from '@shared/models';
 import { tabsActions, tabsFeature } from '@state/tabs';
 import { cardsActions, cardsFeature } from '@state/cards';
