@@ -59,8 +59,8 @@ export abstract class BaseEditFormService<TFormValue> {
             take(1),
             tap(() => {
               isSubmitting = false;
-              modalForm.setLoading(false);
               modalForm.close();
+              modalForm.setLoading(false);
             })
           ),
           errorObservable!.pipe(
