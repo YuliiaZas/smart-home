@@ -3,7 +3,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { Validators } from '@angular/forms';
 import { EMPTY, Observable } from 'rxjs';
 import { CustomValidators } from '@shared/validation';
-import { InputBase, InputText } from '@shared/form';
+import { FormInputsArray, InputText } from '@shared/form';
 import { Entity, EntityInfo } from '@shared/models';
 import { EDIT_MESSAGES, VALIDATION_LIMITS } from '@shared/constants';
 import { getKebabCase, getUniqueId } from '@shared/utils';
@@ -20,7 +20,7 @@ export class TabInfoFormService extends BaseEditFormService<EntityInfo> {
   userTabsTitles = toSignal(this.#tabsFacade.tabsTitles$, { initialValue: [] });
   userTabsIds = toSignal(this.#tabsFacade.tabsIds$, { initialValue: [] });
 
-  protected createInputsData(dashboardInfo?: EntityInfo): InputBase<string>[] {
+  protected createInputsData(dashboardInfo?: EntityInfo): FormInputsArray<EntityInfo> {
     return [
       new InputText({
         controlKey: 'title',

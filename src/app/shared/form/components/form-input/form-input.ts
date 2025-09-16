@@ -27,9 +27,8 @@ import { getValidationErrorMessage } from '@shared/validation';
 import { Spinner } from '@shared/components';
 import { executeWithDestroy, isObjectKey } from '@shared/utils';
 import { SafeHtmlPipe } from '@shared/pipes';
-import { InputType, OptionInfo, PasswordDataInfo } from './models';
-import { InputBase } from './models/typed-inputs';
-import { passwordDataMap } from './constants/password-data-map';
+import { InputBase, InputType, OptionInfo, PasswordDataInfo } from '@shared/form/models';
+import { passwordDataMap } from '@shared/form/constants';
 
 @Component({
   selector: 'app-form-input',
@@ -58,13 +57,13 @@ import { passwordDataMap } from './constants/password-data-map';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FormInput<T> implements OnInit {
+export class FormInput<T, TKey extends string = string, TOption = T> implements OnInit {
   #parentContainer = inject(ControlContainer);
   #destroyRef = inject(DestroyRef);
   #announcer = inject(LiveAnnouncer);
   inputType = InputType;
 
-  inputData = input.required<InputBase<T>>();
+  inputData = input.required<InputBase<T, TKey, TOption>>();
 
   formControl: AbstractControl | null = null;
 
@@ -79,11 +78,11 @@ export class FormInput<T> implements OnInit {
     return isObjectKey(currentType, passwordDataMap) ? passwordDataMap[currentType] : null;
   });
 
-  readonly selectedItemIds = linkedSignal<T[]>(() => {
+  readonly selectedItemIds = linkedSignal<TOption[]>(() => {
     const value = this.inputData().value;
     return value && Array.isArray(value) ? value : [];
   });
-  readonly allOptions = signal<OptionInfo[]>([]);
+  readonly allOptions = signal<OptionInfo<TOption>[]>([]);
   readonly isLoadingOptions = signal(false);
   readonly currentSearch = signal('');
   readonly filteredOptions = computed(() => {
@@ -119,7 +118,7 @@ export class FormInput<T> implements OnInit {
     event.stopPropagation();
   }
 
-  getOptionItem(itemId: T): OptionInfo | undefined {
+  getOptionItem(itemId: TOption): OptionInfo<TOption> | undefined {
     return this.allOptions().find((item) => item.id === itemId);
   }
 
@@ -144,7 +143,7 @@ export class FormInput<T> implements OnInit {
     }
   }
 
-  removeChip(itemIndex: number, selectedOptionItem?: OptionInfo) {
+  removeChip(itemIndex: number, selectedOptionItem?: OptionInfo<TOption>) {
     const currentValue = [...this.selectedItemIds()];
     currentValue.splice(itemIndex, 1);
 
@@ -154,12 +153,12 @@ export class FormInput<T> implements OnInit {
     this.#announcer.announce(`Removed ${selectedOptionItem?.label || 'item'}`);
   }
 
-  #getFilteredOptions(currentSearch: string, allOptions: OptionInfo[]): OptionInfo[] {
+  #getFilteredOptions(currentSearch: string, allOptions: OptionInfo<TOption>[]): OptionInfo<TOption>[] {
     if (!currentSearch) return allOptions;
     return allOptions.filter((option) => option.label.toLowerCase().includes(currentSearch.trim().toLowerCase()));
   }
 
-  #resolveOptions(inputData: InputBase<T | T[]>) {
+  #resolveOptions(inputData: InputBase<T, TKey, TOption>) {
     if (inputData.hasSyncOptions()) {
       this.allOptions.set(inputData.options || []);
     } else if (inputData.hasAsyncOptions()) {

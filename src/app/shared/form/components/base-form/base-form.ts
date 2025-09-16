@@ -4,12 +4,7 @@ import { MatError } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { ComponentWithForm } from '@shared/models';
 import { FormControlsService } from '@shared/form/services';
-import { FormInput, InputBase } from '../form-input';
-
-export interface FormControlsError {
-  errors: Record<string, boolean> | null;
-  controlNames: string[];
-}
+import { FormControlsError, FormInput, InputBase } from '@shared/form';
 
 @Component({
   selector: 'app-base-form',

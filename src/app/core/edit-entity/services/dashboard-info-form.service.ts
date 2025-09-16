@@ -3,7 +3,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { Validators } from '@angular/forms';
 import { EMPTY, filter, map, Observable } from 'rxjs';
 import { CustomValidators } from '@shared/validation';
-import { InputBase, InputIcon, InputText } from '@shared/form';
+import { FormInputsArray, InputIcon, InputText } from '@shared/form';
 import { DashboardInfo } from '@shared/models/dashboard-info';
 import { Entity } from '@shared/models';
 import {
@@ -62,7 +62,7 @@ export class DashboardInfoFormService extends BaseEditFormService<DashboardInfo>
     });
   }
 
-  protected createInputsData(dashboardInfo?: DashboardInfo, showIdField = false): InputBase<string>[] {
+  protected createInputsData(dashboardInfo?: DashboardInfo, showIdField = false): FormInputsArray<DashboardInfo> {
     const defaultInputs = [
       new InputText({
         controlKey: 'title',

@@ -1,24 +1,29 @@
 import { inject, Injectable } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { EMPTY, Observable } from 'rxjs';
-import { InputBase, InputSelect } from '@shared/form';
+import { FormInputsArray, InputSelect, OptionInfo } from '@shared/form';
 import { CardInfo, CardLayout, Entity } from '@shared/models';
 import { EDIT_MESSAGES, LAYOUT_MESSAGES } from '@shared/constants';
 import { getKebabCase, getUniqueId } from '@shared/utils';
 import { CardsFacade } from '@state';
 import { BaseEditFormService } from './base-edit-form.service';
 
+type CardInfoFormValue = Pick<CardInfo, 'layout'>;
+
 @Injectable({
   providedIn: 'root',
 })
-export class CardLayoutFormService extends BaseEditFormService<Pick<CardInfo, 'id' | 'layout'>> {
+export class CardLayoutFormService extends BaseEditFormService<CardInfoFormValue> {
   #cardsFacade = inject(CardsFacade);
   #entity = Entity.CARD;
-  cardLayouts = Object.values(CardLayout).map((layout) => ({ id: layout, label: LAYOUT_MESSAGES[layout] }));
+  cardLayouts: OptionInfo<CardLayout>[] = Object.values(CardLayout).map((layout) => ({
+    id: layout,
+    label: LAYOUT_MESSAGES[layout],
+  }));
 
   cardsOrderedByTab = toSignal(this.#cardsFacade.cardsOrderedByTab$, { initialValue: {} as Record<string, string[]> });
 
-  protected createInputsData(): InputBase<string>[] {
+  protected createInputsData(): FormInputsArray<CardInfoFormValue, CardLayout> {
     return [
       new InputSelect({
         controlKey: 'layout',

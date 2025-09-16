@@ -1,34 +1,31 @@
 import { ValidatorFn } from '@angular/forms';
-import { Observable } from 'rxjs';
 import { ValidationErrorOptions } from '@shared/models';
 import { InputType, OptionInfo } from '..';
 import { InputBase } from './input-base';
+import { Observable } from 'rxjs';
 
-export class InputChips<K extends OptionInfo> extends InputBase<string> {
-  override controlType = InputType.CHIPS;
-  override value: string[];
+export class InputSelect<TValue, TKey extends string = string> extends InputBase<TValue, TKey> {
+  override controlType = InputType.SELECT;
 
-  constructor(options: {
-    controlKey: string;
-    value?: string[];
-    options?: K[];
-    optionsAsync: Observable<K[]>;
+  constructor(config: {
+    controlKey: TKey;
+    value?: TValue;
+    options?: OptionInfo<TValue>[];
+    optionsAsync?: Observable<OptionInfo<TValue>[]>;
     label?: string;
     required?: boolean;
     hint?: string;
     validators?: ValidatorFn[];
     validationErrorOptions?: ValidationErrorOptions;
   }) {
-    super(options);
+    super(config);
 
     if (!this.hasSyncOptions() && !this.hasAsyncOptions()) {
-      throw new Error('The "options" or "optionsAsync" property is required for InputChips.');
+      throw new Error('The "options" or "optionsAsync" property is required for InputSelect.');
     }
 
     if (this.hasSyncOptions() && this.hasAsyncOptions()) {
       throw new Error('Cannot provide both "options" and "optionsAsync".');
     }
-
-    this.value = options.value || [];
   }
 }

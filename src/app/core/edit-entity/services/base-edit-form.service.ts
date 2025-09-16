@@ -1,24 +1,9 @@
 import { inject, Injectable, inputBinding } from '@angular/core';
 import { EMPTY, filter, map, merge, Observable, of, race, switchMap, take, tap } from 'rxjs';
 import { EDIT_MESSAGES } from '@shared/constants';
-import { BaseForm, InputBase } from '@shared/form';
+import { BaseForm, FormInputsArray, InputBase } from '@shared/form';
 import { FormDialogReference, ModalService } from '@shared/modal';
-
-interface FormSubmissionConfig<TFormValue> {
-  initDataId?: string | ((data: TFormValue) => string);
-  submitHandler: (formValue: TFormValue) => void;
-  successObservable?: Observable<void>;
-  errorObservable?: Observable<string | null>;
-}
-
-interface FormCancellationConfig {
-  cancelHandler?: () => void;
-}
-
-interface FormModalConfig<TFormValue> extends FormSubmissionConfig<TFormValue>, FormCancellationConfig {
-  title: string;
-  controlsInfo: InputBase<TFormValue[keyof TFormValue]>[];
-}
+import { FormCancellationConfig, FormModalConfig, FormSubmissionConfig } from '../models/form-modal-config';
 
 @Injectable({
   providedIn: 'root',
@@ -29,7 +14,7 @@ export abstract class BaseEditFormService<TFormValue> {
   abstract addNew(...arguments_: unknown[]): Observable<void>;
   abstract edit(entityInfo: TFormValue): Observable<void>;
 
-  protected abstract createInputsData(entityInfo?: TFormValue): InputBase<TFormValue[keyof TFormValue]>[];
+  protected abstract createInputsData(entityInfo?: TFormValue): FormInputsArray<TFormValue>;
 
   protected handleFormModal({
     title,
@@ -128,11 +113,19 @@ export abstract class BaseEditFormService<TFormValue> {
     });
   }
 
-  #addIdToFormValue(formData: TFormValue, initDataId?: string | ((data: TFormValue) => string)): TFormValue {
-    if (initDataId && formData && typeof formData === 'object' && !('id' in formData)) {
+  #addIdToFormValue(
+    formData: TFormValue,
+    initDataId?: string | ((data: TFormValue) => string)
+  ): TFormValue & { id: string } {
+    if (!formData || typeof formData !== 'object') {
+      throw new Error('Form data is invalid or not an object');
+    } else if ('id' in formData && formData.id) {
+      return formData as TFormValue & { id: string };
+    } else if (initDataId) {
       const id = typeof initDataId === 'function' ? initDataId(formData) : initDataId;
       return { ...formData, id };
+    } else {
+      throw new Error('ID is missing in form data and no initDataId provided');
     }
-    return formData;
   }
 }
