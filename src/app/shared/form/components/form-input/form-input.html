@@ -1,0 +1,88 @@
+<mat-form-field class="input">
+  <mat-label>{{ inputData().label }}</mat-label>
+
+  @if (inputData().controlType === inputType.SELECT && allOptions().length) {
+    <mat-select [formControlName]="inputData().controlKey">
+      @for (option of allOptions(); track option) {
+        <mat-option [value]="option.id">{{ option.label }}</mat-option>
+      }
+    </mat-select>
+  } @else if (inputData().controlType === inputType.CHIPS && allOptions().length) {
+    <mat-chip-grid #chipGrid [formControlName]="inputData().controlKey">
+      @for (itemId of selectedItemIds(); track $index) {
+        @let selectedOptionItem = getOptionItem(itemId);
+        <mat-chip-row [value]="itemId" (removed)="removeChip($index, selectedOptionItem)">
+          <ng-container *ngTemplateOutlet="optionTemplate; context: { $implicit: selectedOptionItem }"></ng-container>
+          <button matChipRemove [attr.aria-label]="'remove item'">
+            <mat-icon>cancel</mat-icon>
+          </button>
+        </mat-chip-row>
+      }
+    </mat-chip-grid>
+    <div class="input-wrapper">
+      <input
+        #optionInput
+        placeholder="Search"
+        [(ngModel)]="currentSearch"
+        [ngModelOptions]="{ standalone: true }"
+        [matChipInputFor]="chipGrid"
+        [matAutocomplete]="auto"
+        (matChipInputTokenEnd)="addChip($event)"
+      />
+      @if (isLoadingOptions()) {
+        <app-spinner [small]="true"></app-spinner>
+      }
+    </div>
+
+    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectedChip($event); optionInput.value = ''">
+      @for (option of filteredOptions(); track option) {
+        <mat-option [value]="option.id">
+          <ng-container *ngTemplateOutlet="optionTemplate; context: { $implicit: option }"></ng-container>
+        </mat-option>
+      }
+    </mat-autocomplete>
+  } @else {
+    <input
+      matInput
+      [formControlName]="inputData().controlKey"
+      [required]="inputData().required"
+      [type]="currentElementType()"
+      autocomplete="on"
+    />
+  }
+
+  @switch (inputData().controlType) {
+    @case (inputType.PASSWORD) {
+      <button
+        matSuffix
+        matIconButton
+        [title]="currentPasswordState()?.title"
+        (click)="togglePasswordVisibility($event)"
+      >
+        <mat-icon>{{ currentPasswordState()?.icon }}</mat-icon>
+      </button>
+    }
+
+    @case (inputType.ICON) {
+      <mat-icon matSuffix>{{ formControl?.value }}</mat-icon>
+    }
+  }
+
+  @if (inputData().hint) {
+    <mat-hint [innerHTML]="inputData().hint | safeHtml"></mat-hint>
+  }
+
+  @if (formControl?.touched && formControl?.invalid) {
+    <mat-error>{{ errorMessage() }}</mat-error>
+  }
+</mat-form-field>
+
+<ng-template #optionTemplate let-option>
+  <div class="option">
+    @let icon = option.icon;
+    @if (icon) {
+      <mat-icon>{{ icon }}</mat-icon>
+    }
+    {{ option.label }}
+  </div>
+</ng-template>

@@ -2,9 +2,10 @@
 
 $icon-size: 24px;
 $icon-margin: 16px;
+$font-size: 1rem;
+$default-color: var(--mat-sys-on-surface-variant);
 
 .nav-button {
-  font-size: medium;
   justify-content: flex-start;
   width: 100%;
 }
@@ -21,7 +22,8 @@ $icon-margin: 16px;
       text-with-icon-horizontal-padding: 0,
       text-icon-offset: $icon-margin,
       text-icon-spacing: $icon-margin,
-      // text-label-text-color: #e23535,
+      text-label-text-color: $default-color,
+      text-label-text-size: $font-size,
     )
   );
 }

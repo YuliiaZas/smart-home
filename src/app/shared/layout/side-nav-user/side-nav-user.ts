@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { UserProfileInfo } from '@shared/auth';
+import { UserProfileInfo } from '@core/auth';
 
 @Component({
   selector: 'app-side-nav-user',

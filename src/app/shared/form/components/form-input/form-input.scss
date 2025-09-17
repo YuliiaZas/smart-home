@@ -1,0 +1,16 @@
+$input-width: 280px;
+
+.input-wrapper {
+  position: relative;
+}
+
+.input {
+  min-width: $input-width;
+  width: 100%;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

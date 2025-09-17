@@ -1,3 +1,18 @@
+$position-size: 2rem;
+
 :host {
   display: block;
+  position: relative;
+  min-height: 100%;
+}
+
+.card-list-empty {
+  position: absolute;
+  inset: 0;
+}
+
+.add-card-button {
+  position: fixed;
+  bottom: $position-size;
+  right: $position-size;
 }

@@ -1,9 +1,14 @@
-@if (isLoading$ | async) {
+@if (isLoading()) {
   <app-spinner></app-spinner>
 }
 
-@if (showSideNav$ | async) {
-  <app-side-nav [navItems]="(dashboards$ | async) || []" [user]="currentUser$ | async" (logout)="logout()">
+@if (showSideNav()) {
+  <app-side-nav
+    [navItems]="dashboards() || []"
+    [user]="currentUser()"
+    (addDashboard)="addDashboard()"
+    (logout)="logout()"
+  >
     <main class="main">
       <router-outlet />
     </main>

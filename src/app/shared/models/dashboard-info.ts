@@ -1,5 +1,5 @@
-export interface DashboardInfo {
-  id: string;
-  title: string;
+import { EntityInfo } from './entity-info';
+
+export interface DashboardInfo extends EntityInfo {
   icon: string;
 }

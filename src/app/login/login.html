@@ -1,43 +1,48 @@
-@if (isLoading$ | async) {
+@if (isLoading()) {
   <app-spinner></app-spinner>
 }
 
 <div class="container">
-  <h1 class="title">Welcome home!</h1>
-  <form [formGroup]="loginForm" class="form" (focusin)="formFocus()">
-    <mat-form-field appearance="fill" class="input">
-      <mat-label>Username</mat-label>
-      <input matInput [formControl]="username" required autocomplete="on" />
-      @if (username.touched && username.invalid) {
-        <mat-error>{{ getErrorMessage(username) }}</mat-error>
-      }
-    </mat-form-field>
+  <div class="container-info">
+    <div class="container-move">
+      <div class="move login">
+        <p class="info-title">Don't have an account?</p>
+        <button matButton (click)="setIsSignup(true)">Sign up</button>
+      </div>
+      <div class="move signup">
+        <p class="info-title">Already have an account?</p>
+        <button matButton (click)="setIsSignup(false)">Log in</button>
+      </div>
+    </div>
+  </div>
 
-    <mat-form-field appearance="fill" class="input">
-      <mat-label>Password</mat-label>
-      <input
-        matInput
-        formControlName="password"
-        [type]="hidePassword() ? 'password' : 'text'"
-        required
-        autocomplete="on"
-      />
-      <button
-        matIconButton
-        matSuffix
-        [attr.aria-label]="'Hide password'"
-        [attr.aria-pressed]="hidePassword()"
-        (click)="togglePasswordVisibility($event)"
-      >
-        <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
-      </button>
-      @if (password.touched && password.invalid) {
-        <mat-error>{{ getErrorMessage(password) }}</mat-error>
-      }
-    </mat-form-field>
+  <div class="container-main">
+    <h1 class="title">Welcome home!</h1>
 
-    <mat-error>{{ errorMessage() }}</mat-error>
+    <div class="container-move">
+      <app-base-form
+        class="move login"
+        [controlsInfo]="loginControlsInfo"
+        [showError]="true"
+        [errorMessage]="loginErrorMessage()"
+        [submitButtonText]="'Log in'"
+        [disableSubmitWhileInvalid]="true"
+        [globalControlsErrors]="loginGlobalControlsErrors()"
+        (formFocus)="formFocus()"
+        (formSubmit)="login($event)"
+      ></app-base-form>
 
-    <button class="button" matButton="filled" [disabled]="loginForm.invalid" (click)="login()">Log in</button>
-  </form>
+      <app-base-form
+        class="move signup"
+        [controlsInfo]="signupControlsInfo"
+        [showError]="true"
+        [errorMessage]="signupErrorMessage()"
+        [submitButtonText]="'Sign up'"
+        [disableSubmitWhileInvalid]="true"
+        [globalControlsErrors]="signupGlobalControlsErrors()"
+        (formFocus)="formFocus()"
+        (formSubmit)="signup($event)"
+      ></app-base-form>
+    </div>
+  </div>
 </div>

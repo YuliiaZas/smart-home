@@ -1,4 +1,5 @@
 @use 'item-with-icon';
+@use 'mover-surround';
 
 .d-flex {
   display: flex;
@@ -40,4 +41,12 @@
 
 .body-3 {
   font-size: 1.5rem;
+}
+
+.danger:not(:disabled) {
+  color: #c64148 !important;
+}
+
+.warning:not(:disabled) {
+  color: #e2b134 !important;
 }

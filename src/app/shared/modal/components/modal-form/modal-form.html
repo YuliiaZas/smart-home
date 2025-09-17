@@ -1,0 +1,24 @@
+@if (isLoading()) {
+  <app-spinner></app-spinner>
+}
+
+<h2 mat-dialog-title>{{ data.title }}</h2>
+
+<mat-dialog-content class="content">
+  <ng-template #dynamicContent></ng-template>
+
+  @if (errorMessage()) {
+    <mat-error>{{ errorMessage() }}</mat-error>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  @if (data.cancelButtonText) {
+    <button matButton id="cancel" [mat-dialog-close]="false" [disabled]="isLoading()">
+      {{ data.cancelButtonText }}
+    </button>
+  }
+  <button matButton id="confirm" type="submit" [disabled]="isLoading()" (click)="handleModalConfirm()">
+    {{ data.confirmButtonText }}
+  </button>
+</mat-dialog-actions>

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
 @Component({
   selector: 'app-spinner',
@@ -6,5 +6,10 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
   templateUrl: './spinner.html',
   styleUrl: './spinner.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '[class.app-spinner--small]': 'small()',
+  },
 })
-export class Spinner {}
+export class Spinner {
+  small = input<boolean>(false);
+}

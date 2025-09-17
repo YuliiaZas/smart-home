@@ -1,10 +1,19 @@
-<app-card-list
-  [sorting]="sorting()"
-  [sortingId]="sortingId()"
-  [cardTemplateRef]="cardTemplateRef"
-  (sortUpdated)="sortUpdated($event)"
-></app-card-list>
+@if (cardIds().length) {
+  <app-card-list [cardIds]="cardIds()" [cardTemplateRef]="cardTemplateRef"></app-card-list>
 
-<ng-template #cardTemplateRef let-cardId="cardId">
-  <app-home-card [cardData]="cards()[cardId]" (updateCardData)="updateCardData($event)"></app-home-card>
-</ng-template>
+  <ng-template #cardTemplateRef let-cardId="cardId">
+    @let cardData = cardsEntities()[cardId];
+    @if (cardData) {
+      <app-home-card [cardData]="cardData" [sortedIds]="cardIds()"></app-home-card>
+    }
+  </ng-template>
+} @else {
+  <app-home-empty class="card-list-empty" [entity]="cardEntity"></app-home-empty>
+}
+
+@if (isEditMode()) {
+  <button class="add-card-button" matButton="filled" (click)="addCard()">
+    <mat-icon class="nav-button-icon" fontIcon="add"></mat-icon>
+    <span>Add Card</span>
+  </button>
+}

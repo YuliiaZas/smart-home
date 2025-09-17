@@ -1,17 +1,93 @@
-<nav mat-tab-nav-bar [tabPanel]="tabPanel">
-  @for (tab of tabs(); track tab) {
-    <a
-      mat-tab-link
-      #linkActive="routerLinkActive"
-      [routerLink]="tab.link"
-      routerLinkActive
-      [routerLinkActiveOptions]="{ exact: false }"
-      [active]="linkActive.isActive"
-    >
-      {{ tab.title }}
-    </a>
+@if (isDashboardSaving()) {
+  <app-spinner></app-spinner>
+}
+
+@let editMode = isEditMode();
+@let dashboard = currentDashboardInfo();
+
+<div class="tabs-container" [class.tabs-container--edit-mode]="editMode">
+  @if (editMode && dashboard) {
+    <div class="dashboard-edit-box">
+      <div class="dashboard-info">
+        <mat-icon>{{ dashboard.icon }}</mat-icon>
+        <span>{{ dashboard.title }}</span>
+        <app-edit-action-buttons
+          [entity]="dashboardEntity"
+          [entityName]="dashboard.title"
+          [renameMode]="true"
+          [showDeleteButton]="false"
+          [editClass]="'warning'"
+          (editEvent)="renameCurrentDashboard()"
+        ></app-edit-action-buttons>
+      </div>
+      <div class="dashboard-actions dashboard-actions--save">
+        <button matButton="outlined" (click)="discardChanges()">{{ editMessages.discardButton }}</button>
+        <button matButton="outlined" (click)="saveChanges()">{{ editMessages.saveButton }}</button>
+      </div>
+    </div>
   }
-</nav>
+
+  <div class="nav-container">
+    <nav mat-tab-nav-bar [tabPanel]="tabPanel">
+      @let dashboardTabsIds = tabsIds();
+      <!-- workaround "@for(ID of IDs; track ID)" https://github.com/angular/angular/issues/56471 -->
+      @for (tabId of dashboardTabsIds; track tabId) {
+        @let tab = tabsEntities()[tabId];
+        @if (tab) {
+          <a
+            mat-tab-link
+            #linkActive="routerLinkActive"
+            [routerLink]="tab.id"
+            routerLinkActive
+            [active]="linkActive.isActive"
+            class="tab-container"
+            appMoverSurround
+          >
+            <span #surroundContent>
+              {{ tab.title }}
+            </span>
+            @if (editMode && linkActive.isActive) {
+              <app-edit-action-buttons
+                [entity]="tabEntity"
+                [entityName]="tab.title"
+                [renameMode]="true"
+                [editClass]="'warning'"
+                (editEvent)="renameCurrentTab()"
+                (deleteEvent)="deleteCurrentTab()"
+              ></app-edit-action-buttons>
+              <app-mover
+                class="mover"
+                [sortedIds]="dashboardTabsIds"
+                [currentId]="tab.id"
+                [showNumberSelector]="false"
+                [buttonsStyle]="moverButtonStyles"
+                [iconClass]="'warning'"
+                (setSorting)="setTabSorting($event)"
+              ></app-mover>
+            }
+          </a>
+        }
+      }
+      @if (editMode) {
+        <div mat-tab-link class="tabs-actions">
+          <button matIconButton (click)="addTab()" [title]="addTabButtonLabel"><mat-icon>add</mat-icon></button>
+        </div>
+      }
+
+      @if (!editMode && dashboard) {
+        <div mat-tab-link class="dashboard-actions dashboard-actions--edit">
+          <app-edit-action-buttons
+            [entity]="dashboardEntity"
+            [entityName]="dashboard.title"
+            (editEvent)="enterEditMode()"
+            (deleteEvent)="deleteCurrentDashboard()"
+          ></app-edit-action-buttons>
+        </div>
+      }
+    </nav>
+  </div>
+</div>
+
 <mat-tab-nav-panel #tabPanel class="tab-content">
   <router-outlet></router-outlet>
 </mat-tab-nav-panel>

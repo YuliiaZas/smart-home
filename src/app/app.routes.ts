@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuard, loginGuard } from '@shared/auth';
+import { authGuard, loginGuard } from '@core/auth';
 import { ROUTING_PATHS } from '@shared/constants';
 import {
   areDashboardsEmptyGuard,
@@ -8,28 +8,33 @@ import {
   userDashboardsGuard,
   isDashboardValidGuard,
   isTabValidGuard,
-} from '@shared/dashboards/guards';
+  unsavedChangesGuard,
+} from '@core/dashboards/guards';
+import { Entity } from '@shared/models';
 
 export const routes: Routes = [
   { path: ROUTING_PATHS.HOME, redirectTo: ROUTING_PATHS.DASHBOARD, pathMatch: 'full' },
   {
     path: ROUTING_PATHS.DASHBOARD,
     canActivate: [authGuard, userDashboardsGuard],
-    loadComponent: () => import('./home-redirect/home-redirect').then((m) => m.HomeRedirect),
+    loadComponent: () => import('./redirect/redirect').then((m) => m.Redirect),
     children: [
       {
         path: '',
         canActivate: [areDashboardsEmptyGuard],
+        data: { entity: Entity.DASHBOARD },
         loadComponent: () => import('./home-empty/home-empty').then((m) => m.HomeEmpty),
       },
       {
         path: ':dashboardId',
         canActivate: [isDashboardValidGuard, currentDashboardGuard],
+        canDeactivate: [unsavedChangesGuard],
         loadComponent: () => import('./home/home').then((m) => m.Home),
         children: [
           {
             path: '',
             canActivate: [areTabsEmptyGuard],
+            data: { entity: Entity.TAB },
             loadComponent: () => import('./home-empty/home-empty').then((m) => m.HomeEmpty),
           },
           {

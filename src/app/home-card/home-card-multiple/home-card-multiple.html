@@ -1,40 +1,39 @@
-<app-card [headerClass]="headerClass">
-  <ng-container cardTitle>
-    {{ cardData().title }}
-  </ng-container>
+<ng-template #cardTitleTemplate>
+  {{ cardData().title }}
+</ng-template>
 
-  <ng-container cardAction>
-    @if (showAllDevicesState()) {
-      <mat-slide-toggle
-        [checked]="allDevicesState()"
-        [hideIcon]="true"
-        aria-label="Toggle all devices state"
-        (change)="changeAllDevicesState()"
-      ></mat-slide-toggle>
-    }
-  </ng-container>
+<ng-template #cardActionTemplate>
+  @if (showAllDevicesState()) {
+    <mat-slide-toggle
+      [checked]="allDevicesState()"
+      [hideIcon]="true"
+      aria-label="Toggle all devices state"
+      (change)="changeAllDevicesState()"
+    ></mat-slide-toggle>
+  }
+</ng-template>
 
-  <ng-container cardContent>
-    <ul class="card-content" [class.card-content-vertical]="isContentVertical()">
-      @for (item of cardData().items; track $index) {
-        <li class="card-row">
-          @switch (item.type) {
-            @case ('sensor') {
-              <app-sensor class="card-item" [sensorData]="item" [iconPosition]="iconPosition()">
-                <span class="capitalize">{{ item.value | appUnits: item.icon : sensorTypesWithHiddenAmount }}</span>
-              </app-sensor>
-            }
-            @case ('device') {
-              <app-device
-                class="card-item"
-                [deviceData]="item"
-                [iconPosition]="iconPosition()"
-                (changeState)="changeDeviceState(item)"
-              ></app-device>
-            }
+<ul class="card-content" [class.card-content-vertical]="isContentVertical()">
+  @for (itemId of cardData().itemIds; track $index) {
+    @let item = homeItemsEntities()[itemId];
+    @if (item) {
+      <li class="card-row">
+        @switch (item.type) {
+          @case ('sensor') {
+            <app-sensor class="card-item" [sensorData]="item" [iconPosition]="iconPosition()">
+              <span class="capitalize">{{ item.value | appUnits }}</span>
+            </app-sensor>
           }
-        </li>
-      }
-    </ul>
-  </ng-container>
-</app-card>
+          @case ('device') {
+            <app-device
+              class="card-item"
+              [deviceData]="item"
+              [iconPosition]="iconPosition()"
+              (changeState)="changeDeviceState(item)"
+            ></app-device>
+          }
+        }
+      </li>
+    }
+  }
+</ul>
