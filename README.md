@@ -1,6 +1,6 @@
-# Smart Home Dashboards
+# Smart Home
 
-Deployment: https://moonlit-frangipane-00916c.netlify.app/
+Deployment: https://yuliiazas-smart-home.netlify.app
 
 This application allows authorized users to manage dashboards with smart home devices. Users can create dashboards, add tabs in there, and add devices to cards inside tabs.
 
